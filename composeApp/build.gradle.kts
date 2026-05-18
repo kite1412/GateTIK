@@ -24,6 +24,8 @@ kotlin {
             isStatic = true
         }
     }
+
+    jvm()
     
     sourceSets {
         androidMain.dependencies {
@@ -42,6 +44,10 @@ kotlin {
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)
+        }
+        jvmMain.dependencies {
+            implementation(compose.desktop.currentOs)
+            implementation(libs.kotlinx.coroutinesSwing)
         }
     }
 }
@@ -77,3 +83,14 @@ dependencies {
     debugImplementation(libs.compose.uiTooling)
 }
 
+compose.desktop {
+    application {
+        mainClass = "kite1412.parking.gatecontrol.MainKt"
+
+        nativeDistributions {
+            targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
+            packageName = "kite1412.parking.gatecontrol"
+            packageVersion = "1.0.0"
+        }
+    }
+}

@@ -21,7 +21,7 @@ import parkinggatecontrol.composeapp.generated.resources.compose_multiplatform
 
 @Composable
 @Preview
-fun App() {
+fun ParkingGateControlApp() {
     MaterialTheme {
         var showContent by remember { mutableStateOf(false) }
         Column(
