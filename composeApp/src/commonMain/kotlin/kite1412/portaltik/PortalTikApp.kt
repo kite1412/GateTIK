@@ -10,19 +10,23 @@ import androidx.compose.foundation.layout.safeContentPadding
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import kite1412.portaltik.designsystem.theme.PortalTikTheme
 import org.jetbrains.compose.resources.painterResource
-
 import portaltik.composeapp.generated.resources.Res
 import portaltik.composeapp.generated.resources.compose_multiplatform
 
 @Composable
 @Preview
 fun PortalTikApp() {
-    MaterialTheme {
+    PortalTikTheme {
         var showContent by remember { mutableStateOf(false) }
         Column(
             modifier = Modifier
