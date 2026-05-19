@@ -1,4 +1,4 @@
-package kite1412.parking.gatecontrol
+package kite1412.portaltik
 
 import platform.UIKit.UIDevice
 

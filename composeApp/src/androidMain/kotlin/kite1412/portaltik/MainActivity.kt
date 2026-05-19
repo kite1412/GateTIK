@@ -1,4 +1,4 @@
-package kite1412.parking.gatecontrol
+package kite1412.portaltik
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -6,6 +6,7 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
+import kite1412.portaltik.PortalTikApp
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -13,13 +14,13 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         setContent {
-            ParkingGateControlApp()
+            PortalTikApp()
         }
     }
 }
 
 @Preview
 @Composable
-fun ParkingGateControlAppAndroidPreview() {
-    ParkingGateControlApp()
+fun PortalTikAppPreview() {
+    PortalTikApp()
 }

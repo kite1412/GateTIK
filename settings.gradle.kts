@@ -1,4 +1,4 @@
-rootProject.name = "ParkingGateControl"
+rootProject.name = "PortalTIK"
 enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
 
 pluginManagement {

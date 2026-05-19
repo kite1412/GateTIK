@@ -1,4 +1,4 @@
-package kite1412.parking.gatecontrol
+package kite1412.portaltik
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.Image
@@ -16,12 +16,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import org.jetbrains.compose.resources.painterResource
 
-import parkinggatecontrol.composeapp.generated.resources.Res
-import parkinggatecontrol.composeapp.generated.resources.compose_multiplatform
+import portaltik.composeapp.generated.resources.Res
+import portaltik.composeapp.generated.resources.compose_multiplatform
 
 @Composable
 @Preview
-fun ParkingGateControlApp() {
+fun PortalTikApp() {
     MaterialTheme {
         var showContent by remember { mutableStateOf(false) }
         Column(

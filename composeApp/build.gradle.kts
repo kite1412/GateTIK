@@ -53,11 +53,11 @@ kotlin {
 }
 
 android {
-    namespace = "kite1412.parking.gatecontrol"
+    namespace = "kite1412.portaltik"
     compileSdk = libs.versions.android.compileSdk.get().toInt()
 
     defaultConfig {
-        applicationId = "kite1412.parking.gatecontrol"
+        applicationId = "kite1412.portaltik"
         minSdk = libs.versions.android.minSdk.get().toInt()
         targetSdk = libs.versions.android.targetSdk.get().toInt()
         versionCode = 1
@@ -85,11 +85,11 @@ dependencies {
 
 compose.desktop {
     application {
-        mainClass = "kite1412.parking.gatecontrol.MainKt"
+        mainClass = "kite1412.portaltik.MainKt"
 
         nativeDistributions {
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
-            packageName = "kite1412.parking.gatecontrol"
+            packageName = "kite1412.portaltik"
             packageVersion = "1.0.0"
         }
     }

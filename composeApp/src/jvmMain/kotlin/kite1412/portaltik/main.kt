@@ -1,4 +1,4 @@
-package kite1412.parking.gatecontrol
+package kite1412.portaltik
 
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
@@ -11,7 +11,7 @@ fun main() {
             },
             title = "Parking Gate Control"
         ) {
-            ParkingGateControlApp()
+            PortalTikApp()
         }
     }
 }
