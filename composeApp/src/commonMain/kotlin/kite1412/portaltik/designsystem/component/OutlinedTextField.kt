@@ -46,11 +46,13 @@ fun OutlinedTextField(
     modifier: Modifier = Modifier,
     placeholder: String? = null,
     label: AnnotatedString? = null,
+    singleLine: Boolean = false,
     visualTransformation: VisualTransformation = VisualTransformation.None,
     keyboardType: KeyboardType = KeyboardType.Text,
     imeAction: ImeAction = ImeAction.Unspecified,
     keyboardActions: KeyboardActions = KeyboardActions.Default,
-    leading: (@Composable () -> Unit)? = null
+    leading: (@Composable () -> Unit)? = null,
+    actions: (@Composable () -> Unit)? = null
 ) {
     val isDarkMode = isSystemInDarkTheme()
     val shape = RoundedCornerShape(16.dp)
@@ -81,19 +83,27 @@ fun OutlinedTextField(
                 )
                 .padding(16.dp),
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(16.dp)
+            horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            leading?.invoke()
-            BasicTextField(
-                value = value,
-                onValueChange = onValueChange,
-                modifier = Modifier.fillMaxWidth(),
-                placeholder = placeholder,
-                visualTransformation = visualTransformation,
-                keyboardType = keyboardType,
-                imeAction = imeAction,
-                keyboardActions = keyboardActions,
-            )
+            Row(
+                modifier = Modifier.weight(1f),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
+                leading?.invoke()
+                BasicTextField(
+                    value = value,
+                    onValueChange = onValueChange,
+                    modifier = Modifier.fillMaxWidth(),
+                    placeholder = placeholder,
+                    singleLine = singleLine,
+                    visualTransformation = visualTransformation,
+                    keyboardType = keyboardType,
+                    imeAction = imeAction,
+                    keyboardActions = keyboardActions,
+                )
+            }
+            actions?.invoke()
         }
     }
 }

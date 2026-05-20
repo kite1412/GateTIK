@@ -6,6 +6,7 @@ plugins {
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.composeMultiplatform)
     alias(libs.plugins.composeCompiler)
+    kotlin("plugin.serialization")
 }
 
 kotlin {
@@ -46,6 +47,7 @@ kotlin {
             implementation(libs.androidx.lifecycle.runtimeCompose)
 
             // Added
+            implementation(libs.compose.navigation)
             implementation(project.dependencies.platform(libs.koin.bom))
             implementation(libs.koin.core)
             implementation(libs.koin.viewModel)
