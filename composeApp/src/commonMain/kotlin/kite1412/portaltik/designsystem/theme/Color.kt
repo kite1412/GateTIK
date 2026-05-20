@@ -68,3 +68,4 @@ val Slate950_100 = Color(0xFF0F1419)
 val Gray200 = Color(0xFFE4E6EB)
 
 val BluePurpleLinearGradient = listOf(Blue500Alt, Indigo600)
+val BlueSlateLinearGradient = listOf(Blue950, Slate950)
