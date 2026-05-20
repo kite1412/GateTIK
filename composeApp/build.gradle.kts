@@ -103,6 +103,16 @@ compose.desktop {
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
             packageName = "kite1412.portaltik"
             packageVersion = "1.0.0"
+
+            macOS {
+                iconFile.set(project.file("resource/desktop_icon.icns"))
+            }
+            windows {
+                iconFile.set(project.file("resource/desktop_icon.ico"))
+            }
+            linux {
+                iconFile.set(project.file("resource/desktop_icon.png"))
+            }
         }
     }
 }
