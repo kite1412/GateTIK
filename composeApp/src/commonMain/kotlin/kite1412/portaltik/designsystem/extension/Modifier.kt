@@ -1,10 +1,12 @@
 package kite1412.portaltik.designsystem.extension
 
+import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
@@ -20,18 +22,20 @@ import kite1412.portaltik.ui.compositionlocal.LocalDarkMode
 @Composable
 fun Modifier.radialBackground(): Modifier {
     val isDarkMode = LocalDarkMode.current
+    val color1 by animateColorAsState(if (isDarkMode) Blue500Alt_30 else Blue400_40)
+    val color2 by animateColorAsState(if (isDarkMode) Indigo400_30 else Blue500Alt_30)
 
     return drawBehind {
         drawRect(
             brush = Brush.radialGradient(
-                colors = listOf(if (isDarkMode) Blue500Alt_30 else Blue400_40, Color.Transparent),
+                colors = listOf(color1, Color.Transparent),
                 center = Offset(size.width * 0.1f, size.height * 0.1f),
                 radius = size.width * 0.8f
             )
         )
         drawRect(
             brush = Brush.radialGradient(
-                colors = listOf(if (isDarkMode) Indigo400_30 else Blue500Alt_30, Color.Transparent),
+                colors = listOf(color2, Color.Transparent),
                 center = Offset(size.width * 0.7f, size.height * 0.9f),
                 radius = size.width * 0.9f
             )

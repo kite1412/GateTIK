@@ -4,8 +4,13 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import kite1412.portaltik.datastore.PortalTikDataStore
+import kotlinx.coroutines.launch
 
-class AuthenticationViewModel : ViewModel() {
+class AuthenticationViewModel(
+    private val dataStore: PortalTikDataStore
+) : ViewModel() {
     var email by mutableStateOf("")
         private set
 
@@ -22,5 +27,11 @@ class AuthenticationViewModel : ViewModel() {
 
     fun signIn(email: String, password: String) {
 
+    }
+
+    fun toggleDarkMode(isDarkMode: Boolean) {
+        viewModelScope.launch {
+            dataStore.setDarkMode(!isDarkMode)
+        }
     }
 }

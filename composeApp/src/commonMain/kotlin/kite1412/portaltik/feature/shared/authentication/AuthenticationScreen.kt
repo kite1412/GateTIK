@@ -1,7 +1,10 @@
 package kite1412.portaltik.feature.shared.authentication
 
+import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -11,9 +14,11 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.ripple
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -39,6 +44,7 @@ import kite1412.portaltik.designsystem.component.GradientTextButton
 import kite1412.portaltik.designsystem.component.Icon
 import kite1412.portaltik.designsystem.component.OutlinedTextField
 import kite1412.portaltik.designsystem.extension.radialBackground
+import kite1412.portaltik.designsystem.theme.Blue200_60
 import kite1412.portaltik.designsystem.theme.Blue300
 import kite1412.portaltik.designsystem.theme.Blue500
 import kite1412.portaltik.designsystem.theme.BlueSlateGradient
@@ -47,6 +53,8 @@ import kite1412.portaltik.designsystem.theme.PortalTikTheme
 import kite1412.portaltik.designsystem.theme.RoyalBlue800_50
 import kite1412.portaltik.designsystem.theme.RoyalBlue800_60
 import kite1412.portaltik.designsystem.theme.White
+import kite1412.portaltik.designsystem.theme.White10
+import kite1412.portaltik.designsystem.theme.White15
 import kite1412.portaltik.designsystem.theme.White50
 import kite1412.portaltik.designsystem.theme.White60
 import kite1412.portaltik.designsystem.util.PortalTikIcons
@@ -57,19 +65,23 @@ import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
 fun AuthenticationScreen(
+    contentPadding: PaddingValues,
     modifier: Modifier = Modifier,
     viewModel: AuthenticationViewModel = koinViewModel()
 ) {
     val email = viewModel.email
     val password = viewModel.password
+    val isDarkMode = LocalDarkMode.current
 
     AuthenticationScreen(
         email = email,
         password = password,
+        contentPadding = contentPadding,
         onEmailChange = viewModel::onEmailChange,
         onPasswordChange = viewModel::onPasswordChange,
         onSignIn = viewModel::signIn,
         onRegisterClick = {},
+        onToggleDarkMode = { viewModel.toggleDarkMode(isDarkMode) },
         modifier = modifier
     )
 }
@@ -78,34 +90,43 @@ fun AuthenticationScreen(
 private fun AuthenticationScreen(
     email: String,
     password: String,
+    contentPadding: PaddingValues,
     onEmailChange: (String) -> Unit,
     onPasswordChange: (String) -> Unit,
     onSignIn: (email: String, password: String) -> Unit,
     onRegisterClick: () -> Unit,
+    onToggleDarkMode: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val isDarkMode = LocalDarkMode.current
-    val backgroundBrush = Brush.verticalGradient(
-        if (isDarkMode) BlueSlateGradient else LighterBlueLightBlueGradient
-    )
+    val gradientColor1 by animateColorAsState(if (isDarkMode) BlueSlateGradient[0] else LighterBlueLightBlueGradient[0])
+    val gradientColor2 by animateColorAsState(if (isDarkMode) BlueSlateGradient[1] else LighterBlueLightBlueGradient[1])
+    val backgroundBrush = Brush.verticalGradient(listOf(gradientColor1, gradientColor2))
 
     Box(
         modifier = modifier
             .fillMaxSize()
             .background(backgroundBrush)
-            .radialBackground(),
+            .radialBackground()
+            .padding(contentPadding),
         contentAlignment = Alignment.Center
     ) {
+        val toggleBorderColor by animateColorAsState(if (isDarkMode) White15 else Blue200_60)
+        val toggleBackgroundColor by animateColorAsState(if (isDarkMode) White10 else White)
+        val toggleIconColor by animateColorAsState(if (isDarkMode) White else Blue500)
+
         GlassBox(
             modifier = Modifier
                 .widthIn(max = 500.dp)
-                .fillMaxWidth()
-                .padding(horizontal = 24.dp),
+                .fillMaxWidth(),
             contentPadding = PaddingValues(
                 horizontal = 24.dp,
                 vertical = 32.dp
             )
         ) {
+            val titleColor by animateColorAsState(if (isDarkMode) White else MaterialTheme.colorScheme.onSurface)
+            val subtitleColor by animateColorAsState(if (isDarkMode) White60 else RoyalBlue800_60)
+
             Column(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalAlignment = Alignment.CenterHorizontally,
@@ -123,18 +144,18 @@ private fun AuthenticationScreen(
                     Text(
                         text = "Portal TIK",
                         style = MaterialTheme.typography.titleMedium,
-                        color = if (isDarkMode) White else MaterialTheme.colorScheme.onSurface
+                        color = titleColor
                     )
                     Text(
                         text = "Sistem Smart Gate TIK UNILA",
                         style = MaterialTheme.typography.bodyMedium,
-                        color = if (isDarkMode) White60 else RoyalBlue800_60
+                        color = subtitleColor
                     )
                 }
                 Column(
                     verticalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
-                    val iconColor = if (isDarkMode) White50 else RoyalBlue800_50
+                    val iconColor by animateColorAsState(if (isDarkMode) White50 else RoyalBlue800_50)
                     var showPassword by retain { mutableStateOf(false) }
 
                     OutlinedTextField(
@@ -196,11 +217,14 @@ private fun AuthenticationScreen(
                     },
                     modifier = Modifier.fillMaxWidth()
                 )
+                val secondaryTextColor by animateColorAsState(if (isDarkMode) White50 else MaterialTheme.colorScheme.onSurfaceVariant)
+                val linkColor by animateColorAsState(if (!isDarkMode) Blue500 else Blue300)
+
                 Text(
                     text = buildAnnotatedString {
                         withStyle(
                             style = SpanStyle(
-                                color = if (isDarkMode) White50 else MaterialTheme.colorScheme.onSurfaceVariant
+                                color = secondaryTextColor
                             )
                         ) {
                             append("Belum punya akun? ")
@@ -213,7 +237,7 @@ private fun AuthenticationScreen(
                         ) {
                             withStyle(
                                 style = SpanStyle(
-                                    color = if (!isDarkMode) Blue500 else Blue300,
+                                    color = linkColor,
                                     fontWeight = FontWeight.Bold
                                 )
                             ) {
@@ -225,6 +249,34 @@ private fun AuthenticationScreen(
                     textAlign = TextAlign.Center
                 )
             }
+        }
+        Box(
+            modifier = Modifier
+                .align(Alignment.TopEnd)
+                .padding(top = 16.dp)
+                .size(44.dp)
+                .border(
+                    width = 1.dp,
+                    color = toggleBorderColor,
+                    shape = CircleShape
+                )
+                .background(
+                    color = toggleBackgroundColor,
+                    shape = CircleShape
+                )
+                .clickable(
+                    interactionSource = remember { MutableInteractionSource() },
+                    indication = ripple(bounded = false),
+                    onClick = onToggleDarkMode
+                ),
+            contentAlignment = Alignment.Center
+        ) {
+            Icon(
+                painter = painterResource(if (isDarkMode) PortalTikIcons.sun else PortalTikIcons.moon),
+                contentDescription = "Toggle Theme",
+                tint = toggleIconColor,
+                modifier = Modifier.size(24.dp)
+            )
         }
     }
 }
@@ -240,10 +292,12 @@ private fun AuthenticationScreenPreview() {
             AuthenticationScreen(
                 email = email,
                 password = password,
+                contentPadding = PaddingValues(0.dp),
                 onEmailChange = { email = it },
                 onPasswordChange = { password = it },
                 onSignIn = {_, _ ->},
                 onRegisterClick = {},
+                onToggleDarkMode = {},
                 modifier = Modifier.padding(p)
             )
         }

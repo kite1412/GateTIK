@@ -12,7 +12,7 @@ import org.koin.dsl.module
 
 private val viewModelModule = module {
     viewModel {
-        AuthenticationViewModel()
+        AuthenticationViewModel(dataStore = get())
     }
     viewModel {
         PortalTikViewModel(dataStore = get())

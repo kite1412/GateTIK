@@ -1,5 +1,6 @@
 package kite1412.portaltik.designsystem.component
 
+import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
@@ -8,6 +9,7 @@ import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.text.input.ImeAction
@@ -35,6 +37,7 @@ fun BasicTextField(
     )
     val cursorColor = MaterialTheme.colorScheme.onPrimary
     val isDarkMode = LocalDarkMode.current
+    val placeholderColor by animateColorAsState(if (!isDarkMode) RoyalBlue800_30 else White30)
 
     BasicTextField(
         value = value,
@@ -46,7 +49,7 @@ fun BasicTextField(
         decorationBox = { text ->
             if (placeholder != null && value.isEmpty()) Text(
                 text = placeholder,
-                color = if (!isDarkMode) RoyalBlue800_30 else White30
+                color = placeholderColor
             )
             text()
         },

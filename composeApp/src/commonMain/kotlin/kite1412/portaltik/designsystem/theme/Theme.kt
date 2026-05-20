@@ -1,10 +1,12 @@
 package kite1412.portaltik.designsystem.theme
 
+import androidx.compose.animation.animateColorAsState
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ProvideTextStyle
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import kite1412.portaltik.ui.compositionlocal.LocalDarkMode
 
 private val LightColorScheme = lightColorScheme(
@@ -31,10 +33,28 @@ fun PortalTikTheme(
     darkTheme: Boolean = LocalDarkMode.current,
     content: @Composable () -> Unit
 ) {
-    val colorScheme = when {
+    val targetColorScheme = when {
         darkTheme -> DarkColorScheme
         else -> LightColorScheme
     }
+
+    val primary by animateColorAsState(targetColorScheme.primary)
+    val onPrimary by animateColorAsState(targetColorScheme.onPrimary)
+    val background by animateColorAsState(targetColorScheme.background)
+    val surface by animateColorAsState(targetColorScheme.surface)
+    val onSurface by animateColorAsState(targetColorScheme.onSurface)
+    val onSurfaceVariant by animateColorAsState(targetColorScheme.onSurfaceVariant)
+    val outline by animateColorAsState(targetColorScheme.outline)
+
+    val colorScheme = targetColorScheme.copy(
+        primary = primary,
+        onPrimary = onPrimary,
+        background = background,
+        surface = surface,
+        onSurface = onSurface,
+        onSurfaceVariant = onSurfaceVariant,
+        outline = outline
+    )
 
     MaterialTheme(
         colorScheme = colorScheme,

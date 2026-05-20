@@ -1,5 +1,6 @@
 package kite1412.portaltik.app
 
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -15,6 +16,7 @@ import kite1412.portaltik.model.User
 @Composable
 fun PortalTikNavHost(
     signedInUser: User?,
+    scaffoldPadding: PaddingValues,
     modifier: Modifier = Modifier,
     navController: NavHostController = rememberNavController()
 ) {
@@ -23,7 +25,9 @@ fun PortalTikNavHost(
         startDestination = if (signedInUser != null) HomeRoute else AuthenticationRoute,
         modifier = modifier.fillMaxSize()
     ) {
-        authenticationScreen()
+        authenticationScreen(
+            contentPadding = largeContentPadding(scaffoldPadding)
+        )
         homeScreen()
     }
 }

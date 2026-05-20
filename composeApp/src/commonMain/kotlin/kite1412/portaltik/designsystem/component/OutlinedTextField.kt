@@ -1,5 +1,6 @@
 package kite1412.portaltik.designsystem.component
 
+import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -55,6 +56,9 @@ fun OutlinedTextField(
     actions: (@Composable () -> Unit)? = null
 ) {
     val isDarkMode = LocalDarkMode.current
+    val labelColor by animateColorAsState(if (!isDarkMode) RoyalBlue800_50 else White50)
+    val borderColor by animateColorAsState(if (!isDarkMode) Blue200_60 else White15)
+    val backgroundColor by animateColorAsState(White.copy(if (!isDarkMode) 0.5f else 0.04f))
     val shape = RoundedCornerShape(16.dp)
 
     Column(
@@ -66,7 +70,7 @@ fun OutlinedTextField(
                 text = it,
                 style = MaterialTheme.typography.bodySmall,
                 fontWeight = FontWeight.Bold,
-                color = if (!isDarkMode) RoyalBlue800_50 else White50
+                color = labelColor
             )
         }
         Row(
@@ -74,11 +78,11 @@ fun OutlinedTextField(
                 .fillMaxWidth()
                 .border(
                     width = 2.dp,
-                    color = if (!isDarkMode) Blue200_60 else White15,
+                    color = borderColor,
                     shape = shape
                 )
                 .background(
-                    color = White.copy(if (!isDarkMode) 0.5f else 0.04f),
+                    color = backgroundColor,
                     shape = shape
                 )
                 .padding(16.dp),

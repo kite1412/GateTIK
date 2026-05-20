@@ -1,6 +1,7 @@
 package kite1412.portaltik.app
 
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
@@ -20,9 +21,12 @@ fun PortalTikApp() {
         LocalDarkMode provides (isDarkMode ?: isSystemInDarkTheme())
     ) {
         PortalTikTheme {
-            PortalTikNavHost(
-                signedInUser = viewModel.signedInUser
-            )
+            Scaffold { p ->
+                PortalTikNavHost(
+                    signedInUser = viewModel.signedInUser,
+                    scaffoldPadding = p
+                )
+            }
         }
     }
 }
