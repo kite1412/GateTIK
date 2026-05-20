@@ -2,7 +2,6 @@ package kite1412.portaltik.designsystem.component
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -37,6 +36,7 @@ import kite1412.portaltik.designsystem.theme.White
 import kite1412.portaltik.designsystem.theme.White15
 import kite1412.portaltik.designsystem.theme.White50
 import kite1412.portaltik.designsystem.util.PortalTikIcons
+import kite1412.portaltik.ui.compositionlocal.LocalDarkMode
 import org.jetbrains.compose.resources.painterResource
 
 @Composable
@@ -54,7 +54,7 @@ fun OutlinedTextField(
     leading: (@Composable () -> Unit)? = null,
     actions: (@Composable () -> Unit)? = null
 ) {
-    val isDarkMode = isSystemInDarkTheme()
+    val isDarkMode = LocalDarkMode.current
     val shape = RoundedCornerShape(16.dp)
 
     Column(

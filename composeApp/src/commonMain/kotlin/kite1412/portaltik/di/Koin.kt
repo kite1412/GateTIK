@@ -1,7 +1,9 @@
 package kite1412.portaltik.di
 
-import kite1412.portaltik.PortalTikViewModel
+import kite1412.portaltik.app.PortalTikViewModel
+import kite1412.portaltik.datastore.di.dataStoreModule
 import kite1412.portaltik.feature.shared.authentication.AuthenticationViewModel
+import kite1412.portaltik.platformModule
 import org.koin.core.KoinApplication
 import org.koin.core.context.startKoin
 import org.koin.core.module.Module
@@ -13,11 +15,11 @@ private val viewModelModule = module {
         AuthenticationViewModel()
     }
     viewModel {
-        PortalTikViewModel()
+        PortalTikViewModel(dataStore = get())
     }
 }
 
-private val appModule = viewModelModule
+private val appModule = platformModule + dataStoreModule + viewModelModule
 
 fun initKoin(
     extraModules: List<Module> = emptyList(),

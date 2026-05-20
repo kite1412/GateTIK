@@ -1,6 +1,5 @@
 package kite1412.portaltik.designsystem.extension
 
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -16,10 +15,11 @@ import kite1412.portaltik.designsystem.theme.Blue400_40
 import kite1412.portaltik.designsystem.theme.Blue500Alt_30
 import kite1412.portaltik.designsystem.theme.Indigo400_30
 import kite1412.portaltik.designsystem.theme.PortalTikTheme
+import kite1412.portaltik.ui.compositionlocal.LocalDarkMode
 
 @Composable
 fun Modifier.radialBackground(): Modifier {
-    val isDarkMode = isSystemInDarkTheme()
+    val isDarkMode = LocalDarkMode.current
 
     return drawBehind {
         drawRect(

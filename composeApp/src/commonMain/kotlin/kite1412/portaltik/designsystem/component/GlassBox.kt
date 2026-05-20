@@ -2,7 +2,6 @@ package kite1412.portaltik.designsystem.component
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.PaddingValues
@@ -16,6 +15,7 @@ import kite1412.portaltik.designsystem.theme.Blue200_60
 import kite1412.portaltik.designsystem.theme.White10
 import kite1412.portaltik.designsystem.theme.White15
 import kite1412.portaltik.designsystem.theme.White60
+import kite1412.portaltik.ui.compositionlocal.LocalDarkMode
 
 @Composable
 fun GlassBox(
@@ -23,7 +23,7 @@ fun GlassBox(
     contentPadding: PaddingValues = PaddingValues(24.dp),
     content: @Composable BoxScope.() -> Unit
 ) {
-    val isDarkMode = isSystemInDarkTheme()
+    val isDarkMode = LocalDarkMode.current
     val shape = RoundedCornerShape(24.dp)
 
     Box(

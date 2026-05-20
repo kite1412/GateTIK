@@ -1,0 +1,29 @@
+package kite1412.portaltik
+
+import androidx.datastore.core.DataStore
+import androidx.datastore.core.FileStorage
+import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.PreferencesFileSerializer
+import kite1412.portaltik.datastore.createDataStore
+import kite1412.portaltik.datastore.dataStoreFileName
+import org.koin.core.module.Module
+import org.koin.dsl.module
+import java.io.File
+
+actual val platformModule: Module = module {
+    single<DataStore<Preferences>> {
+        createDataStore()
+    }
+}
+
+private fun createDataStore() = createDataStore(
+    storage = FileStorage(
+        serializer = PreferencesFileSerializer,
+        produceFile = {
+            File(
+                System.getProperty("user.home"),
+                ".portaltik/$dataStoreFileName"
+            )
+        }
+    )
+)

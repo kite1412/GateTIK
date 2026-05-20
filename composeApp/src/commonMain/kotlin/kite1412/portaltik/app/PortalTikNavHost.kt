@@ -1,4 +1,4 @@
-package kite1412.portaltik
+package kite1412.portaltik.app
 
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable

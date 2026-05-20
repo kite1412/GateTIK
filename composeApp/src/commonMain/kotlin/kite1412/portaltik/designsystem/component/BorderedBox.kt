@@ -2,7 +2,6 @@ package kite1412.portaltik.designsystem.component
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.PaddingValues
@@ -14,6 +13,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.unit.dp
+import kite1412.portaltik.ui.compositionlocal.LocalDarkMode
 
 // use border if isDarkMode == false
 @Composable
@@ -23,7 +23,7 @@ fun BorderedBox(
     shape: Shape = RoundedCornerShape(16.dp),
     content: @Composable BoxScope.() -> Unit
 ) {
-    val isDarkMode = isSystemInDarkTheme()
+    val isDarkMode = LocalDarkMode.current
 
     Box(
         modifier = modifier

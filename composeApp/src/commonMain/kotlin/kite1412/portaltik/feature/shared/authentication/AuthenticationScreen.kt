@@ -2,7 +2,6 @@ package kite1412.portaltik.feature.shared.authentication
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -51,6 +50,7 @@ import kite1412.portaltik.designsystem.theme.White
 import kite1412.portaltik.designsystem.theme.White50
 import kite1412.portaltik.designsystem.theme.White60
 import kite1412.portaltik.designsystem.util.PortalTikIcons
+import kite1412.portaltik.ui.compositionlocal.LocalDarkMode
 import kite1412.portaltik.ui.preview.DevicePreviews
 import org.jetbrains.compose.resources.painterResource
 import org.koin.compose.viewmodel.koinViewModel
@@ -84,7 +84,7 @@ private fun AuthenticationScreen(
     onRegisterClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val isDarkMode = isSystemInDarkTheme()
+    val isDarkMode = LocalDarkMode.current
     val backgroundBrush = Brush.verticalGradient(
         if (isDarkMode) BlueSlateGradient else LighterBlueLightBlueGradient
     )

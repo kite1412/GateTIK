@@ -1,6 +1,5 @@
 package kite1412.portaltik.designsystem.component
 
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
@@ -16,6 +15,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.VisualTransformation
 import kite1412.portaltik.designsystem.theme.RoyalBlue800_30
 import kite1412.portaltik.designsystem.theme.White30
+import kite1412.portaltik.ui.compositionlocal.LocalDarkMode
 
 @Composable
 fun BasicTextField(
@@ -34,7 +34,7 @@ fun BasicTextField(
         color = contentColor
     )
     val cursorColor = MaterialTheme.colorScheme.onPrimary
-    val isDarkMode = isSystemInDarkTheme()
+    val isDarkMode = LocalDarkMode.current
 
     BasicTextField(
         value = value,
