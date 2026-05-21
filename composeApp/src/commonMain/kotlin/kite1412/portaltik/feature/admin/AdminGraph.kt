@@ -4,6 +4,8 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.navigation
 import kite1412.portaltik.DeviceType
+import kite1412.portaltik.app.normalContentPadding
+import kite1412.portaltik.app.smallContentPadding
 import kite1412.portaltik.designsystem.util.PortalTikIcons
 import kite1412.portaltik.feature.Graph
 import kite1412.portaltik.feature.Route
@@ -14,7 +16,7 @@ import kite1412.portaltik.ui.navigation.RootDestination
 import kite1412.portaltik.ui.navigation.RootDestinationsProvider
 import org.jetbrains.compose.resources.DrawableResource
 
-fun NavGraphBuilder.adminGraph(contentPadding: PaddingValues) {
+fun NavGraphBuilder.adminGraph(scaffoldPadding: PaddingValues) {
     val isDesktop = getDeviceType() == DeviceType.DESKTOP
 
     navigation(
@@ -22,8 +24,8 @@ fun NavGraphBuilder.adminGraph(contentPadding: PaddingValues) {
             else AdminGraph.Mobile.Home.name,
         route = AdminGraph.route
     ) {
-        if (isDesktop) desktopAdminGraph(contentPadding)
-        else mobileAdminGraph(contentPadding)
+        if (isDesktop) desktopAdminGraph(scaffoldPadding)
+        else mobileAdminGraph(scaffoldPadding)
     }
 }
 
@@ -51,10 +53,10 @@ object AdminGraph : Graph {
     }
 }
 
-private fun NavGraphBuilder.desktopAdminGraph(contentPadding: PaddingValues) {
-    desktopAdminDashboardScreen(contentPadding = contentPadding)
+private fun NavGraphBuilder.desktopAdminGraph(scaffoldPadding: PaddingValues) {
+    desktopAdminDashboardScreen(contentPadding = normalContentPadding(scaffoldPadding))
 }
 
-private fun NavGraphBuilder.mobileAdminGraph(contentPadding: PaddingValues) {
-    mobileAdminHomeScreen(contentPadding = contentPadding)
+private fun NavGraphBuilder.mobileAdminGraph(scaffoldPadding: PaddingValues) {
+    mobileAdminHomeScreen(contentPadding = smallContentPadding(scaffoldPadding))
 }

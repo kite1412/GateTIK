@@ -1,7 +1,9 @@
 package kite1412.portaltik.designsystem.util
 
 import portaltik.composeapp.generated.resources.Res
+import portaltik.composeapp.generated.resources.bell
 import portaltik.composeapp.generated.resources.car
+import portaltik.composeapp.generated.resources.chevron_right
 import portaltik.composeapp.generated.resources.dashboard
 import portaltik.composeapp.generated.resources.door_open
 import portaltik.composeapp.generated.resources.email
@@ -15,6 +17,7 @@ import portaltik.composeapp.generated.resources.person
 import portaltik.composeapp.generated.resources.sun
 import portaltik.composeapp.generated.resources.unila
 import portaltik.composeapp.generated.resources.video_recorder
+import portaltik.composeapp.generated.resources.wifi
 
 object PortalTikIcons {
     val email = Res.drawable.email
@@ -31,4 +34,7 @@ object PortalTikIcons {
     val videoRecorder = Res.drawable.video_recorder
     val person = Res.drawable.person
     val dashboard = Res.drawable.dashboard
+    val bell = Res.drawable.bell
+    val wifi = Res.drawable.wifi
+    val chevronRight = Res.drawable.chevron_right
 }

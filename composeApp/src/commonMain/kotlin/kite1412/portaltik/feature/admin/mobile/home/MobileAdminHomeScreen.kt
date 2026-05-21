@@ -1,13 +1,64 @@
 package kite1412.portaltik.feature.admin.mobile.home
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.LinearProgressIndicator
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import kite1412.portaltik.designsystem.component.Badge
+import kite1412.portaltik.designsystem.component.Icon
+import kite1412.portaltik.designsystem.component.StatusIndicator
+import kite1412.portaltik.designsystem.theme.Blue200
+import kite1412.portaltik.designsystem.theme.Blue200_50
+import kite1412.portaltik.designsystem.theme.Blue500
+import kite1412.portaltik.designsystem.theme.Blue900
+import kite1412.portaltik.designsystem.theme.BluePurpleLinearGradient
+import kite1412.portaltik.designsystem.theme.Emerald500
+import kite1412.portaltik.designsystem.theme.Gray900
 import kite1412.portaltik.designsystem.theme.PortalTikTheme
+import kite1412.portaltik.designsystem.theme.Red500
+import kite1412.portaltik.designsystem.theme.Slate400
+import kite1412.portaltik.designsystem.theme.Slate500
+import kite1412.portaltik.designsystem.theme.Slate900_95
+import kite1412.portaltik.designsystem.theme.White
+import kite1412.portaltik.designsystem.theme.White20
+import kite1412.portaltik.designsystem.theme.White55
+import kite1412.portaltik.designsystem.theme.Yellow300
+import kite1412.portaltik.designsystem.util.PortalTikIcons
+import kite1412.portaltik.ui.component.ActionCard
+import kite1412.portaltik.ui.compositionlocal.LocalDarkMode
 import kite1412.portaltik.ui.preview.DevicePreviews
+import kite1412.portaltik.util.now
+import kite1412.portaltik.util.toLocalDateTime
+import org.jetbrains.compose.resources.painterResource
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
@@ -16,26 +67,381 @@ fun MobileAdminHomeScreen(
     modifier: Modifier = Modifier,
     viewModel: MobileAdminHomeViewModel = koinViewModel()
 ) {
-    MobileAdminHomeScreen(contentPadding = contentPadding)
+    MobileAdminHomeScreen(
+        contentPadding = contentPadding,
+        userName = "Aulia Rahman",
+        modifier = modifier
+    )
 }
 
 @Composable
 private fun MobileAdminHomeScreen(
     contentPadding: PaddingValues,
+    userName: String,
     modifier: Modifier = Modifier
 ) {
-    Text("Admin Home")
+    val isDarkMode = LocalDarkMode.current
+
+    LazyColumn(
+        modifier = modifier
+            .fillMaxSize()
+            .padding(contentPadding),
+        verticalArrangement = Arrangement.spacedBy(24.dp)
+    ) {
+        item {
+            HeaderSection(
+                userName = userName,
+                isDarkMode = isDarkMode
+            )
+        }
+        item { GateControlCard() }
+        item { ParkingStatusCard(isDarkMode = isDarkMode) }
+        item { CctvCard() }
+        item { QuickActionsRow() }
+    }
+}
+
+@Composable
+private fun HeaderSection(
+    userName: String,
+    isDarkMode: Boolean
+) {
+    val currentHour = now().toLocalDateTime().hour
+    val greeting = when (currentHour) {
+        in 6..11 -> "Selamat pagi,"
+        in 12..15 -> "Selamat siang,"
+        in 16..18 -> "Selamat sore,"
+        else -> "Selamat malam,"
+    }
+
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Column {
+            Text(
+                text = greeting,
+                style = MaterialTheme.typography.bodySmall,
+                color = if (isDarkMode) Slate400 else Slate500
+            )
+            Text(
+                text = userName,
+                style = MaterialTheme.typography.titleMedium,
+                color = MaterialTheme.colorScheme.onSurface
+            )
+        }
+
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            Badge(
+                text = "ADMIN",
+                containerColor = if (isDarkMode) Blue900.copy(alpha = 0.4f) else Blue200.copy(alpha = 0.4f),
+                contentColor = if (isDarkMode) Blue200 else Blue900
+            )
+
+            Box(
+                modifier = Modifier
+                    .size(40.dp)
+                    .background(
+                        color = if (isDarkMode) White20 else MaterialTheme.colorScheme.surface,
+                        shape = CircleShape
+                    ),
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    painter = painterResource(PortalTikIcons.bell),
+                    contentDescription = "Notifikasi",
+                    modifier = Modifier.size(20.dp),
+                    tint = MaterialTheme.colorScheme.onSurface
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun GateControlCard() {
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(32.dp))
+            .background(Brush.linearGradient(BluePurpleLinearGradient))
+            .padding(24.dp)
+    ) {
+        Column(
+            verticalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            Text(
+                text = "GERBANG UTAMA",
+                style = MaterialTheme.typography.labelSmall,
+                color = White.copy(alpha = 0.6f),
+                letterSpacing = 1.sp
+            )
+
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                Text(
+                    text = "TERTUTUP",
+                    style = MaterialTheme.typography.titleMedium,
+                    color = White
+                )
+                StatusIndicator(color = Yellow300)
+            }
+
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                Icon(
+                    painter = painterResource(PortalTikIcons.wifi),
+                    contentDescription = null,
+                    modifier = Modifier.size(16.dp),
+                    tint = White.copy(alpha = 0.6f)
+                )
+                Text(
+                    text = "Perangkat terhubung",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = White.copy(alpha = 0.6f)
+                )
+            }
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clip(RoundedCornerShape(16.dp))
+                    .background(White)
+                    .clickable { /* Handle Open Gate */ }
+                    .padding(vertical = 12.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    Icon(
+                        painter = painterResource(PortalTikIcons.doorOpen),
+                        contentDescription = null,
+                        modifier = Modifier.size(20.dp),
+                        tint = Blue500
+                    )
+                    Text(
+                        text = "BUKA GERBANG",
+                        style = MaterialTheme.typography.labelLarge.copy(
+                            fontWeight = FontWeight.Bold
+                        ),
+                        color = Blue500
+                    )
+                }
+            }
+        }
+
+        Box(
+            modifier = Modifier
+                .align(Alignment.TopEnd)
+                .size(64.dp)
+                .background(
+                    color = White.copy(alpha = 0.15f),
+                    shape = RoundedCornerShape(16.dp)
+                ),
+            contentAlignment = Alignment.Center
+        ) {
+            Icon(
+                painter = painterResource(PortalTikIcons.lock),
+                contentDescription = null,
+                modifier = Modifier.size(32.dp),
+                tint = White
+            )
+        }
+    }
+}
+
+@Composable
+private fun ParkingStatusCard(
+    isDarkMode: Boolean
+) {
+    val background = if (isDarkMode) Slate900_95 else White55
+    val shape = RoundedCornerShape(24.dp)
+
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(shape)
+            .background(background)
+            .run {
+                if (!isDarkMode) border(
+                    width = 2.dp,
+                    color = Blue200_50,
+                    shape = shape
+                ) else this
+            }
+            .clickable { /* Handle Parking Click */ }
+            .padding(20.dp)
+    ) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            Box(
+                modifier = Modifier
+                    .size(56.dp)
+                    .background(
+                        color = Emerald500.copy(alpha = 0.15f),
+                        shape = RoundedCornerShape(16.dp)
+                    ),
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    painter = painterResource(PortalTikIcons.car),
+                    contentDescription = null,
+                    modifier = Modifier.size(28.dp),
+                    tint = Emerald500
+                )
+            }
+
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(4.dp)
+            ) {
+                Column(
+                    modifier = Modifier.weight(1f),
+                    verticalArrangement = Arrangement.spacedBy(4.dp)
+                ) {
+                    Text(
+                        text = "Parkir (Mahasiswa)",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = if (isDarkMode) Slate400 else Slate500
+                    )
+                    Text(
+                        text = "72 / 100 slot",
+                        style = MaterialTheme.typography.titleSmall,
+                        color = MaterialTheme.colorScheme.onSurface
+                    )
+                    Spacer(modifier = Modifier.height(4.dp))
+                    LinearProgressIndicator(
+                        progress = { 0.72f },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(8.dp),
+                        color = Emerald500,
+                        trackColor = if (isDarkMode) White.copy(alpha = 0.1f) else Blue200.copy(alpha = 0.2f),
+                        strokeCap = StrokeCap.Round,
+                        drawStopIndicator = {},
+                        gapSize = 2.dp
+                    )
+                }
+
+                Icon(
+                    painter = painterResource(PortalTikIcons.chevronRight),
+                    contentDescription = "parkir mahasiswa",
+                    tint = if (isDarkMode) Slate400 else Slate500
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun CctvCard() {
+    Column(
+        verticalArrangement = Arrangement.spacedBy(12.dp)
+    ) {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .aspectRatio(16f / 9f)
+                .clip(RoundedCornerShape(24.dp))
+                .background(
+                    Brush.radialGradient(
+                        colors = listOf(Gray900, Color.Black)
+                    )
+                )
+        ) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(
+                        Brush.verticalGradient(
+                            listOf(Color.Transparent, Color.Black.copy(alpha = 0.7f)),
+                            startY = 0f
+                        )
+                    )
+            )
+
+            Badge(
+                text = "LIVE",
+                containerColor = Red500,
+                contentColor = White,
+                modifier = Modifier
+                    .padding(16.dp)
+                    .align(Alignment.TopStart)
+            )
+
+            Row(
+                modifier = Modifier
+                    .align(Alignment.BottomStart)
+                    .padding(16.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                Icon(
+                    painter = painterResource(PortalTikIcons.videoRecorder),
+                    contentDescription = null,
+                    modifier = Modifier.size(20.dp),
+                    tint = White
+                )
+                Text(
+                    text = "Gerbang Utama - CAM-01",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = White
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun QuickActionsRow() {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.spacedBy(16.dp)
+    ) {
+        ActionCard(
+            icon = painterResource(PortalTikIcons.doorOpen),
+            label = "Gerbang",
+            onClick = {},
+            modifier = Modifier.weight(1f)
+        )
+        ActionCard(
+            icon = painterResource(PortalTikIcons.car),
+            label = "Parkir",
+            onClick = {},
+            modifier = Modifier.weight(1f)
+        )
+        ActionCard(
+            icon = painterResource(PortalTikIcons.person),
+            label = "Profil",
+            onClick = {},
+            modifier = Modifier.weight(1f)
+        )
+    }
 }
 
 @DevicePreviews
 @Composable
 private fun MobileAdminHomeScreenPreview() {
-    PortalTikTheme {
+    PortalTikTheme(darkTheme = isSystemInDarkTheme()) {
         Scaffold { p ->
-              MobileAdminHomeScreen(
-                  contentPadding = p,
-                  modifier = Modifier.padding(p)
-              )
+            MobileAdminHomeScreen(
+                contentPadding = p,
+                userName = "Aulia Rahman",
+            )
         }
     }
 }

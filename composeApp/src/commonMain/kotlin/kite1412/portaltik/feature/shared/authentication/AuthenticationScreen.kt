@@ -107,7 +107,10 @@ private fun AuthenticationScreen(
         modifier = modifier
             .fillMaxSize()
             .background(backgroundBrush)
-            .radialBackground()
+            .run {
+                if (isDarkMode) radialBackground()
+                else this
+            }
             .padding(contentPadding),
         contentAlignment = Alignment.Center
     ) {

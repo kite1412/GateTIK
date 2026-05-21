@@ -4,11 +4,13 @@ import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.compose.rememberNavController
 import kite1412.portaltik.designsystem.component.Destination
 import kite1412.portaltik.designsystem.component.NavigationScaffold
+import kite1412.portaltik.designsystem.extension.radialBackground
 import kite1412.portaltik.designsystem.theme.PortalTikTheme
 import kite1412.portaltik.ui.compositionlocal.LocalDarkMode
 import kite1412.portaltik.ui.compositionlocal.LocalScaffoldComponentsController
@@ -54,6 +56,10 @@ fun PortalTikApp() {
                 PortalTikNavHost(
                     signedInUser = signedInUser,
                     scaffoldPadding = p,
+                    modifier = Modifier.run {
+                        if (!LocalDarkMode.current) radialBackground()
+                        else this
+                    },
                     navController = navController
                 )
             }

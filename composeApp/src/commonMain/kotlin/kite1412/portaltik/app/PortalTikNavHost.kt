@@ -35,8 +35,8 @@ fun PortalTikNavHost(
         startDestination = startDestination,
         modifier = modifier.fillMaxSize()
     ) {
-        sharedGraph(contentPadding = largeContentPadding(scaffoldPadding))
-        adminGraph(contentPadding = normalContentPadding(scaffoldPadding))
-        studentGraph(contentPadding = normalContentPadding(scaffoldPadding))
+        sharedGraph(scaffoldPadding = scaffoldPadding)
+        adminGraph(scaffoldPadding = scaffoldPadding)
+        studentGraph(scaffoldPadding = scaffoldPadding)
     }
 }

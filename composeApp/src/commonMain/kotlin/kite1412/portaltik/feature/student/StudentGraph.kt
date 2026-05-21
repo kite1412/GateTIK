@@ -11,7 +11,7 @@ import kite1412.portaltik.ui.navigation.RootDestination
 import kite1412.portaltik.ui.navigation.RootDestinationsProvider
 import org.jetbrains.compose.resources.DrawableResource
 
-fun NavGraphBuilder.studentGraph(contentPadding: PaddingValues) {
+fun NavGraphBuilder.studentGraph(scaffoldPadding: PaddingValues) {
     navigation(
         startDestination = StudentGraph.Home.name,
         route = StudentGraph.route
