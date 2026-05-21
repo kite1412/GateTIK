@@ -5,6 +5,7 @@ import portaltik.composeapp.generated.resources.email
 import portaltik.composeapp.generated.resources.eye_close
 import portaltik.composeapp.generated.resources.eye_open
 import portaltik.composeapp.generated.resources.lock
+import portaltik.composeapp.generated.resources.logout
 import portaltik.composeapp.generated.resources.moon
 import portaltik.composeapp.generated.resources.sun
 import portaltik.composeapp.generated.resources.unila
@@ -17,4 +18,5 @@ object PortalTikIcons {
     val eyeClose = Res.drawable.eye_close
     val sun = Res.drawable.sun
     val moon = Res.drawable.moon
+    val logout = Res.drawable.logout
 }
