@@ -1,4 +1,4 @@
-package kite1412.portaltik
+package kite1412.portaltik.android
 
 import android.app.Application
 import kite1412.portaltik.di.initKoin
