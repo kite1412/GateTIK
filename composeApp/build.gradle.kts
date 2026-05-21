@@ -6,6 +6,7 @@ plugins {
     alias(libs.plugins.kotlinMultiplatformLibrary)
     alias(libs.plugins.composeMultiplatform)
     alias(libs.plugins.composeCompiler)
+    alias(libs.plugins.portaltik.buildconfig)
     kotlin("plugin.serialization")
 }
 
@@ -93,4 +94,8 @@ compose.desktop {
             }
         }
     }
+}
+
+buildConfig {
+    packageName = "kite1412.portaltik"
 }
