@@ -2,7 +2,8 @@ package kite1412.portaltik.di
 
 import kite1412.portaltik.app.PortalTikViewModel
 import kite1412.portaltik.datastore.di.dataStoreModule
-import kite1412.portaltik.feature.admin.dashboard.DashboardViewModel
+import kite1412.portaltik.feature.admin.desktop.dashboard.DesktopAdminDashboardViewModel
+import kite1412.portaltik.feature.admin.mobile.home.MobileAdminHomeViewModel
 import kite1412.portaltik.feature.shared.authentication.AuthenticationViewModel
 import kite1412.portaltik.network.mock.mockRemoteModule
 import kite1412.portaltik.platformModule
@@ -12,7 +13,15 @@ import org.koin.core.module.Module
 import org.koin.core.module.dsl.viewModel
 import org.koin.dsl.module
 
+private val mobileViewModelModule = module {
+    viewModel {
+        MobileAdminHomeViewModel()
+    }
+}
+
 private val viewModelModule = module {
+    includes(mobileViewModelModule)
+
     viewModel {
         AuthenticationViewModel(
             dataStore = get(),
@@ -26,7 +35,7 @@ private val viewModelModule = module {
         )
     }
     viewModel {
-        DashboardViewModel()
+        DesktopAdminDashboardViewModel()
     }
 }
 

@@ -6,7 +6,9 @@ import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -120,14 +122,20 @@ fun NavigationScaffold(
 
         Scaffold(
             modifier = Modifier.weight(1f),
-            bottomBar = if (showNavigationBar && windowWidthSize == WindowWidthSize.COMPACT) {
+            bottomBar = if (windowWidthSize == WindowWidthSize.COMPACT) {
                 {
-                    BottomNavigationBar(
-                        destinations = destinations,
-                        isDarkTheme = isDarkTheme,
-                        selectedDestination = selectedDestination,
-                        onDestinationClick = onDestinationClick
-                    )
+                    AnimatedVisibility(
+                        visible = showNavigationBar,
+                        enter = fadeIn() + slideInVertically { it },
+                        exit = fadeOut() + slideOutVertically { it }
+                    ) {
+                        BottomNavigationBar(
+                            destinations = destinations,
+                            isDarkTheme = isDarkTheme,
+                            selectedDestination = selectedDestination,
+                            onDestinationClick = onDestinationClick
+                        )
+                    }
                 }
             } else {
                 {}
@@ -139,8 +147,12 @@ fun NavigationScaffold(
 data class Destination(
     val route: String,
     val label: String,
-    val icon: DrawableResource
-)
+    val icon: DrawableResource?
+) {
+    companion object {
+        val Empty = Destination("", "", null)
+    }
+}
 
 @Composable
 private fun SideNavigationRail(
@@ -180,7 +192,7 @@ private fun SideNavigationRail(
                 selected = selected,
                 onClick = { onDestinationClick(destination) },
                 icon = {
-                    ComposeIcon(
+                    if (destination.icon != null) ComposeIcon(
                         painter = painterResource(destination.icon),
                         contentDescription = destination.label,
                         modifier = Modifier.size(20.dp)
@@ -379,12 +391,11 @@ private fun NavigationDrawerItem(
         if (selected) {
             Spacer(modifier = Modifier.width(12.dp))
         } else {
-            // Maintain layout consistency even when not selected
             val spacerWidth by animateDpAsState(targetValue = if (selected) 12.dp else 0.dp)
             Spacer(modifier = Modifier.width(spacerWidth))
         }
 
-        ComposeIcon(
+        if (destination.icon != null) ComposeIcon(
             painter = painterResource(destination.icon),
             contentDescription = null,
             tint = contentColor,
@@ -426,7 +437,7 @@ private fun BottomNavigationBar(
                 selected = selected,
                 onClick = { onDestinationClick(destination) },
                 icon = {
-                    ComposeIcon(
+                    if (destination.icon != null) ComposeIcon(
                         painter = painterResource(destination.icon),
                         contentDescription = destination.label,
                         modifier = Modifier.size(18.dp)

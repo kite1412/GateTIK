@@ -1,9 +1,12 @@
 package kite1412.portaltik.app
 
+import androidx.compose.runtime.mutableStateMapOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import kite1412.portaltik.app.util.AppScaffoldComponentsController
 import kite1412.portaltik.datastore.PortalTikDataStore
 import kite1412.portaltik.domain.Authentication
+import kite1412.portaltik.ui.util.ScaffoldComponent
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.stateIn
 
@@ -11,6 +14,7 @@ class PortalTikViewModel(
     dataStore: PortalTikDataStore,
     authentication: Authentication,
 ) : ViewModel() {
+    private val scaffoldComponentVisibilityMap = mutableStateMapOf<ScaffoldComponent, Boolean>()
     val signedInUser = authentication.signedInUser
         .stateIn(
             scope = viewModelScope,
@@ -25,4 +29,5 @@ class PortalTikViewModel(
             started = SharingStarted.WhileSubscribed(5000),
             initialValue = null
         )
+    val scaffoldComponentsController = AppScaffoldComponentsController(scaffoldComponentVisibilityMap)
 }
