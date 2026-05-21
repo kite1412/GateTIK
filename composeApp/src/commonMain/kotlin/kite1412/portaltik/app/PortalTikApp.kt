@@ -16,14 +16,15 @@ import org.koin.compose.viewmodel.koinViewModel
 fun PortalTikApp() {
     val viewModel = koinViewModel<PortalTikViewModel>()
     val isDarkMode by viewModel.isDarkMode.collectAsStateWithLifecycle()
+    val signedInUser by viewModel.signedInUser.collectAsStateWithLifecycle()
 
     CompositionLocalProvider(
-        LocalDarkMode provides (isDarkMode ?: isSystemInDarkTheme())
+        LocalDarkMode provides (isDarkMode ?: isSystemInDarkTheme()),
     ) {
         PortalTikTheme {
             Scaffold { p ->
                 PortalTikNavHost(
-                    signedInUser = viewModel.signedInUser,
+                    signedInUser = signedInUser,
                     scaffoldPadding = p
                 )
             }

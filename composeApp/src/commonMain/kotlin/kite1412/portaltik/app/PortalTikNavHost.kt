@@ -7,11 +7,14 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
-import kite1412.portaltik.feature.shared.authentication.navigation.AuthenticationRoute
-import kite1412.portaltik.feature.shared.authentication.navigation.authenticationScreen
-import kite1412.portaltik.feature.student.home.navigation.HomeRoute
-import kite1412.portaltik.feature.student.home.navigation.homeScreen
+import kite1412.portaltik.feature.admin.AdminGraph
+import kite1412.portaltik.feature.admin.adminGraph
+import kite1412.portaltik.feature.shared.SharedGraph
+import kite1412.portaltik.feature.shared.sharedGraph
+import kite1412.portaltik.feature.student.StudentGraph
+import kite1412.portaltik.feature.student.studentGraph
 import kite1412.portaltik.model.User
+import kite1412.portaltik.model.UserRole
 
 @Composable
 fun PortalTikNavHost(
@@ -20,14 +23,20 @@ fun PortalTikNavHost(
     modifier: Modifier = Modifier,
     navController: NavHostController = rememberNavController()
 ) {
+    val startDestination = if (signedInUser == null) SharedGraph.route
+        else when(signedInUser.role) {
+            UserRole.ADMIN -> AdminGraph.route
+            UserRole.STAFF -> SharedGraph.route // TODO change later
+            UserRole.STUDENT -> StudentGraph.route
+        }
+
     NavHost(
         navController = navController,
-        startDestination = if (signedInUser != null) HomeRoute else AuthenticationRoute,
+        startDestination = startDestination,
         modifier = modifier.fillMaxSize()
     ) {
-        authenticationScreen(
-            contentPadding = largeContentPadding(scaffoldPadding)
-        )
-        homeScreen()
+        sharedGraph(contentPadding = largeContentPadding(scaffoldPadding))
+        adminGraph(contentPadding = normalContentPadding(scaffoldPadding))
+        studentGraph(contentPadding = normalContentPadding(scaffoldPadding))
     }
 }
