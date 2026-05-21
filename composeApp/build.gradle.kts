@@ -11,6 +11,10 @@ plugins {
 }
 
 kotlin {
+    compilerOptions {
+        freeCompilerArgs.add("-Xexpect-actual-classes")
+    }
+
     androidLibrary {
         namespace = "kite1412.portaltik"
         minSdk = libs.versions.android.minSdk.get().toInt()
@@ -59,6 +63,7 @@ kotlin {
             implementation(libs.koin.viewModel)
             implementation(libs.koin.compose.viewModel)
             implementation(libs.androidx.datastore.preferences.core)
+            implementation(libs.kotlinx.datetime)
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)
@@ -66,6 +71,7 @@ kotlin {
         jvmMain.dependencies {
             implementation(compose.desktop.currentOs)
             implementation(libs.kotlinx.coroutinesSwing)
+            implementation(libs.kotlin.logging.jvm)
         }
     }
 }

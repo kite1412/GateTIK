@@ -16,7 +16,9 @@ junit = "4.13.2"
 kotlin = "2.3.21"
 material3 = "1.10.0-alpha05"
 kotlinxCoroutines = "1.11.0"
+kotlinx-datetime = "0.8.0"
 koin = "4.2.1"
+kotlinLogging = "8.0.03"
 
 [libraries]
 kotlin-gp = { group = "org.jetbrains.kotlin", name = "kotlin-gradle-plugin", version.ref = "kotlin" }
@@ -40,11 +42,13 @@ compose-components-resources = { module = "org.jetbrains.compose.components:comp
 compose-uiToolingPreview = { module = "org.jetbrains.compose.ui:ui-tooling-preview", version.ref = "composeMultiplatform" }
 compose-navigation = { module = "org.jetbrains.androidx.navigation:navigation-compose", version.ref = "androidx-navigation" }
 kotlinx-coroutinesSwing = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-swing", version.ref = "kotlinxCoroutines"}
+kotlinx-datetime = { group = "org.jetbrains.kotlinx", name = "kotlinx-datetime", version.ref = "kotlinx-datetime" }
 koin-bom = { group = "io.insert-koin", name = "koin-bom", version.ref = "koin" }
 koin-core = { group = "io.insert-koin", name = "koin-core" }
 koin-android = { group = "io.insert-koin", name = "koin-android" }
 koin-viewModel = { group = "io.insert-koin", name = "koin-core-viewmodel" }
 koin-compose-viewModel = { group = "io.insert-koin", name = "koin-compose-viewmodel" }
+kotlin-logging-jvm = { group = "io.github.oshai", name = "kotlin-logging-jvm", version.ref = "kotlinLogging" }
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }
