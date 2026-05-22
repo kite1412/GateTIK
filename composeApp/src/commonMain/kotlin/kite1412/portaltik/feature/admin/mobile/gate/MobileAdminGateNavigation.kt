@@ -7,6 +7,8 @@ import kite1412.portaltik.feature.admin.AdminGraph
 
 fun NavGraphBuilder.mobileAdminGateScreen(contentPadding: PaddingValues) {
     composable(AdminGraph.Mobile.Gate.name) {
-        MobileAdminGateScreen()
+        MobileAdminGateScreen(
+            contentPadding = contentPadding
+        )
     }
 }
