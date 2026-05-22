@@ -9,8 +9,12 @@ import kite1412.portaltik.app.smallContentPadding
 import kite1412.portaltik.designsystem.util.PortalTikIcons
 import kite1412.portaltik.feature.Graph
 import kite1412.portaltik.feature.Route
-import kite1412.portaltik.feature.admin.desktop.dashboard.navigation.desktopAdminDashboardScreen
-import kite1412.portaltik.feature.admin.mobile.home.navigation.mobileAdminHomeScreen
+import kite1412.portaltik.feature.admin.desktop.dashboard.desktopAdminDashboardScreen
+import kite1412.portaltik.feature.admin.mobile.cctv.mobileAdminCctvScreen
+import kite1412.portaltik.feature.admin.mobile.gate.mobileAdminGateScreen
+import kite1412.portaltik.feature.admin.mobile.home.mobileAdminHomeScreen
+import kite1412.portaltik.feature.admin.mobile.parking.mobileAdminParkingScreen
+import kite1412.portaltik.feature.admin.mobile.profile.mobileAdminProfileScreen
 import kite1412.portaltik.getDeviceType
 import kite1412.portaltik.ui.navigation.RootDestination
 import kite1412.portaltik.ui.navigation.RootDestinationsProvider
@@ -85,4 +89,8 @@ private fun NavGraphBuilder.desktopAdminGraph(scaffoldPadding: PaddingValues) {
 
 private fun NavGraphBuilder.mobileAdminGraph(scaffoldPadding: PaddingValues) {
     mobileAdminHomeScreen(contentPadding = smallContentPadding(scaffoldPadding))
+    mobileAdminGateScreen(contentPadding = smallContentPadding(scaffoldPadding))
+    mobileAdminParkingScreen(contentPadding = smallContentPadding(scaffoldPadding))
+    mobileAdminCctvScreen(contentPadding = smallContentPadding(scaffoldPadding))
+    mobileAdminProfileScreen(contentPadding = smallContentPadding(scaffoldPadding))
 }
