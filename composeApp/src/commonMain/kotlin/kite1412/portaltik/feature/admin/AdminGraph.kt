@@ -43,12 +43,38 @@ object AdminGraph : Graph {
     }
 
     object Mobile : RootDestinationsProvider {
-        override val rootDestinations: List<RootDestination> = listOf(Home)
+        override val rootDestinations: List<RootDestination> = listOf(
+            Home, Gate, Parking, Cctv, Profile
+        )
 
         object Home : RootDestination, Route("mobile_admin_home") {
             override val route: String = name
             override val icon: DrawableResource = PortalTikIcons.house
             override val label: String = "Home"
+        }
+
+        object Gate : RootDestination, Route("mobile_admin_gate") {
+            override val route: String = name
+            override val icon: DrawableResource = PortalTikIcons.doorOpen
+            override val label: String = "Gate"
+        }
+
+        object Parking : RootDestination, Route("mobile_admin_parking") {
+            override val route: String = name
+            override val icon: DrawableResource = PortalTikIcons.car
+            override val label: String = "Parkir"
+        }
+
+        object Cctv : RootDestination, Route("mobile_admin_cctv") {
+            override val route: String = name
+            override val icon: DrawableResource = PortalTikIcons.videoRecorder
+            override val label: String = "CCTV"
+        }
+
+        object Profile : RootDestination, Route("mobile_admin_profile") {
+            override val route: String = name
+            override val icon: DrawableResource = PortalTikIcons.person
+            override val label: String = "Profil"
         }
     }
 }

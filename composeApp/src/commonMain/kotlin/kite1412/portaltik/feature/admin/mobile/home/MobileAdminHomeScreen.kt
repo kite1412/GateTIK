@@ -45,9 +45,10 @@ import kite1412.portaltik.designsystem.theme.Blue500
 import kite1412.portaltik.designsystem.theme.Blue900
 import kite1412.portaltik.designsystem.theme.BluePurpleLinearGradient
 import kite1412.portaltik.designsystem.theme.Emerald500
-import kite1412.portaltik.designsystem.theme.Emerald600
+import kite1412.portaltik.designsystem.theme.Emerald700
 import kite1412.portaltik.designsystem.theme.Gray200
 import kite1412.portaltik.designsystem.theme.Gray900
+import kite1412.portaltik.designsystem.theme.Gray950
 import kite1412.portaltik.designsystem.theme.PortalTikTheme
 import kite1412.portaltik.designsystem.theme.Red500
 import kite1412.portaltik.designsystem.theme.Slate400
@@ -58,6 +59,7 @@ import kite1412.portaltik.designsystem.theme.White20
 import kite1412.portaltik.designsystem.theme.White55
 import kite1412.portaltik.designsystem.theme.Yellow300
 import kite1412.portaltik.designsystem.util.PortalTikIcons
+import kite1412.portaltik.model.Cctv
 import kite1412.portaltik.model.Gate
 import kite1412.portaltik.model.IotDevice
 import kite1412.portaltik.model.IotDeviceStatus
@@ -86,6 +88,7 @@ fun MobileAdminHomeScreen(
         gate = viewModel.mainGate,
         iotDevice = viewModel.mainIotDevice,
         parkingQuota = viewModel.mainParkingQuota,
+        cctv = viewModel.mainCctv,
         contentPadding = contentPadding,
         modifier = modifier
     )
@@ -97,6 +100,7 @@ private fun MobileAdminHomeScreen(
     gate: LoadState<Gate?>,
     iotDevice: LoadState<IotDevice?>,
     parkingQuota: LoadState<ParkingQuota?>,
+    cctv: LoadState<Cctv?>,
     contentPadding: PaddingValues,
     modifier: Modifier = Modifier
 ) {
@@ -130,7 +134,7 @@ private fun MobileAdminHomeScreen(
                 parkingQuota = parkingQuota
             )
         }
-        item { CctvCard() }
+        item { CctvCard(cctv = cctv) }
         item { QuickActionsRow() }
     }
 }
@@ -249,7 +253,7 @@ private fun GateControlCard(
                     }
                 )
                 StatusIndicator(
-                    color = if (isGateSuccess) Emerald600 else Yellow300
+                    color = if (isGateSuccess) Emerald700 else Yellow300
                 )
             }
 
@@ -452,7 +456,9 @@ private fun ParkingStatusCard(
 }
 
 @Composable
-private fun CctvCard() {
+private fun CctvCard(
+    cctv: LoadState<Cctv?>
+) {
     Column(
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
@@ -478,34 +484,62 @@ private fun CctvCard() {
                     )
             )
 
-            Badge(
-                text = "LIVE",
-                containerColor = Red500,
-                contentColor = White,
-                modifier = Modifier
-                    .padding(16.dp)
-                    .align(Alignment.TopStart)
-            )
+            LoadState(
+                state = cctv,
+                loading = {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .background(Gray950.copy(alpha = 0.5f)),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        SmallCircularProgressIndicator()
+                    }
+                },
+                error = {
+                    Text(
+                        text = "Cctv tidak ditemukan",
+                        modifier = Modifier.align(Alignment.Center),
+                        color = White
+                    )
+                },
+                success = { cctv ->
+                    if (cctv != null) {
+                        Badge(
+                            text = "LIVE",
+                            containerColor = Red500,
+                            contentColor = White,
+                            modifier = Modifier
+                                .padding(16.dp)
+                                .align(Alignment.TopStart)
+                        )
 
-            Row(
-                modifier = Modifier
-                    .align(Alignment.BottomStart)
-                    .padding(16.dp),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                Icon(
-                    painter = painterResource(PortalTikIcons.videoRecorder),
-                    contentDescription = null,
-                    modifier = Modifier.size(20.dp),
-                    tint = White
-                )
-                Text(
-                    text = "Gerbang Utama - CAM-01",
-                    style = MaterialTheme.typography.bodySmall,
-                    color = White
-                )
-            }
+                        Row(
+                            modifier = Modifier
+                                .align(Alignment.BottomStart)
+                                .padding(16.dp),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            Icon(
+                                painter = painterResource(PortalTikIcons.videoRecorder),
+                                contentDescription = null,
+                                modifier = Modifier.size(20.dp),
+                                tint = White
+                            )
+                            Text(
+                                text = cctv.cameraName,
+                                style = MaterialTheme.typography.bodySmall,
+                                color = White
+                            )
+                        }
+                    } else Text(
+                        text = "Cctv tidak ditemukan",
+                        modifier = Modifier.align(Alignment.Center),
+                        color = White
+                    )
+                }
+            )
         }
     }
 }
@@ -518,7 +552,7 @@ private fun QuickActionsRow() {
     ) {
         ActionCard(
             icon = painterResource(PortalTikIcons.doorOpen),
-            label = "Gerbang",
+            label = "Gate",
             onClick = {},
             modifier = Modifier.weight(1f)
         )
@@ -559,6 +593,7 @@ private fun MobileAdminHomeScreenPreview() {
                 gate = LoadState.Loading(),
                 iotDevice = LoadState.Loading(),
                 parkingQuota = LoadState.Loading(),
+                cctv = LoadState.Loading(),
                 contentPadding = p
             )
         }
