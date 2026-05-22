@@ -1,7 +1,8 @@
 package kite1412.portaltik.di
 
 import kite1412.portaltik.app.PortalTikViewModel
-import kite1412.portaltik.datastore.di.dataStoreModule
+import kite1412.portaltik.data.dataModule
+import kite1412.portaltik.datastore.dataStoreModule
 import kite1412.portaltik.feature.admin.desktop.dashboard.DesktopAdminDashboardViewModel
 import kite1412.portaltik.feature.admin.mobile.home.MobileAdminHomeViewModel
 import kite1412.portaltik.feature.shared.authentication.AuthenticationViewModel
@@ -15,7 +16,13 @@ import org.koin.dsl.module
 
 private val mobileViewModelModule = module {
     viewModel {
-        MobileAdminHomeViewModel()
+        MobileAdminHomeViewModel(
+            authentication = get(),
+            cctvRepository = get(),
+            gateRepository = get(),
+            iotDeviceRepository = get(),
+            parkinQuotaRepository = get(),
+        )
     }
 }
 
@@ -39,7 +46,11 @@ private val viewModelModule = module {
     }
 }
 
-private val appModule = platformModule + dataStoreModule + viewModelModule + mockRemoteModule
+private val appModule = platformModule +
+        dataStoreModule +
+        viewModelModule +
+        mockRemoteModule +
+        dataModule
 
 fun initKoin(
     extraModules: List<Module> = emptyList(),
