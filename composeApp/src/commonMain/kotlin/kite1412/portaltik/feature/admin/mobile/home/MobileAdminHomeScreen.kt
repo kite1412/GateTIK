@@ -1,5 +1,6 @@
 package kite1412.portaltik.feature.admin.mobile.home
 
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -19,7 +20,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -32,7 +32,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -41,16 +40,15 @@ import kite1412.portaltik.designsystem.component.Icon
 import kite1412.portaltik.designsystem.component.StatusIndicator
 import kite1412.portaltik.designsystem.theme.Blue200
 import kite1412.portaltik.designsystem.theme.Blue200_50
-import kite1412.portaltik.designsystem.theme.Blue500
 import kite1412.portaltik.designsystem.theme.Blue900
 import kite1412.portaltik.designsystem.theme.BluePurpleLinearGradient
 import kite1412.portaltik.designsystem.theme.Emerald500
 import kite1412.portaltik.designsystem.theme.Emerald700
-import kite1412.portaltik.designsystem.theme.Gray200
 import kite1412.portaltik.designsystem.theme.Gray900
 import kite1412.portaltik.designsystem.theme.Gray950
 import kite1412.portaltik.designsystem.theme.PortalTikTheme
 import kite1412.portaltik.designsystem.theme.Red500
+import kite1412.portaltik.designsystem.theme.Red600
 import kite1412.portaltik.designsystem.theme.Slate400
 import kite1412.portaltik.designsystem.theme.Slate500
 import kite1412.portaltik.designsystem.theme.Slate900_95
@@ -61,10 +59,13 @@ import kite1412.portaltik.designsystem.theme.Yellow300
 import kite1412.portaltik.designsystem.util.PortalTikIcons
 import kite1412.portaltik.model.Cctv
 import kite1412.portaltik.model.Gate
+import kite1412.portaltik.model.GateStatus
 import kite1412.portaltik.model.IotDevice
 import kite1412.portaltik.model.IotDeviceStatus
 import kite1412.portaltik.model.ParkingQuota
 import kite1412.portaltik.ui.component.ActionCard
+import kite1412.portaltik.ui.component.GateControlButton
+import kite1412.portaltik.ui.component.SmallCircularProgressIndicator
 import kite1412.portaltik.ui.compositionlocal.LocalDarkMode
 import kite1412.portaltik.ui.compositionlocal.LocalScaffoldComponentsController
 import kite1412.portaltik.ui.preview.DevicePreviews
@@ -90,6 +91,7 @@ fun MobileAdminHomeScreen(
         parkingQuota = viewModel.mainParkingQuota,
         cctv = viewModel.mainCctv,
         contentPadding = contentPadding,
+        onGateControlClick = {},
         modifier = modifier
     )
 }
@@ -102,6 +104,7 @@ private fun MobileAdminHomeScreen(
     parkingQuota: LoadState<ParkingQuota?>,
     cctv: LoadState<Cctv?>,
     contentPadding: PaddingValues,
+    onGateControlClick: (currentStatus: GateStatus) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val isDarkMode = LocalDarkMode.current
@@ -125,7 +128,8 @@ private fun MobileAdminHomeScreen(
         item {
             GateControlCard(
                 gate = gate,
-                iotDevice = iotDevice
+                iotDevice = iotDevice,
+                onGateControlClick = onGateControlClick
             )
         }
         item {
@@ -203,7 +207,8 @@ private fun HeaderSection(
 @Composable
 private fun GateControlCard(
     gate: LoadState<Gate?>,
-    iotDevice: LoadState<IotDevice?>
+    iotDevice: LoadState<IotDevice?>,
+    onGateControlClick: (currentStatus: GateStatus) -> Unit
 ) {
     val isGateSuccess = gate is LoadState.Success && gate.data != null
 
@@ -218,7 +223,7 @@ private fun GateControlCard(
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             Text(
-                text = "GERBANG UTAMA",
+                text = "GATE UTAMA",
                 style = MaterialTheme.typography.labelSmall,
                 color = White.copy(alpha = 0.6f),
                 letterSpacing = 1.sp
@@ -253,7 +258,9 @@ private fun GateControlCard(
                     }
                 )
                 StatusIndicator(
-                    color = if (isGateSuccess) Emerald700 else Yellow300
+                    color = if (isGateSuccess)
+                        if (gate.data.currentStatus != GateStatus.OFFLINE) Emerald700 else Red600
+                        else Yellow300
                 )
             }
 
@@ -289,47 +296,10 @@ private fun GateControlCard(
 
             Spacer(modifier = Modifier.height(8.dp))
 
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clip(RoundedCornerShape(16.dp))
-                    .background(if (isGateSuccess) White else Gray200)
-                    .clickable(enabled = isGateSuccess) { /* Handle Open Gate */ }
-                    .padding(vertical = 12.dp),
-                contentAlignment = Alignment.Center
-            ) {
-                val color = Blue500
-
-                LoadState(
-                    state = gate,
-                    loading = {
-                        SmallCircularProgressIndicator(color = color)
-                    },
-                    error = {
-                        Text("Gate tidak ditemukan")
-                    },
-                    success = { gate ->
-                        if (gate != null) Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.spacedBy(8.dp)
-                        ) {
-                            Icon(
-                                painter = painterResource(PortalTikIcons.doorOpen),
-                                contentDescription = null,
-                                modifier = Modifier.size(20.dp),
-                                tint = color
-                            )
-                            Text(
-                                text = "BUKA GERBANG",
-                                style = MaterialTheme.typography.labelLarge.copy(
-                                    fontWeight = FontWeight.Bold
-                                ),
-                                color = color
-                            )
-                        } else Text("Gate tidak ditemukan")
-                    }
-                )
-            }
+            GateControlButton(
+                gateState = gate,
+                onClick = onGateControlClick
+            )
         }
 
         Box(
@@ -423,17 +393,28 @@ private fun ParkingStatusCard(
                                 color = color
                             )
                         },
-                        success = {
-                            Text(
-                                text = "72 / 100 slot",
+                        success = { parkingQuota ->
+                            if (parkingQuota != null) Text(
+                                text = "${parkingQuota.usedSlots} / ${parkingQuota.totalSlots} slot",
                                 style = MaterialTheme.typography.titleSmall,
                                 color = color
+                            ) else Text(
+                                text = "Kuota parkir belum diatur"
                             )
                         }
                     )
                     Spacer(modifier = Modifier.height(4.dp))
+
+                    val progress by animateFloatAsState(
+                        targetValue = if (parkingQuota is LoadState.Success && parkingQuota.data != null) {
+                            val data = parkingQuota.data
+
+                            data.usedSlots / data.totalSlots.toFloat()
+                        } else 0f
+                    )
+
                     LinearProgressIndicator(
-                        progress = { 0.72f },
+                        progress = { progress },
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(8.dp),
@@ -571,18 +552,6 @@ private fun QuickActionsRow() {
     }
 }
 
-@Composable
-private fun SmallCircularProgressIndicator(
-    modifier: Modifier = Modifier,
-    color: Color = White55
-) {
-    CircularProgressIndicator(
-        modifier = modifier.size(12.dp),
-        strokeWidth = 2.dp,
-        color = color
-    )
-}
-
 @DevicePreviews
 @Composable
 private fun MobileAdminHomeScreenPreview() {
@@ -594,7 +563,8 @@ private fun MobileAdminHomeScreenPreview() {
                 iotDevice = LoadState.Loading(),
                 parkingQuota = LoadState.Loading(),
                 cctv = LoadState.Loading(),
-                contentPadding = p
+                contentPadding = p,
+                onGateControlClick = {}
             )
         }
     }

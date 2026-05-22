@@ -14,7 +14,7 @@ val mockGate = Gate(
     latitude = -5.35723145,
     longitude = 105.31578291,
     allowedRadiusMeter = 50,
-    currentStatus = GateStatus.OPEN,
+    currentStatus = GateStatus.CLOSED,
     isActive = true
 )
 

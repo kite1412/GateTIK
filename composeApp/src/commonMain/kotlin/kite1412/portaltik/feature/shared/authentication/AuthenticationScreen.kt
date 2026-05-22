@@ -218,7 +218,8 @@ private fun AuthenticationScreen(
                     onClick = {
                         onSignIn(email, password)
                     },
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier.fillMaxWidth(),
+                    enabled = email.isNotBlank() && password.isNotBlank()
                 )
                 val secondaryTextColor by animateColorAsState(if (isDarkMode) White50 else MaterialTheme.colorScheme.onSurfaceVariant)
                 val linkColor by animateColorAsState(if (!isDarkMode) Blue500 else Blue300)

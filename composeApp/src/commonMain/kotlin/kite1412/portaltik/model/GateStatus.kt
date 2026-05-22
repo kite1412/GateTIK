@@ -7,9 +7,9 @@ enum class GateStatus {
     OFFLINE;
 
     fun toIdString(): String = when (this) {
-        GateStatus.OPEN -> "Terbuka"
-        GateStatus.CLOSED -> "Tertutup"
-        GateStatus.OPENING -> "Sedang Membuka"
-        GateStatus.OFFLINE -> "Offline"
+        OPEN -> "Terbuka"
+        CLOSED -> "Tertutup"
+        OPENING -> "Sedang Membuka"
+        OFFLINE -> "Offline"
     }
 }
