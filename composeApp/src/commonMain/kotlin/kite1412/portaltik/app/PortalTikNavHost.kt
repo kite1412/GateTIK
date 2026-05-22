@@ -15,11 +15,13 @@ import kite1412.portaltik.feature.student.StudentGraph
 import kite1412.portaltik.feature.student.studentGraph
 import kite1412.portaltik.model.User
 import kite1412.portaltik.model.UserRole
+import kite1412.portaltik.ui.navigation.RootDestination
 
 @Composable
 fun PortalTikNavHost(
     signedInUser: User?,
     scaffoldPadding: PaddingValues,
+    navigateToRootDestination: (RootDestination) -> Unit,
     modifier: Modifier = Modifier,
     navController: NavHostController = rememberNavController()
 ) {
@@ -36,7 +38,10 @@ fun PortalTikNavHost(
         modifier = modifier.fillMaxSize()
     ) {
         sharedGraph(scaffoldPadding = scaffoldPadding)
-        adminGraph(scaffoldPadding = scaffoldPadding)
+        adminGraph(
+            scaffoldPadding = scaffoldPadding,
+            navigateToRootDestination = navigateToRootDestination
+        )
         studentGraph(scaffoldPadding = scaffoldPadding)
     }
 }

@@ -79,6 +79,9 @@ import org.koin.compose.viewmodel.koinViewModel
 @Composable
 fun MobileAdminHomeScreen(
     contentPadding: PaddingValues,
+    navigateToGate: () -> Unit,
+    navigateToParking: () -> Unit,
+    navigateToCctv: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: MobileAdminHomeViewModel = koinViewModel()
 ) {
@@ -92,6 +95,9 @@ fun MobileAdminHomeScreen(
         cctv = viewModel.mainCctv,
         contentPadding = contentPadding,
         onGateControlClick = {},
+        onGateClick = navigateToGate,
+        onParkingClick = navigateToParking,
+        onCctvClick = navigateToCctv,
         modifier = modifier
     )
 }
@@ -105,6 +111,9 @@ private fun MobileAdminHomeScreen(
     cctv: LoadState<Cctv?>,
     contentPadding: PaddingValues,
     onGateControlClick: (currentStatus: GateStatus) -> Unit,
+    onGateClick: () -> Unit,
+    onParkingClick: () -> Unit,
+    onCctvClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val isDarkMode = LocalDarkMode.current
@@ -139,7 +148,13 @@ private fun MobileAdminHomeScreen(
             )
         }
         item { CctvCard(cctv = cctv) }
-        item { QuickActionsRow() }
+        item {
+            QuickActionsRow(
+                onGateClick = onGateClick,
+                onParkingClick = onParkingClick,
+                onCctvClick = onCctvClick
+            )
+        }
     }
 }
 
@@ -526,7 +541,11 @@ private fun CctvCard(
 }
 
 @Composable
-private fun QuickActionsRow() {
+private fun QuickActionsRow(
+    onGateClick: () -> Unit,
+    onParkingClick: () -> Unit,
+    onCctvClick: () -> Unit
+) {
     Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.spacedBy(16.dp)
@@ -534,19 +553,19 @@ private fun QuickActionsRow() {
         ActionCard(
             icon = painterResource(PortalTikIcons.doorOpen),
             label = "Gate",
-            onClick = {},
+            onClick = onGateClick,
             modifier = Modifier.weight(1f)
         )
         ActionCard(
             icon = painterResource(PortalTikIcons.car),
             label = "Parkir",
-            onClick = {},
+            onClick = onParkingClick,
             modifier = Modifier.weight(1f)
         )
         ActionCard(
-            icon = painterResource(PortalTikIcons.person),
-            label = "Profil",
-            onClick = {},
+            icon = painterResource(PortalTikIcons.videoRecorder),
+            label = "Cctv",
+            onClick = onCctvClick,
             modifier = Modifier.weight(1f)
         )
     }
@@ -564,7 +583,10 @@ private fun MobileAdminHomeScreenPreview() {
                 parkingQuota = LoadState.Loading(),
                 cctv = LoadState.Loading(),
                 contentPadding = p,
-                onGateControlClick = {}
+                onGateControlClick = {},
+                onGateClick = {},
+                onParkingClick = {},
+                onCctvClick = {}
             )
         }
     }

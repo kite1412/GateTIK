@@ -20,7 +20,10 @@ import kite1412.portaltik.ui.navigation.RootDestination
 import kite1412.portaltik.ui.navigation.RootDestinationsProvider
 import org.jetbrains.compose.resources.DrawableResource
 
-fun NavGraphBuilder.adminGraph(scaffoldPadding: PaddingValues) {
+fun NavGraphBuilder.adminGraph(
+    scaffoldPadding: PaddingValues,
+    navigateToRootDestination: (RootDestination) -> Unit
+) {
     val isDesktop = getDeviceType() == DeviceType.DESKTOP
 
     navigation(
@@ -29,7 +32,10 @@ fun NavGraphBuilder.adminGraph(scaffoldPadding: PaddingValues) {
         route = AdminGraph.route
     ) {
         if (isDesktop) desktopAdminGraph(scaffoldPadding)
-        else mobileAdminGraph(scaffoldPadding)
+        else mobileAdminGraph(
+            scaffoldPadding = scaffoldPadding,
+            navigateToRootDestination = navigateToRootDestination
+        )
     }
 }
 
@@ -87,8 +93,16 @@ private fun NavGraphBuilder.desktopAdminGraph(scaffoldPadding: PaddingValues) {
     desktopAdminDashboardScreen(contentPadding = normalContentPadding(scaffoldPadding))
 }
 
-private fun NavGraphBuilder.mobileAdminGraph(scaffoldPadding: PaddingValues) {
-    mobileAdminHomeScreen(contentPadding = smallContentPadding(scaffoldPadding))
+private fun NavGraphBuilder.mobileAdminGraph(
+    scaffoldPadding: PaddingValues,
+    navigateToRootDestination: (RootDestination) -> Unit
+) {
+    mobileAdminHomeScreen(
+        contentPadding = smallContentPadding(scaffoldPadding),
+        navigateToGate = { navigateToRootDestination(AdminGraph.Mobile.Gate) },
+        navigateToParking = { navigateToRootDestination(AdminGraph.Mobile.Parking) },
+        navigateToCctv = { navigateToRootDestination(AdminGraph.Mobile.Cctv) },
+    )
     mobileAdminGateScreen(contentPadding = smallContentPadding(scaffoldPadding))
     mobileAdminParkingScreen(contentPadding = smallContentPadding(scaffoldPadding))
     mobileAdminCctvScreen(contentPadding = smallContentPadding(scaffoldPadding))

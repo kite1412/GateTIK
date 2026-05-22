@@ -65,6 +65,9 @@ fun PortalTikApp() {
                 PortalTikNavHost(
                     signedInUser = signedInUser,
                     scaffoldPadding = p,
+                    navigateToRootDestination = { rootDestination ->
+                        appState.navigateToRootDestination(rootDestination.route)
+                    },
                     modifier = Modifier.run {
                         if (!LocalDarkMode.current) radialBackground()
                         else this
