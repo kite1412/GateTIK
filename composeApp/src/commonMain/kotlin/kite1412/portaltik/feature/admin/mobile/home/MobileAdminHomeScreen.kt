@@ -64,8 +64,10 @@ import kite1412.portaltik.model.IotDeviceStatus
 import kite1412.portaltik.model.ParkingQuota
 import kite1412.portaltik.ui.component.ActionCard
 import kite1412.portaltik.ui.compositionlocal.LocalDarkMode
+import kite1412.portaltik.ui.compositionlocal.LocalScaffoldComponentsController
 import kite1412.portaltik.ui.preview.DevicePreviews
 import kite1412.portaltik.ui.util.LoadState
+import kite1412.portaltik.ui.util.ScaffoldComponent
 import kite1412.portaltik.util.now
 import kite1412.portaltik.util.toLocalDateTime
 import org.jetbrains.compose.resources.painterResource
@@ -99,11 +101,15 @@ private fun MobileAdminHomeScreen(
     modifier: Modifier = Modifier
 ) {
     val isDarkMode = LocalDarkMode.current
+    val scaffoldComponentsController = LocalScaffoldComponentsController.current
 
     LazyColumn(
         modifier = modifier
             .fillMaxSize()
             .padding(contentPadding),
+        contentPadding = PaddingValues(
+            bottom = scaffoldComponentsController.getState(ScaffoldComponent.NAV_BAR).size.height
+        ),
         verticalArrangement = Arrangement.spacedBy(24.dp)
     ) {
         item {

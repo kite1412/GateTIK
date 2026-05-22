@@ -23,9 +23,10 @@ import org.koin.compose.viewmodel.koinViewModel
 @Preview
 fun PortalTikApp() {
     val viewModel = koinViewModel<PortalTikViewModel>()
-    val navController = rememberNavController()
     val isDarkMode by viewModel.isDarkMode.collectAsStateWithLifecycle()
     val signedInUser by viewModel.signedInUser.collectAsStateWithLifecycle()
+    val scaffoldComponentsController = viewModel.scaffoldComponentsController
+    val navController = rememberNavController()
     val appState = rememberPortalTikAppState(
         navController = navController,
         userRole = signedInUser?.role
@@ -34,7 +35,7 @@ fun PortalTikApp() {
 
     CompositionLocalProvider(
         LocalDarkMode provides (isDarkMode ?: isSystemInDarkTheme()),
-        LocalScaffoldComponentsController provides viewModel.scaffoldComponentsController
+        LocalScaffoldComponentsController provides scaffoldComponentsController
     ) {
         PortalTikTheme {
             NavigationScaffold(
@@ -51,7 +52,15 @@ fun PortalTikApp() {
                 },
                 onLogoutClick = {},
                 showNavigationBar = appState.currentRootDestination != null &&
-                    viewModel.scaffoldComponentsController.getVisibilityState(ScaffoldComponent.NAV_BAR)
+                    viewModel.scaffoldComponentsController
+                        .getState(ScaffoldComponent.NAV_BAR)
+                        .isVisible,
+                onNavigationBarSizeChange = { size ->
+                    scaffoldComponentsController.updateComponentSize(
+                        component = ScaffoldComponent.NAV_BAR,
+                        size = size
+                    )
+                }
             ) { p ->
                 PortalTikNavHost(
                     signedInUser = signedInUser,

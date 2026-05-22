@@ -48,7 +48,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.Density
+import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kite1412.portaltik.designsystem.theme.Blue100
@@ -81,8 +85,10 @@ fun NavigationScaffold(
     modifier: Modifier = Modifier,
     showNavigationBar: Boolean = true,
     windowWidthSize: WindowWidthSize = rememberWindowWidthSize(),
+    onNavigationBarSizeChange: ((DpSize) -> Unit)? = null,
     content: @Composable (contentPadding: PaddingValues) -> Unit
 ) {
+    val density = LocalDensity.current
     val sideNavigationBarEnter = fadeIn() + slideInHorizontally { -it }
     val sideNavigationBarExit = fadeOut() + slideOutHorizontally { -it }
 
@@ -93,6 +99,7 @@ fun NavigationScaffold(
     ) {
         AnimatedVisibility(
             visible = showNavigationBar && windowWidthSize == WindowWidthSize.MEDIUM,
+            modifier = navBarSizeConsumerModifier(density, onNavigationBarSizeChange),
             enter = sideNavigationBarEnter,
             exit = sideNavigationBarExit
         ) {
@@ -106,6 +113,7 @@ fun NavigationScaffold(
 
         AnimatedVisibility(
             visible = showNavigationBar && windowWidthSize == WindowWidthSize.LARGE,
+            modifier = navBarSizeConsumerModifier(density, onNavigationBarSizeChange),
             enter = sideNavigationBarEnter,
             exit = sideNavigationBarExit
         ) {
@@ -126,6 +134,7 @@ fun NavigationScaffold(
                 {
                     AnimatedVisibility(
                         visible = showNavigationBar,
+                        modifier = navBarSizeConsumerModifier(density, onNavigationBarSizeChange),
                         enter = fadeIn() + slideInVertically { it },
                         exit = fadeOut() + slideOutVertically { it }
                     ) {
@@ -153,6 +162,18 @@ data class Destination(
         val Empty = Destination("", "", null)
     }
 }
+
+private fun navBarSizeConsumerModifier(density: Density, consumer: ((DpSize) -> Unit)?): Modifier =
+    if (consumer != null) Modifier.onGloballyPositioned { coordinates ->
+        consumer(
+            with(density) {
+                DpSize(
+                    width = coordinates.size.width.toDp(),
+                    height = coordinates.size.height.toDp()
+                )
+            }
+        )
+    } else Modifier
 
 @Composable
 private fun SideNavigationRail(
