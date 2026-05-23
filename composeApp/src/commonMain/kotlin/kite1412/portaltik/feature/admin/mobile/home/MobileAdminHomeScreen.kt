@@ -135,7 +135,8 @@ private fun MobileAdminHomeScreen(
         item {
             HeaderSection(
                 userName = userName,
-                isDarkMode = isDarkMode
+                isDarkMode = isDarkMode,
+                modifier = Modifier.padding(start = 8.dp)
             )
         }
         item {
@@ -165,7 +166,8 @@ private fun MobileAdminHomeScreen(
 @Composable
 private fun HeaderSection(
     userName: String,
-    isDarkMode: Boolean
+    isDarkMode: Boolean,
+    modifier: Modifier = Modifier
 ) {
     val currentHour = now().toLocalDateTime().hour
     val greeting = when (currentHour) {
@@ -176,7 +178,7 @@ private fun HeaderSection(
     }
 
     Row(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {

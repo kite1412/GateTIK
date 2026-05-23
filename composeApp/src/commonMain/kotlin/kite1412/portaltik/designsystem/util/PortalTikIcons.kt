@@ -11,6 +11,7 @@ import portaltik.composeapp.generated.resources.email
 import portaltik.composeapp.generated.resources.eye_close
 import portaltik.composeapp.generated.resources.eye_open
 import portaltik.composeapp.generated.resources.house
+import portaltik.composeapp.generated.resources.location_mark
 import portaltik.composeapp.generated.resources.lock
 import portaltik.composeapp.generated.resources.logout
 import portaltik.composeapp.generated.resources.moon
@@ -47,4 +48,5 @@ object PortalTikIcons {
     val zoomIn = Res.drawable.zoom_in
     val phone = Res.drawable.phone
     val radio = Res.drawable.radio
+    val locationMark = Res.drawable.location_mark
 }

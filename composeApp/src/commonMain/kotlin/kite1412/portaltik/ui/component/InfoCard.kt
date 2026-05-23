@@ -17,7 +17,9 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import kite1412.portaltik.designsystem.component.Icon
 import kite1412.portaltik.designsystem.theme.Blue200_50
@@ -31,6 +33,8 @@ fun InfoCard(
     title: String,
     description: String,
     modifier: Modifier = Modifier,
+    iconBackground: Color = MaterialTheme.colorScheme.primary,
+    iconColor: Color = MaterialTheme.colorScheme.onPrimary
 ) {
     val isDarkMode = LocalDarkMode.current
     val containerColor by animateColorAsState(
@@ -56,7 +60,7 @@ fun InfoCard(
         Box(
             modifier = Modifier
                 .background(
-                    color = MaterialTheme.colorScheme.primary,
+                    color = iconBackground,
                     shape = RoundedCornerShape(12.dp)
                 )
                 .padding(12.dp),
@@ -65,7 +69,7 @@ fun InfoCard(
             Icon(
                 painter = icon,
                 contentDescription = null,
-                tint = MaterialTheme.colorScheme.onPrimary,
+                tint = iconColor,
                 modifier = Modifier.size(24.dp)
             )
         }
@@ -75,8 +79,8 @@ fun InfoCard(
         ) {
             Text(
                 text = title,
-                style = MaterialTheme.typography.bodyLarge,
-                color = MaterialTheme.colorScheme.onSurface
+                color = MaterialTheme.colorScheme.onSurface,
+                fontWeight = FontWeight.Bold
             )
             Text(
                 text = description,

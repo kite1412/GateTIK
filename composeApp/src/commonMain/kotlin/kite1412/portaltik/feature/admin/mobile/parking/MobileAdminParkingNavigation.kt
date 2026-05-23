@@ -7,6 +7,6 @@ import kite1412.portaltik.feature.admin.AdminGraph
 
 fun NavGraphBuilder.mobileAdminParkingScreen(contentPadding: PaddingValues) {
     composable(AdminGraph.Mobile.Parking.name) {
-        MobileAdminParkingScreen()
+        MobileAdminParkingScreen(contentPadding = contentPadding)
     }
 }
