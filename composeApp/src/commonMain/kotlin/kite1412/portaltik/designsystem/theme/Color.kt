@@ -63,6 +63,7 @@ val Gray900 = Color(0xFF252A32)
 val Gray950 = Color(0xFF0A0A0A)
 
 // Indigo
+val Indigo200 = Color(0xFF312E81)
 val Indigo400 = Color(0xFF615FFF)
 val Indigo400_30 = Color(0x4D615FFF)
 val Indigo600 = Color(0xFF4F39F6)
@@ -86,6 +87,7 @@ val Purple400_20 = Color(0x33A684FF)
 val Yellow300 = Color(0xFFFFD230)
 
 // Gradients
-val BluePurpleLinearGradient = listOf(Blue500Alt, Indigo600)
+val BlueIndigoGradient = listOf(Blue500Alt, Indigo600)
 val LighterBlueLightBlueGradient = listOf(Blue50, Blue100)
 val BlueSlateGradient = listOf(Blue950, Slate950)
+val RoyalBlueIndigoGradient = listOf(RoyalBlue800, Indigo200)

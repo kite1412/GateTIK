@@ -6,7 +6,7 @@ import androidx.navigation.navigation
 import kite1412.portaltik.designsystem.util.PortalTikIcons
 import kite1412.portaltik.feature.Graph
 import kite1412.portaltik.feature.Route
-import kite1412.portaltik.feature.student.home.navigation.homeScreen
+import kite1412.portaltik.feature.student.home.homeScreen
 import kite1412.portaltik.ui.navigation.RootDestination
 import kite1412.portaltik.ui.navigation.RootDestinationsProvider
 import org.jetbrains.compose.resources.DrawableResource

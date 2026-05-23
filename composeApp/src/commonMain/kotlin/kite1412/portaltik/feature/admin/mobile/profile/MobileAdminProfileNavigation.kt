@@ -7,6 +7,6 @@ import kite1412.portaltik.feature.admin.AdminGraph
 
 fun NavGraphBuilder.mobileAdminProfileScreen(contentPadding: PaddingValues) {
     composable(AdminGraph.Mobile.Profile.name) {
-        MobileAdminProfileScreen()
+        MobileAdminProfileScreen(contentPadding = contentPadding)
     }
 }

@@ -41,7 +41,7 @@ import kite1412.portaltik.designsystem.component.StatusIndicator
 import kite1412.portaltik.designsystem.theme.Blue200
 import kite1412.portaltik.designsystem.theme.Blue200_50
 import kite1412.portaltik.designsystem.theme.Blue900
-import kite1412.portaltik.designsystem.theme.BluePurpleLinearGradient
+import kite1412.portaltik.designsystem.theme.BlueIndigoGradient
 import kite1412.portaltik.designsystem.theme.Emerald500
 import kite1412.portaltik.designsystem.theme.Emerald700
 import kite1412.portaltik.designsystem.theme.Gray900
@@ -237,7 +237,7 @@ private fun GateControlCard(
         modifier = Modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(32.dp))
-            .background(Brush.linearGradient(BluePurpleLinearGradient))
+            .background(Brush.linearGradient(BlueIndigoGradient))
             .padding(24.dp)
     ) {
         Column(

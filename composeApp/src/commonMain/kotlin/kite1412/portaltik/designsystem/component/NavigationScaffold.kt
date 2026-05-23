@@ -58,7 +58,7 @@ import androidx.compose.ui.unit.sp
 import kite1412.portaltik.designsystem.theme.Blue100
 import kite1412.portaltik.designsystem.theme.Blue500
 import kite1412.portaltik.designsystem.theme.Blue900
-import kite1412.portaltik.designsystem.theme.BluePurpleLinearGradient
+import kite1412.portaltik.designsystem.theme.BlueIndigoGradient
 import kite1412.portaltik.designsystem.theme.PortalTikTheme
 import kite1412.portaltik.designsystem.theme.Slate400
 import kite1412.portaltik.designsystem.theme.Slate500
@@ -325,7 +325,7 @@ private fun SideNavigationDrawer(
                         modifier = Modifier
                             .size(40.dp)
                             .background(
-                                brush = Brush.linearGradient(BluePurpleLinearGradient),
+                                brush = Brush.linearGradient(BlueIndigoGradient),
                                 shape = CircleShape
                             ),
                         contentAlignment = Alignment.Center

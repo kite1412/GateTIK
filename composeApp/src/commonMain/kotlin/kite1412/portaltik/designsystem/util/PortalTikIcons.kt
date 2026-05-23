@@ -11,6 +11,7 @@ import portaltik.composeapp.generated.resources.email
 import portaltik.composeapp.generated.resources.eye_close
 import portaltik.composeapp.generated.resources.eye_open
 import portaltik.composeapp.generated.resources.house
+import portaltik.composeapp.generated.resources.id_card
 import portaltik.composeapp.generated.resources.location_mark
 import portaltik.composeapp.generated.resources.lock
 import portaltik.composeapp.generated.resources.logout
@@ -18,6 +19,7 @@ import portaltik.composeapp.generated.resources.moon
 import portaltik.composeapp.generated.resources.person
 import portaltik.composeapp.generated.resources.phone
 import portaltik.composeapp.generated.resources.radio
+import portaltik.composeapp.generated.resources.shield
 import portaltik.composeapp.generated.resources.sound_up
 import portaltik.composeapp.generated.resources.sun
 import portaltik.composeapp.generated.resources.unila
@@ -49,4 +51,6 @@ object PortalTikIcons {
     val phone = Res.drawable.phone
     val radio = Res.drawable.radio
     val locationMark = Res.drawable.location_mark
+    val shield = Res.drawable.shield
+    val idCard = Res.drawable.id_card
 }
