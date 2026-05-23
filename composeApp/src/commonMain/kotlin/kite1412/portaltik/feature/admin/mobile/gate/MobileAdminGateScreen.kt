@@ -1,14 +1,11 @@
 package kite1412.portaltik.feature.admin.mobile.gate
 
 import androidx.compose.animation.AnimatedContent
-import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateColor
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.slideInHorizontally
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -50,6 +47,7 @@ import kite1412.portaltik.designsystem.component.GlassBox
 import kite1412.portaltik.designsystem.component.GradientTextButton
 import kite1412.portaltik.designsystem.component.Icon
 import kite1412.portaltik.designsystem.component.OutlinedTextButton
+import kite1412.portaltik.designsystem.component.SectionHeader
 import kite1412.portaltik.designsystem.theme.Blue200_50
 import kite1412.portaltik.designsystem.theme.Emerald500
 import kite1412.portaltik.designsystem.theme.PortalTikTheme
@@ -117,7 +115,7 @@ private fun MobileAdminGateScreen(
         verticalArrangement = Arrangement.spacedBy(24.dp)
     ) {
         item {
-            GateControlHeader(
+            SectionHeader(
                 title = "Kontrol Gerbang",
                 subtitle = if (isGateSuccess) gate.data.gateName else ""
             )
@@ -158,37 +156,6 @@ private fun MobileAdminGateScreen(
                     text = "Simulasi Offline",
                     onClick = {},
                     modifier = Modifier.fillMaxWidth()
-                )
-            }
-        }
-    }
-}
-
-@Composable
-private fun GateControlHeader(
-    title: String,
-    subtitle: String,
-    modifier: Modifier = Modifier
-) {
-    Row(
-        modifier = modifier.fillMaxWidth(),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(16.dp)
-    ) {
-        Column {
-            Text(
-                text = title,
-                style = MaterialTheme.typography.titleMedium,
-                color = MaterialTheme.colorScheme.onSurface
-            )
-            AnimatedVisibility(
-                visible = subtitle.isNotBlank(),
-                enter = fadeIn() + slideInHorizontally { -it }
-            ) {
-                Text(
-                    text = subtitle,
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
         }

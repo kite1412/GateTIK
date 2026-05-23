@@ -7,6 +7,6 @@ import kite1412.portaltik.feature.admin.AdminGraph
 
 fun NavGraphBuilder.mobileAdminCctvScreen(contentPadding: PaddingValues) {
     composable(AdminGraph.Mobile.Cctv.name) {
-        MobileAdminCctvScreen()
+        MobileAdminCctvScreen(contentPadding = contentPadding)
     }
 }

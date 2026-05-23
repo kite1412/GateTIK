@@ -2,6 +2,7 @@ package kite1412.portaltik.designsystem.util
 
 import portaltik.composeapp.generated.resources.Res
 import portaltik.composeapp.generated.resources.bell
+import portaltik.composeapp.generated.resources.camera
 import portaltik.composeapp.generated.resources.car
 import portaltik.composeapp.generated.resources.chevron_right
 import portaltik.composeapp.generated.resources.dashboard
@@ -14,10 +15,14 @@ import portaltik.composeapp.generated.resources.lock
 import portaltik.composeapp.generated.resources.logout
 import portaltik.composeapp.generated.resources.moon
 import portaltik.composeapp.generated.resources.person
+import portaltik.composeapp.generated.resources.phone
+import portaltik.composeapp.generated.resources.radio
+import portaltik.composeapp.generated.resources.sound_up
 import portaltik.composeapp.generated.resources.sun
 import portaltik.composeapp.generated.resources.unila
 import portaltik.composeapp.generated.resources.video_recorder
 import portaltik.composeapp.generated.resources.wifi
+import portaltik.composeapp.generated.resources.zoom_in
 
 object PortalTikIcons {
     val email = Res.drawable.email
@@ -37,4 +42,9 @@ object PortalTikIcons {
     val bell = Res.drawable.bell
     val wifi = Res.drawable.wifi
     val chevronRight = Res.drawable.chevron_right
+    val camera = Res.drawable.camera
+    val soundUp = Res.drawable.sound_up
+    val zoomIn = Res.drawable.zoom_in
+    val phone = Res.drawable.phone
+    val radio = Res.drawable.radio
 }
