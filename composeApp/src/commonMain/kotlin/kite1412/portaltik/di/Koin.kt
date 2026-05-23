@@ -3,6 +3,7 @@ package kite1412.portaltik.di
 import kite1412.portaltik.app.PortalTikViewModel
 import kite1412.portaltik.data.dataModule
 import kite1412.portaltik.datastore.dataStoreModule
+import kite1412.portaltik.domain.domainModule
 import kite1412.portaltik.feature.admin.desktop.dashboard.DesktopAdminDashboardViewModel
 import kite1412.portaltik.feature.admin.mobile.cctv.MobileAdminCctvViewModel
 import kite1412.portaltik.feature.admin.mobile.gate.MobileAdminGateViewModel
@@ -22,14 +23,18 @@ private val mobileViewModelModule = module {
     viewModel {
         MobileAdminHomeViewModel(
             authentication = get(),
-            cctvRepository = get(),
-            gateRepository = get(),
-            iotDeviceRepository = get(),
-            parkinQuotaRepository = get(),
+            getMainGateUseCase = get(),
+            getMainIotDeviceUseCase = get(),
+            getMainCctvUseCase = get(),
+            getMainParkingQuotaUseCase = get()
         )
     }
     viewModel {
-        MobileAdminGateViewModel()
+        MobileAdminGateViewModel(
+            gateRepository = get(),
+            iotDeviceRepository = get(),
+            accessLogRepository = get()
+        )
     }
     viewModel {
         MobileAdminCctvViewModel()
@@ -64,6 +69,7 @@ private val viewModelModule = module {
 
 private val appModule = platformModule +
         dataStoreModule +
+        domainModule +
         viewModelModule +
         mockRemoteModule +
         dataModule

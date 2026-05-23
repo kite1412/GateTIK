@@ -1,5 +1,7 @@
 package kite1412.portaltik.network.mock
 
+import kite1412.portaltik.model.AccessLog
+import kite1412.portaltik.model.AccessStatus
 import kite1412.portaltik.model.Cctv
 import kite1412.portaltik.model.Gate
 import kite1412.portaltik.model.GateStatus
@@ -41,4 +43,62 @@ val mockParkingQuota = ParkingQuota(
     totalSlots = 120,
     usedSlots = 87,
     autoRestrictStudents = true
+)
+
+val mockAccessLogs = listOf(
+    AccessLog(
+        id = 1,
+        userId = 0,
+        gateId = 1,
+        status = AccessStatus.SUCCESS,
+        accessMethod = "RFID",
+        triggeredBy = "System",
+        notes = "Access granted normally",
+        accessedAt = Instant.parse("2026-05-23T07:15:30Z"),
+        createdAt = Instant.parse("2026-05-23T07:15:35Z")
+    ),
+    AccessLog(
+        id = 2,
+        userId = 0,
+        gateId = 2,
+        status = AccessStatus.DENIED,
+        accessMethod = "Face Recognition",
+        triggeredBy = "Security",
+        notes = "Face mismatch detected",
+        accessedAt = Instant.parse("2026-05-23T08:02:10Z"),
+        createdAt = Instant.parse("2026-05-23T08:02:15Z")
+    ),
+    AccessLog(
+        id = 3,
+        userId = 103,
+        gateId = 1,
+        status = AccessStatus.SUCCESS,
+        accessMethod = "QR Code",
+        triggeredBy = "Mobile App",
+        notes = null,
+        accessedAt = Instant.parse("2026-05-23T09:40:00Z"),
+        createdAt = Instant.parse("2026-05-23T09:40:03Z")
+    ),
+    AccessLog(
+        id = 4,
+        userId = 104,
+        gateId = 1,
+        status = AccessStatus.FAILED,
+        accessMethod = null,
+        triggeredBy = "Manual Override",
+        notes = "Waiting for admin approval",
+        accessedAt = Instant.parse("2026-05-23T10:12:45Z"),
+        createdAt = Instant.parse("2026-05-23T10:12:50Z")
+    ),
+    AccessLog(
+        id = 5,
+        userId = 105,
+        gateId = 1,
+        status = AccessStatus.SUCCESS,
+        accessMethod = "Fingerprint",
+        triggeredBy = "System",
+        notes = "Fingerprint verified",
+        accessedAt = Instant.parse("2026-05-23T11:05:20Z"),
+        createdAt = Instant.parse("2026-05-23T11:05:25Z")
+    )
 )

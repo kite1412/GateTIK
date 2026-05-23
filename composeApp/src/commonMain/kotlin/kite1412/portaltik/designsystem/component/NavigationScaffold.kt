@@ -65,6 +65,7 @@ import kite1412.portaltik.designsystem.theme.Slate500
 import kite1412.portaltik.designsystem.theme.Slate900_95
 import kite1412.portaltik.designsystem.theme.White
 import kite1412.portaltik.designsystem.theme.White60
+import kite1412.portaltik.designsystem.theme.White95
 import kite1412.portaltik.designsystem.util.PortalTikIcons
 import kite1412.portaltik.designsystem.util.WindowWidthSize
 import kite1412.portaltik.designsystem.util.rememberWindowWidthSize
@@ -442,7 +443,7 @@ private fun BottomNavigationBar(
     modifier: Modifier = Modifier
 ) {
     val containerColor by animateColorAsState(
-        targetValue = if (isDarkTheme) Slate900_95 else White60
+        targetValue = if (isDarkTheme) Slate900_95 else White95
     )
 
     NavigationBar(

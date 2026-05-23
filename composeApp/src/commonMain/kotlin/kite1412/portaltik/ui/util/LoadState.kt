@@ -12,6 +12,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.stateIn
 
 sealed interface LoadState<out T> {
     data class Loading(
@@ -24,6 +29,15 @@ sealed interface LoadState<out T> {
         val message: String
     ) : LoadState<Nothing>
 }
+
+fun <T> Flow<LoadState<T>>.stateIn(
+    scope: CoroutineScope,
+    started: SharingStarted = SharingStarted.WhileSubscribed(5000)
+): StateFlow<LoadState<T>> = stateIn(
+    scope = scope,
+    started = started,
+    initialValue = LoadState.Loading()
+)
 
 @Composable
 fun <T> UiLoadState(

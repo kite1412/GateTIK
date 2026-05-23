@@ -4,6 +4,7 @@ import androidx.compose.ui.graphics.Color
 
 // White & Black
 val White = Color(0xFFFFFFFF)
+val White95 = Color(0xF2FFFFFF)
 val White80 = Color(0xCCFFFFFF)
 val White70 = Color(0xB3FFFFFF)
 val White60 = Color(0x99FFFFFF)

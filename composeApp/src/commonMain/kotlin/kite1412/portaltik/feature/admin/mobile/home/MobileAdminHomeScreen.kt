@@ -86,13 +86,17 @@ fun MobileAdminHomeScreen(
     viewModel: MobileAdminHomeViewModel = koinViewModel()
 ) {
     val signedInUser by viewModel.signedInUser.collectAsStateWithLifecycle()
+    val mainGate by viewModel.mainGate.collectAsStateWithLifecycle()
+    val mainIotDevice by viewModel.mainIotDevice.collectAsStateWithLifecycle()
+    val mainCctv by viewModel.mainCctv.collectAsStateWithLifecycle()
+    val mainParkingQuota by viewModel.mainParkingQuota.collectAsStateWithLifecycle()
 
     MobileAdminHomeScreen(
         userName = signedInUser?.fullName ?: "",
-        gate = viewModel.mainGate,
-        iotDevice = viewModel.mainIotDevice,
-        parkingQuota = viewModel.mainParkingQuota,
-        cctv = viewModel.mainCctv,
+        gate = mainGate,
+        iotDevice = mainIotDevice,
+        parkingQuota = mainParkingQuota,
+        cctv = mainCctv,
         contentPadding = contentPadding,
         onGateControlClick = {},
         onGateClick = navigateToGate,
