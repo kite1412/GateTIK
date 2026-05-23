@@ -24,15 +24,16 @@ private val mobileViewModelModule = module {
         MobileAdminHomeViewModel(
             authentication = get(),
             getMainGateUseCase = get(),
-            getMainIotDeviceUseCase = get(),
+            getIotDeviceUseCase = get(),
             getMainCctvUseCase = get(),
             getMainParkingQuotaUseCase = get()
         )
     }
     viewModel {
         MobileAdminGateViewModel(
-            gateRepository = get(),
-            iotDeviceRepository = get(),
+            getMainGateUseCase = get(),
+            getIotDeviceUseCase = get(),
+            getMainParkingQuotaUseCase = get(),
             accessLogRepository = get()
         )
     }

@@ -1,10 +1,14 @@
 package kite1412.portaltik.feature.admin.mobile.gate
 
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateColor
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.slideInHorizontally
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -41,6 +45,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kite1412.portaltik.designsystem.component.GlassBox
 import kite1412.portaltik.designsystem.component.GradientTextButton
 import kite1412.portaltik.designsystem.component.Icon
@@ -48,16 +53,25 @@ import kite1412.portaltik.designsystem.component.OutlinedTextButton
 import kite1412.portaltik.designsystem.theme.Blue200_50
 import kite1412.portaltik.designsystem.theme.Emerald500
 import kite1412.portaltik.designsystem.theme.PortalTikTheme
+import kite1412.portaltik.designsystem.theme.Red500
 import kite1412.portaltik.designsystem.theme.Slate900_95
 import kite1412.portaltik.designsystem.theme.White
 import kite1412.portaltik.designsystem.theme.White55
 import kite1412.portaltik.designsystem.util.PortalTikIcons
+import kite1412.portaltik.model.AccessLog
+import kite1412.portaltik.model.Gate
+import kite1412.portaltik.model.IotDevice
+import kite1412.portaltik.model.IotDeviceStatus
+import kite1412.portaltik.model.ParkingQuota
+import kite1412.portaltik.ui.component.SmallCircularProgressIndicator
 import kite1412.portaltik.ui.compositionlocal.LocalDarkMode
 import kite1412.portaltik.ui.compositionlocal.LocalScaffoldComponentsController
 import kite1412.portaltik.ui.preview.DevicePreviews
+import kite1412.portaltik.ui.util.LoadState
 import kite1412.portaltik.ui.util.ScaffoldComponent
 import kite1412.portaltik.ui.util.ScaffoldComponentState
 import kite1412.portaltik.ui.util.ScaffoldComponentsController
+import kite1412.portaltik.util.timeAgo
 import org.jetbrains.compose.resources.painterResource
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -67,7 +81,15 @@ fun MobileAdminGateScreen(
     modifier: Modifier = Modifier,
     viewModel: MobileAdminGateViewModel = koinViewModel()
 ) {
+    val mainGate by viewModel.mainGate.collectAsStateWithLifecycle()
+    val mainIotDevice by viewModel.mainIotDevice.collectAsStateWithLifecycle()
+    val mainParkingQuota by viewModel.mainParkingQuota.collectAsStateWithLifecycle()
+
     MobileAdminGateScreen(
+        gate = mainGate,
+        iotDevice = mainIotDevice,
+        parkingQuota = mainParkingQuota,
+        latestAccessLog = viewModel.latestAccessLog,
         contentPadding = contentPadding,
         modifier = modifier
     )
@@ -75,10 +97,15 @@ fun MobileAdminGateScreen(
 
 @Composable
 private fun MobileAdminGateScreen(
+    gate: LoadState<Gate?>,
+    iotDevice: LoadState<IotDevice?>,
+    parkingQuota: LoadState<ParkingQuota?>,
+    latestAccessLog: LoadState<AccessLog?>,
     contentPadding: PaddingValues,
     modifier: Modifier = Modifier
 ) {
     val scaffoldComponentsController = LocalScaffoldComponentsController.current
+    val isGateSuccess = gate is LoadState.Success && gate.data != null
 
     LazyColumn(
         modifier = modifier
@@ -92,7 +119,7 @@ private fun MobileAdminGateScreen(
         item {
             GateControlHeader(
                 title = "Kontrol Gerbang",
-                subtitle = "Pintu Masuk Utama · Gedung A"
+                subtitle = if (isGateSuccess) gate.data.gateName else ""
             )
         }
 
@@ -101,7 +128,12 @@ private fun MobileAdminGateScreen(
         }
 
         item {
-            StatusGrid()
+            StatusGrid(
+                gate = gate,
+                iotDevice = iotDevice,
+                parkingQuota = parkingQuota,
+                latestAccessLog = latestAccessLog
+            )
         }
 
         item {
@@ -149,11 +181,16 @@ private fun GateControlHeader(
                 style = MaterialTheme.typography.titleMedium,
                 color = MaterialTheme.colorScheme.onSurface
             )
-            Text(
-                text = subtitle,
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
+            AnimatedVisibility(
+                visible = subtitle.isNotBlank(),
+                enter = fadeIn() + slideInHorizontally { -it }
+            ) {
+                Text(
+                    text = subtitle,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
         }
     }
 }
@@ -244,6 +281,10 @@ private fun GateStatusCard(
 
 @Composable
 private fun StatusGrid(
+    gate: LoadState<Gate?>,
+    iotDevice: LoadState<IotDevice?>,
+    parkingQuota: LoadState<ParkingQuota?>,
+    latestAccessLog: LoadState<AccessLog?>,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -254,15 +295,24 @@ private fun StatusGrid(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(16.dp)
         ) {
+            val isIotDeviceSuccess = iotDevice is LoadState.Success && iotDevice.data != null
+
             StatusGridItem(
                 label = "STATUS",
-                value = "CLOSED",
+                value = if (gate is LoadState.Success && gate.data != null)
+                    gate.data.currentStatus.toIdString() else "Gate Tidak Ditemukan",
+                showLoading = gate is LoadState.Loading,
                 modifier = Modifier.weight(1f)
             )
             StatusGridItem(
                 label = "KONEKSI",
-                value = "Online",
-                valueColor = Emerald500,
+                value = if (isIotDeviceSuccess) iotDevice.data.status.name
+                        .lowercase()
+                        .replaceFirstChar { it.uppercase() } else "Tidak Terkoneksi",
+                showLoading = iotDevice is LoadState.Loading,
+                valueColor = if (
+                        iotDevice is LoadState.Error || (isIotDeviceSuccess && iotDevice.data.status == IotDeviceStatus.OFFLINE)
+                    ) Red500 else Emerald500,
                 icon = painterResource(PortalTikIcons.wifi),
                 modifier = Modifier.weight(1f)
             )
@@ -273,13 +323,18 @@ private fun StatusGrid(
         ) {
             StatusGridItem(
                 label = "TERAKHIR DIBUKA",
-                value = "2 menit yang lalu",
+                value = if (latestAccessLog is LoadState.Success && latestAccessLog.data != null)
+                    latestAccessLog.data.accessedAt.timeAgo() else "Data Tidak Ditemukan",
+                showLoading = latestAccessLog is LoadState.Loading,
                 modifier = Modifier.weight(1f)
             )
             StatusGridItem(
                 label = "PARKIR",
-                value = "72/100",
-                valueColor = Emerald500,
+                value = if (parkingQuota is LoadState.Success && parkingQuota.data != null)
+                    "${parkingQuota.data.usedSlots} / ${parkingQuota.data.totalSlots}"
+                    else "Parkir Tidak Ditemukan",
+                showLoading = parkingQuota is LoadState.Loading,
+                valueColor = if (parkingQuota is LoadState.Error) Red500 else Emerald500,
                 modifier = Modifier.weight(1f)
             )
         }
@@ -290,6 +345,7 @@ private fun StatusGrid(
 private fun StatusGridItem(
     label: String,
     value: String,
+    showLoading: Boolean,
     modifier: Modifier = Modifier,
     valueColor: Color = MaterialTheme.colorScheme.onSurface,
     icon: Painter? = null
@@ -320,25 +376,29 @@ private fun StatusGridItem(
             ),
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(4.dp)
+        AnimatedContent(
+            targetState = showLoading
         ) {
-            if (icon != null) {
-                Icon(
-                    painter = icon,
-                    contentDescription = null,
-                    modifier = Modifier.size(16.dp),
-                    tint = valueColor
+            if (!it) Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(4.dp)
+            ) {
+                if (icon != null) {
+                    Icon(
+                        painter = icon,
+                        contentDescription = null,
+                        modifier = Modifier.size(16.dp),
+                        tint = valueColor
+                    )
+                }
+                Text(
+                    text = value,
+                    style = LocalTextStyle.current.copy(
+                        fontWeight = FontWeight.Bold
+                    ),
+                    color = valueColor
                 )
-            }
-            Text(
-                text = value,
-                style = LocalTextStyle.current.copy(
-                    fontWeight = FontWeight.Bold
-                ),
-                color = valueColor
-            )
+            } else SmallCircularProgressIndicator()
         }
     }
 }
@@ -361,6 +421,10 @@ private fun MobileAdminGateScreenPreview() {
                 }
             ) {
                 MobileAdminGateScreen(
+                    gate = LoadState.Success(null),
+                    iotDevice = LoadState.Success(null),
+                    parkingQuota = LoadState.Success(null),
+                    latestAccessLog = LoadState.Success(null),
                     contentPadding = p
                 )
             }
