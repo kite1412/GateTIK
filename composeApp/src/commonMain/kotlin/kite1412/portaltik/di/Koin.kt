@@ -38,7 +38,9 @@ private val mobileViewModelModule = module {
         )
     }
     viewModel {
-        MobileAdminCctvViewModel()
+        MobileAdminCctvViewModel(
+            getMainCctvUseCase = get()
+        )
     }
     viewModel {
         MobileAdminParkingViewModel(

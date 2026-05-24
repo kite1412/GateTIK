@@ -1,5 +1,6 @@
 package kite1412.portaltik.feature.admin.mobile.cctv
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateColor
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.infiniteRepeatable
@@ -24,21 +25,26 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kite1412.portaltik.designsystem.component.Badge
 import kite1412.portaltik.designsystem.component.Icon
 import kite1412.portaltik.designsystem.component.SectionHeader
 import kite1412.portaltik.designsystem.theme.Black
 import kite1412.portaltik.designsystem.theme.Emerald700
+import kite1412.portaltik.designsystem.theme.Gray900
 import kite1412.portaltik.designsystem.theme.PortalTikTheme
 import kite1412.portaltik.designsystem.theme.Red600
 import kite1412.portaltik.designsystem.theme.White
 import kite1412.portaltik.designsystem.theme.White20
 import kite1412.portaltik.designsystem.util.PortalTikIcons
+import kite1412.portaltik.model.Cctv
 import kite1412.portaltik.ui.component.InfoCard
 import kite1412.portaltik.ui.compositionlocal.LocalScaffoldComponentsController
 import kite1412.portaltik.ui.preview.DevicePreviews
+import kite1412.portaltik.ui.util.LoadState
 import kite1412.portaltik.ui.util.ScaffoldComponent
 import org.jetbrains.compose.resources.painterResource
 import org.koin.compose.viewmodel.koinViewModel
@@ -49,7 +55,10 @@ fun MobileAdminCctvScreen(
     modifier: Modifier = Modifier,
     viewModel: MobileAdminCctvViewModel = koinViewModel()
 ) {
+    val mainCctv by viewModel.mainCctv.collectAsStateWithLifecycle()
+
     MobileAdminCctvScreen(
+        cctv = mainCctv,
         contentPadding = contentPadding,
         modifier = modifier
     )
@@ -57,6 +66,7 @@ fun MobileAdminCctvScreen(
 
 @Composable
 private fun MobileAdminCctvScreen(
+    cctv: LoadState<Cctv?>,
     contentPadding: PaddingValues,
     modifier: Modifier = Modifier
 ) {
@@ -74,12 +84,13 @@ private fun MobileAdminCctvScreen(
         item {
             SectionHeader(
                 title = "CCTV",
-                subtitle = "Kamera Gerbang Utama · Interkom juga memiliki kamera"
+                subtitle = if (cctv is LoadState.Success && cctv.data != null) "${cctv.data.cameraName}"
+                    else ""
             )
         }
         item {
             CctvPlayer(
-                label = "CAM-01 · Gerbang Utama"
+                cctv = cctv
             )
         }
         item {
@@ -94,7 +105,7 @@ private fun MobileAdminCctvScreen(
 
 @Composable
 private fun CctvPlayer(
-    label: String,
+    cctv: LoadState<Cctv?>,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -107,7 +118,11 @@ private fun CctvPlayer(
             modifier = Modifier
                 .fillMaxWidth()
                 .aspectRatio(16f / 9f)
-                .background(Color(0xFF0F172A)) // Dark slate for preview
+                .background(
+                    Brush.radialGradient(
+                        colors = listOf(Gray900, Color.Black)
+                    )
+                )
         ) {
             Row(
                 modifier = Modifier
@@ -130,17 +145,24 @@ private fun CctvPlayer(
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
+                    val isCctvSuccess = cctv is LoadState.Success && cctv.data != null
+
                     Badge(
                         text = "LIVE",
                         containerColor = Red600,
                         contentColor = White
                     )
 
-                    Badge(
-                        text = label,
-                        containerColor = White20,
-                        contentColor = White
-                    )
+                    AnimatedVisibility(isCctvSuccess) {
+                        val cctv = if (isCctvSuccess) cctv.data else null
+                        cctv?.let {
+                            Badge(
+                                text = it.cameraName,
+                                containerColor = White20,
+                                contentColor = White
+                            )
+                        }
+                    }
                 }
 
                 Icon(

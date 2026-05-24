@@ -495,7 +495,9 @@ private fun CctvCard(
                             .background(Gray950.copy(alpha = 0.5f)),
                         contentAlignment = Alignment.Center
                     ) {
-                        SmallCircularProgressIndicator()
+                        SmallCircularProgressIndicator(
+                            color = White
+                        )
                     }
                 },
                 error = {

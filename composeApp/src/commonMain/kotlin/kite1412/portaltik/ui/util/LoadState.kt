@@ -12,6 +12,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import kite1412.portaltik.designsystem.theme.Black70
+import kite1412.portaltik.designsystem.theme.White55
+import kite1412.portaltik.ui.compositionlocal.LocalDarkMode
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
@@ -32,11 +35,12 @@ sealed interface LoadState<out T> {
 
 fun <T> Flow<LoadState<T>>.stateIn(
     scope: CoroutineScope,
-    started: SharingStarted = SharingStarted.WhileSubscribed(5000)
+    started: SharingStarted = SharingStarted.WhileSubscribed(5000),
+    initialValue: LoadState<T> = LoadState.Loading()
 ): StateFlow<LoadState<T>> = stateIn(
     scope = scope,
     started = started,
-    initialValue = LoadState.Loading()
+    initialValue = initialValue
 )
 
 @Composable
@@ -80,17 +84,20 @@ fun LoadingState(
     message: String,
     modifier: Modifier = Modifier
 ) {
+    val color = if (LocalDarkMode.current) White55 else Black70
+
     Column(
         modifier = modifier,
         verticalArrangement = Arrangement.spacedBy(8.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         CircularProgressIndicator(
-            color = MaterialTheme.colorScheme.primary
+            color = color
         )
         Text(
             text = message,
-            style = MaterialTheme.typography.bodySmall
+            style = MaterialTheme.typography.bodySmall,
+            color = color
         )
     }
 }

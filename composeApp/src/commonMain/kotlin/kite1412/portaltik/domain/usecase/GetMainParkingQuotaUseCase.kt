@@ -10,7 +10,7 @@ import kotlinx.coroutines.flow.flow
 
 class GetMainParkingQuotaUseCase(private val parkingQuotaRepository: ParkingQuotaRepository) {
     operator fun invoke(): Flow<LoadState<ParkingQuota?>> = flow {
-        emit(LoadState.Loading())
+        emit(LoadState.Loading("Memuat informasi parkir"))
 
         parkingQuotaRepository
             .getMainParkingQuota()
