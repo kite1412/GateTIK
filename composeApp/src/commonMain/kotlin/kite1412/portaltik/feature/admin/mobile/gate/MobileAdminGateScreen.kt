@@ -39,7 +39,6 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -66,9 +65,8 @@ import kite1412.portaltik.ui.compositionlocal.LocalDarkMode
 import kite1412.portaltik.ui.compositionlocal.LocalScaffoldComponentsController
 import kite1412.portaltik.ui.preview.DevicePreviews
 import kite1412.portaltik.ui.util.LoadState
+import kite1412.portaltik.ui.util.MockScaffoldComponentController
 import kite1412.portaltik.ui.util.ScaffoldComponent
-import kite1412.portaltik.ui.util.ScaffoldComponentState
-import kite1412.portaltik.ui.util.ScaffoldComponentsController
 import kite1412.portaltik.util.timeAgo
 import org.jetbrains.compose.resources.painterResource
 import org.koin.compose.viewmodel.koinViewModel
@@ -376,16 +374,7 @@ private fun MobileAdminGateScreenPreview() {
     PortalTikTheme(darkTheme = isSystemInDarkTheme()) {
         Scaffold { p ->
             CompositionLocalProvider(
-                LocalScaffoldComponentsController provides object : ScaffoldComponentsController {
-                    override fun getState(component: ScaffoldComponent): ScaffoldComponentState =
-                        ScaffoldComponentState()
-                    override fun showComponent(component: ScaffoldComponent) {}
-                    override fun hideComponent(component: ScaffoldComponent) {}
-                    override fun updateComponentSize(
-                        component: ScaffoldComponent,
-                        size: DpSize
-                    ) {}
-                }
+                LocalScaffoldComponentsController provides MockScaffoldComponentController
             ) {
                 MobileAdminGateScreen(
                     gate = LoadState.Success(null),

@@ -40,7 +40,7 @@ val mockCctv = Cctv(
 
 val mockParkingQuota = ParkingQuota(
     id = "PARKING-QUOTA-001",
-    totalSlots = 120,
+    totalSlots = 100,
     usedSlots = 87,
     autoRestrictStudents = true
 )

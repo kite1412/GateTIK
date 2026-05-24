@@ -16,6 +16,7 @@ import portaltik.composeapp.generated.resources.location_mark
 import portaltik.composeapp.generated.resources.lock
 import portaltik.composeapp.generated.resources.logout
 import portaltik.composeapp.generated.resources.moon
+import portaltik.composeapp.generated.resources.parking_off
 import portaltik.composeapp.generated.resources.person
 import portaltik.composeapp.generated.resources.phone
 import portaltik.composeapp.generated.resources.radio
@@ -53,4 +54,5 @@ object PortalTikIcons {
     val locationMark = Res.drawable.location_mark
     val shield = Res.drawable.shield
     val idCard = Res.drawable.id_card
+    val parkingOff = Res.drawable.parking_off
 }

@@ -18,3 +18,14 @@ data class ScaffoldComponentState(
     val isVisible: Boolean = true,
     val size: DpSize = DpSize(0.dp, 0.dp)
 )
+
+val MockScaffoldComponentController = object : ScaffoldComponentsController {
+    override fun getState(component: ScaffoldComponent): ScaffoldComponentState =
+        ScaffoldComponentState()
+    override fun showComponent(component: ScaffoldComponent) {}
+    override fun hideComponent(component: ScaffoldComponent) {}
+    override fun updateComponentSize(
+        component: ScaffoldComponent,
+        size: DpSize
+    ) {}
+}

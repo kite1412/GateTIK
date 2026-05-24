@@ -1,5 +1,6 @@
 package kite1412.portaltik.feature.admin.mobile.parking
 
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -16,30 +17,41 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kite1412.portaltik.designsystem.component.Badge
 import kite1412.portaltik.designsystem.component.GlassBox
+import kite1412.portaltik.designsystem.component.Icon
 import kite1412.portaltik.designsystem.component.SectionHeader
+import kite1412.portaltik.designsystem.extension.radialBackground
 import kite1412.portaltik.designsystem.theme.Emerald500
 import kite1412.portaltik.designsystem.theme.Emerald700
 import kite1412.portaltik.designsystem.theme.PortalTikTheme
 import kite1412.portaltik.designsystem.theme.Slate900
 import kite1412.portaltik.designsystem.theme.White
 import kite1412.portaltik.designsystem.util.PortalTikIcons
+import kite1412.portaltik.model.ParkingQuota
 import kite1412.portaltik.ui.component.InfoCard
 import kite1412.portaltik.ui.component.StatCard
 import kite1412.portaltik.ui.compositionlocal.LocalDarkMode
 import kite1412.portaltik.ui.compositionlocal.LocalScaffoldComponentsController
 import kite1412.portaltik.ui.preview.DevicePreviews
+import kite1412.portaltik.ui.util.LoadState
+import kite1412.portaltik.ui.util.LoadingState
+import kite1412.portaltik.ui.util.MockScaffoldComponentController
 import kite1412.portaltik.ui.util.ScaffoldComponent
 import org.jetbrains.compose.resources.painterResource
 import org.koin.compose.viewmodel.koinViewModel
+import kotlin.math.max
 
 @Composable
 fun MobileAdminParkingScreen(
@@ -47,7 +59,10 @@ fun MobileAdminParkingScreen(
     modifier: Modifier = Modifier,
     viewModel: MobileAdminParkingViewModel = koinViewModel()
 ) {
+    val mainParkingQuota by viewModel.mainParkingQuota.collectAsStateWithLifecycle()
+
     MobileAdminParkingScreen(
+        parkingQuota = mainParkingQuota,
         contentPadding = contentPadding,
         modifier = modifier
     )
@@ -55,72 +70,110 @@ fun MobileAdminParkingScreen(
 
 @Composable
 private fun MobileAdminParkingScreen(
+    parkingQuota: LoadState<ParkingQuota?>,
     contentPadding: PaddingValues,
     modifier: Modifier = Modifier
 ) {
     val scaffoldComponentsController = LocalScaffoldComponentsController.current
+    val arrangement = Arrangement.spacedBy(24.dp)
 
-    LazyColumn(
+    Box(
         modifier = modifier
             .fillMaxSize()
-            .padding(contentPadding),
-        contentPadding = PaddingValues(
-            bottom = scaffoldComponentsController.getState(ScaffoldComponent.NAV_BAR).size.height
-        ),
-        verticalArrangement = Arrangement.spacedBy(24.dp)
+            .padding(contentPadding)
     ) {
-        item {
-            SectionHeader(
-                title = "Parkir",
-                subtitle = "Kuota Mahasiswa · Staf/Admin tidak terbatas"
-            )
-        }
-
-        item {
-            OccupancyChartCard(
-                used = 72,
-                total = 100
-            )
-        }
-
-        item {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
-                StatCard(
-                    label = "TOTAL",
-                    value = "100",
-                    modifier = Modifier.weight(1f)
-                )
-                StatCard(
-                    label = "TERPAKAI",
-                    value = "72",
-                    modifier = Modifier.weight(1f)
-                )
-                StatCard(
-                    label = "SISA",
-                    value = "28",
-                    modifier = Modifier.weight(1f)
+        LazyColumn(
+            modifier = Modifier.fillMaxSize(),
+            contentPadding = PaddingValues(
+                bottom = scaffoldComponentsController.getState(ScaffoldComponent.NAV_BAR).size.height
+            ),
+            verticalArrangement = arrangement
+        ) {
+            item {
+                SectionHeader(
+                    title = "Parkir",
+                    subtitle = "Kuota Mahasiswa · Staf/Admin tidak terbatas"
                 )
             }
+
+            if (parkingQuota is LoadState.Success && parkingQuota.data != null) {
+                val data = parkingQuota.data
+
+                item {
+                    OccupancyChartCard(
+                        used = data.usedSlots,
+                        total = data.totalSlots
+                    )
+                }
+                item {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(12.dp)
+                    ) {
+                        StatCard(
+                            label = "TOTAL",
+                            value = data.totalSlots.toString(),
+                            modifier = Modifier.weight(1f)
+                        )
+                        StatCard(
+                            label = "TERPAKAI",
+                            value = data.usedSlots.toString(),
+                            modifier = Modifier.weight(1f)
+                        )
+                        StatCard(
+                            label = "SISA",
+                            value = max(data.totalSlots - data.usedSlots, 0).toString(),
+                            modifier = Modifier.weight(1f)
+                        )
+                    }
+                }
+                item {
+                    Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
+                        InfoCard(
+                            icon = painterResource(PortalTikIcons.car),
+                            title = "Sistem Kuota Mahasiswa",
+                            description = "Slot parkir terbatas untuk mahasiswa. Akses akan diblokir jika sudah penuh."
+                        )
+
+                        InfoCard(
+                            icon = painterResource(PortalTikIcons.locationMark),
+                            title = "Akses Staf & Admin",
+                            description = "Akses parkir tidak terbatas, tidak tunduk pada batasan kapasitas.",
+                            iconBackground = Emerald700.copy(alpha = 0.2f),
+                            iconColor = Emerald700
+                        )
+                    }
+                }
+            }
         }
+        if (parkingQuota !is LoadState.Success) {
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                if (parkingQuota is LoadState.Loading) LoadingState(
+                    message = parkingQuota.message,
+                    modifier = Modifier.align(Alignment.Center)
+                ) else Column(
+                    verticalArrangement = Arrangement.spacedBy(16.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    val color = MaterialTheme.colorScheme.outline
 
-        item {
-            Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
-                InfoCard(
-                    icon = painterResource(PortalTikIcons.car),
-                    title = "Sistem Kuota Mahasiswa",
-                    description = "Slot parkir terbatas untuk mahasiswa. Akses akan diblokir jika sudah penuh."
-                )
-
-                InfoCard(
-                    icon = painterResource(PortalTikIcons.locationMark),
-                    title = "Akses Staf & Admin",
-                    description = "Akses parkir tidak terbatas, tidak tunduk pada batasan kapasitas.",
-                    iconBackground = Emerald700.copy(alpha = 0.3f),
-                    iconColor = Emerald700
-                )
+                    Icon(
+                        painter = painterResource(PortalTikIcons.parkingOff),
+                        contentDescription = "gagal memuat informasi parkir",
+                        modifier = Modifier.size(120.dp),
+                        tint = color
+                    )
+                    Text(
+                        text = "Gagal memuat informasi parkir",
+                        style = MaterialTheme.typography.bodyLarge,
+                        color = color,
+                        fontStyle = FontStyle.Italic,
+                        fontWeight = FontWeight.SemiBold
+                    )
+                }
             }
         }
     }
@@ -201,11 +254,17 @@ private fun OccupancyChartCard(
 @DevicePreviews
 @Composable
 private fun MobileAdminParkingScreenPreview() {
-    PortalTikTheme {
+    PortalTikTheme(darkTheme = isSystemInDarkTheme()) {
         Scaffold { p ->
-            MobileAdminParkingScreen(
-                contentPadding = p
-            )
+            CompositionLocalProvider(
+                LocalScaffoldComponentsController provides MockScaffoldComponentController
+            ) {
+                MobileAdminParkingScreen(
+                    parkingQuota = LoadState.Error("Error"),
+                    contentPadding = p,
+                    modifier = Modifier.radialBackground()
+                )
+            }
         }
     }
 }

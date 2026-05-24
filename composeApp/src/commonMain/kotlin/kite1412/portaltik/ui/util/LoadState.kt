@@ -76,7 +76,7 @@ fun <T> LoadState(
 }
 
 @Composable
-private fun LoadingState(
+fun LoadingState(
     message: String,
     modifier: Modifier = Modifier
 ) {
