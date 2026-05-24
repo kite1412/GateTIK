@@ -48,7 +48,10 @@ private val mobileViewModelModule = module {
         )
     }
     viewModel {
-        MobileAdminProfileViewModel()
+        MobileAdminProfileViewModel(
+            authentication = get(),
+            dataStore = get()
+        )
     }
 }
 

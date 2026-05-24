@@ -24,6 +24,7 @@ class MockAuthentication : Authentication {
             email = "mock@portaltik.com",
             role = UserRole.ADMIN,
             status = UserStatus.ACTIVE,
+            instituteNumber = "mock-1"
         )
             .also {
                 _loggedInUser.value = it
@@ -40,7 +41,8 @@ class MockAuthentication : Authentication {
             fullName = "Mock User",
             email = "mock@portaltik.com",
             role = UserRole.ADMIN,
-            status = UserStatus.ACTIVE
+            status = UserStatus.ACTIVE,
+            instituteNumber = "mock-1"
         )
     )
 

@@ -19,12 +19,15 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kite1412.portaltik.designsystem.component.Badge
 import kite1412.portaltik.designsystem.component.Icon
 import kite1412.portaltik.designsystem.component.PrimaryButton
@@ -35,12 +38,15 @@ import kite1412.portaltik.designsystem.theme.Red600
 import kite1412.portaltik.designsystem.theme.RoyalBlueIndigoGradient
 import kite1412.portaltik.designsystem.theme.White
 import kite1412.portaltik.designsystem.util.PortalTikIcons
+import kite1412.portaltik.model.User
 import kite1412.portaltik.ui.component.SettingsDivider
 import kite1412.portaltik.ui.component.SettingsGroup
 import kite1412.portaltik.ui.component.SettingsItem
 import kite1412.portaltik.ui.compositionlocal.LocalDarkMode
 import kite1412.portaltik.ui.compositionlocal.LocalScaffoldComponentsController
 import kite1412.portaltik.ui.preview.DevicePreviews
+import kite1412.portaltik.ui.util.LoadState
+import kite1412.portaltik.ui.util.LoadingState
 import kite1412.portaltik.ui.util.ScaffoldComponent
 import org.jetbrains.compose.resources.painterResource
 import org.koin.compose.viewmodel.koinViewModel
@@ -51,136 +57,156 @@ fun MobileAdminProfileScreen(
     modifier: Modifier = Modifier,
     viewModel: MobileAdminProfileViewModel = koinViewModel()
 ) {
+    val user by viewModel.user.collectAsStateWithLifecycle(LoadState.Loading())
+
     MobileAdminProfileScreen(
+        user = user,
         contentPadding = contentPadding,
+        onDarkModeChange = viewModel::setDarkMode,
+        onLogout = viewModel::logout,
         modifier = modifier
     )
 }
 
 @Composable
 private fun MobileAdminProfileScreen(
+    user: LoadState<User>,
     contentPadding: PaddingValues,
+    onDarkModeChange: (Boolean) -> Unit,
+    onLogout: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val isDarkMode = LocalDarkMode.current
     val scaffoldComponentsController = LocalScaffoldComponentsController.current
 
-    LazyColumn(
-        modifier = modifier
-            .fillMaxSize()
-            .padding(contentPadding),
-        contentPadding = PaddingValues(
-            bottom = scaffoldComponentsController.getState(ScaffoldComponent.NAV_BAR).size.height
-        ),
-        verticalArrangement = Arrangement.spacedBy(24.dp)
+    Box(
+        modifier = modifier.fillMaxSize()
     ) {
-        item {
-            SectionHeader(
-                title = "Profil",
-                subtitle = ""
-            )
-        }
-
-        item {
-            ProfileHeaderCard(
-                name = "Aulia Rahman",
-                email = "admin@campus.edu",
-                role = "ADMIN"
-            )
-        }
-
-        item {
-            SettingsGroup(title = "AKUN") {
-                SettingsItem(
-                    icon = painterResource(PortalTikIcons.idCard),
-                    title = "NPM / NIP",
-                    subtitle = "ADM-001",
-                    trailing = {
-                        Icon(
-                            painter = painterResource(PortalTikIcons.chevronRight),
-                            contentDescription = null,
-                            modifier = Modifier.size(16.dp),
-                            tint = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                    }
-                )
-                SettingsDivider()
-                SettingsItem(
-                    icon = painterResource(PortalTikIcons.email),
-                    title = "EMAIL",
-                    subtitle = "admin@campus.edu",
-                    trailing = {
-                        Icon(
-                            painter = painterResource(PortalTikIcons.chevronRight),
-                            contentDescription = null,
-                            modifier = Modifier.size(16.dp),
-                            tint = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                    }
-                )
-                SettingsDivider()
-                SettingsItem(
-                    icon = painterResource(PortalTikIcons.shield),
-                    title = "ROLE",
-                    subtitle = "admin",
-                    trailing = {
-                        Icon(
-                            painter = painterResource(PortalTikIcons.chevronRight),
-                            contentDescription = null,
-                            modifier = Modifier.size(16.dp),
-                            tint = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                    }
+        LazyColumn(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(contentPadding),
+            contentPadding = PaddingValues(
+                bottom = scaffoldComponentsController.getState(ScaffoldComponent.NAV_BAR).size.height
+            ),
+            verticalArrangement = Arrangement.spacedBy(24.dp)
+        ) {
+            item {
+                SectionHeader(
+                    title = "Profil",
+                    subtitle = ""
                 )
             }
-        }
 
-        item {
-            SettingsGroup(title = "PENGATURAN") {
-                SettingsItem(
-                    icon = painterResource(if (isDarkMode) PortalTikIcons.moon else PortalTikIcons.sun),
-                    subtitle = "Mode gelap",
-                    trailing = {
-                        Switch(
-                            checked = isDarkMode,
-                            onCheckedChange = { /* Toggle dark mode logic */ },
-                            isDarkMode = isDarkMode
-                        )
-                    }
-                )
-            }
-        }
+            if (user is LoadState.Success) {
+                val user = user.data
 
-        item {
-            Spacer(modifier = Modifier.height(8.dp))
-            PrimaryButton(
-                text = "Keluar",
-                onClick = { /* Logout logic */ },
-                containerColor = Red600,
-                leading = {
-                    Icon(
-                        painter = painterResource(PortalTikIcons.logout),
-                        contentDescription = null,
-                        tint = White,
-                        modifier = Modifier.size(20.dp)
+                item {
+                    ProfileHeaderCard(
+                        name = user.fullName,
+                        email = user.email,
+                        role = user.role.toIdString()
                     )
                 }
-            )
+
+                item {
+                    SettingsGroup(title = "AKUN") {
+                        SettingsItem(
+                            icon = painterResource(PortalTikIcons.idCard),
+                            title = "NPM / NIP",
+                            subtitle = user.instituteNumber,
+                            trailing = {
+                                Icon(
+                                    painter = painterResource(PortalTikIcons.chevronRight),
+                                    contentDescription = null,
+                                    modifier = Modifier.size(16.dp),
+                                    tint = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                            }
+                        )
+                        SettingsDivider()
+                        SettingsItem(
+                            icon = painterResource(PortalTikIcons.email),
+                            title = "EMAIL",
+                            subtitle = user.email,
+                            trailing = {
+                                Icon(
+                                    painter = painterResource(PortalTikIcons.chevronRight),
+                                    contentDescription = null,
+                                    modifier = Modifier.size(16.dp),
+                                    tint = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                            }
+                        )
+                        SettingsDivider()
+                        SettingsItem(
+                            icon = painterResource(PortalTikIcons.shield),
+                            title = "ROLE",
+                            subtitle = user.role.toIdString(),
+                            trailing = {
+                                Icon(
+                                    painter = painterResource(PortalTikIcons.chevronRight),
+                                    contentDescription = null,
+                                    modifier = Modifier.size(16.dp),
+                                    tint = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                            }
+                        )
+                    }
+                }
+
+                item {
+                    SettingsGroup(title = "PENGATURAN") {
+                        SettingsItem(
+                            icon = painterResource(if (isDarkMode) PortalTikIcons.moon else PortalTikIcons.sun),
+                            subtitle = "Mode gelap",
+                            trailing = {
+                                Switch(
+                                    checked = isDarkMode,
+                                    onCheckedChange = { onDarkModeChange(!isDarkMode) },
+                                    isDarkMode = isDarkMode
+                                )
+                            }
+                        )
+                    }
+                }
+
+                item {
+                    Spacer(modifier = Modifier.height(8.dp))
+                    PrimaryButton(
+                        text = "Keluar",
+                        onClick = onLogout,
+                        containerColor = Red600,
+                        leading = {
+                            Icon(
+                                painter = painterResource(PortalTikIcons.logout),
+                                contentDescription = null,
+                                tint = White,
+                                modifier = Modifier.size(20.dp)
+                            )
+                        }
+                    )
+                }
+
+                item {
+                    Box(
+                        modifier = Modifier.fillMaxWidth(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = "Portal TIK - v1.0.0",
+                            style = MaterialTheme.typography.labelSmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
+                        )
+                    }
+                    Spacer(modifier = Modifier.height(24.dp))
+                }
+            }
         }
 
-        item {
-            Box(
-                modifier = Modifier.fillMaxWidth(),
-                contentAlignment = Alignment.Center
-            ) {
-                Text(
-                    text = "Portal TIK - v1.0.0",
-                    style = MaterialTheme.typography.labelSmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
-                )
-            }
-            Spacer(modifier = Modifier.height(24.dp))
-        }
+        if (user is LoadState.Loading) LoadingState(
+            message = user.message
+        )
     }
 }
 
@@ -210,7 +236,9 @@ private fun ProfileHeaderCard(
                 text = name.firstOrNull()?.toString() ?: "",
                 style = MaterialTheme.typography.headlineSmall,
                 color = White,
-                fontWeight = FontWeight.Bold
+                fontWeight = FontWeight.Bold,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
             )
         }
 
