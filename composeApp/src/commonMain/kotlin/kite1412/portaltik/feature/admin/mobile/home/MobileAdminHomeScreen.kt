@@ -98,7 +98,9 @@ fun MobileAdminHomeScreen(
         parkingQuota = mainParkingQuota,
         cctv = mainCctv,
         contentPadding = contentPadding,
-        onGateControlClick = {},
+        onGateControlClick = {
+            viewModel.openGate()
+        },
         onGateClick = navigateToGate,
         onParkingClick = navigateToParking,
         onCctvClick = navigateToCctv,

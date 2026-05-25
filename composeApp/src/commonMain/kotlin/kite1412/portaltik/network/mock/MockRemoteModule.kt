@@ -2,12 +2,10 @@ package kite1412.portaltik.network.mock
 
 import kite1412.portaltik.network.domain.datasource.AccessLogRemoteDataSource
 import kite1412.portaltik.network.domain.datasource.CctvRemoteDataSource
-import kite1412.portaltik.network.domain.datasource.GateRemoteDataSource
 import kite1412.portaltik.network.domain.datasource.IotDeviceRemoteDataSource
 import kite1412.portaltik.network.domain.datasource.ParkingQuotaRemoteDataSource
 import kite1412.portaltik.network.mock.datasource.MockAccessLogRemoteDataSource
 import kite1412.portaltik.network.mock.datasource.MockCctvRemoteDataSource
-import kite1412.portaltik.network.mock.datasource.MockGateRemoteDataSource
 import kite1412.portaltik.network.mock.datasource.MockIotDeviceRemoteDataSource
 import kite1412.portaltik.network.mock.datasource.MockParkingQuotaRemoteDataSource
 import org.koin.dsl.bind
@@ -22,9 +20,9 @@ val mockRemoteModule = module {
         MockCctvRemoteDataSource()
     } bind CctvRemoteDataSource::class
 
-    single {
-        MockGateRemoteDataSource()
-    } bind GateRemoteDataSource::class
+//    single {
+//        MockGateRemoteDataSource()
+//    } bind GateRemoteDataSource::class
 
     single {
         MockIotDeviceRemoteDataSource()

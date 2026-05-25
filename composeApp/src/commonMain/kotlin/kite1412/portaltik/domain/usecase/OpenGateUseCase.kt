@@ -1,0 +1,7 @@
+package kite1412.portaltik.domain.usecase
+
+import kite1412.portaltik.domain.repository.GateRepository
+
+class OpenGateUseCase(private val gateRepository: GateRepository) {
+    suspend operator fun invoke(id: Int) = gateRepository.openGate(id)
+}

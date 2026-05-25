@@ -6,4 +6,6 @@ interface GateRemoteDataSource {
     suspend fun getGates(): List<Gate>
 
     suspend fun getMainGate(): Gate?
+
+    suspend fun openGate(id: Int): Boolean
 }

@@ -4,14 +4,21 @@ import io.ktor.client.call.body
 import io.ktor.client.request.HttpRequestBuilder
 import io.ktor.client.request.delete
 import io.ktor.client.request.get
+import io.ktor.client.request.headers
 import io.ktor.client.request.post
 import io.ktor.client.request.put
 import io.ktor.client.request.setBody
 import io.ktor.client.statement.HttpResponse
+import kite1412.portaltik.Logger
+import kite1412.portaltik.datastore.PortalTikDataStore
 import kite1412.portaltik.ktorHttpClient
 import kite1412.portaltik.network.backend.util.getPath
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 
-object BackendClient {
+object BackendClient : KoinComponent {
+    const val LOG_TAG = "BackendClient"
+    val dataStore: PortalTikDataStore by inject()
     val httpClient = ktorHttpClient
 
     suspend inline fun rawGet(
@@ -27,17 +34,31 @@ object BackendClient {
     suspend inline fun <reified Request : Any> rawPost(
         path: String,
         body: Request,
+        useToken: Boolean = true,
         block: HttpRequestBuilder.() -> Unit = {}
     ): HttpResponse = httpClient.post(getPath(path)) {
         setBody(body)
+        if (useToken) {
+            val token = dataStore.getToken() ?: throw IllegalStateException("Not Authenticated")
+            headers {
+                append("Authorization", "Bearer $token")
+            }
+        }
         block()
     }
+        .also {
+            Logger.i(
+                tag = LOG_TAG,
+                message = "status $path: ${it.status.value}"
+            )
+        }
 
     suspend inline fun <reified Request : Any, reified Response> post(
         path: String,
         body: Request,
+        useToken: Boolean = true,
         block: HttpRequestBuilder.() -> Unit = {}
-    ): Response = rawPost(path, body, block).body()
+    ): Response = rawPost(path, body, useToken, block).body()
 
     suspend inline fun <reified Request : Any, reified Response> put(
         path: String,

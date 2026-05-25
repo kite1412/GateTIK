@@ -1,6 +1,7 @@
 package kite1412.portaltik.di
 
 import kite1412.portaltik.app.PortalTikViewModel
+import kite1412.portaltik.common.commonModule
 import kite1412.portaltik.data.dataModule
 import kite1412.portaltik.datastore.dataStoreModule
 import kite1412.portaltik.domain.domainModule
@@ -27,7 +28,8 @@ private val mobileViewModelModule = module {
             getMainGateUseCase = get(),
             getIotDeviceUseCase = get(),
             getMainCctvUseCase = get(),
-            getMainParkingQuotaUseCase = get()
+            getMainParkingQuotaUseCase = get(),
+            openGateUseCase = get()
         )
     }
     viewModel {
@@ -82,7 +84,8 @@ private val appModule = platformModule +
         viewModelModule +
         mockRemoteModule +
         dataModule +
-        backendModule
+        backendModule +
+        commonModule
 
 fun initKoin(
     extraModules: List<Module> = emptyList(),

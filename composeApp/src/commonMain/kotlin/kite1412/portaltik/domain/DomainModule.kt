@@ -1,9 +1,10 @@
 package kite1412.portaltik.domain
 
+import kite1412.portaltik.domain.usecase.GetIotDeviceUseCase
 import kite1412.portaltik.domain.usecase.GetMainCctvUseCase
 import kite1412.portaltik.domain.usecase.GetMainGateUseCase
-import kite1412.portaltik.domain.usecase.GetIotDeviceUseCase
 import kite1412.portaltik.domain.usecase.GetMainParkingQuotaUseCase
+import kite1412.portaltik.domain.usecase.OpenGateUseCase
 import org.koin.dsl.module
 
 private val useCaseModule = module {
@@ -21,6 +22,10 @@ private val useCaseModule = module {
 
     factory {
         GetMainParkingQuotaUseCase(parkingQuotaRepository = get())
+    }
+
+    factory {
+        OpenGateUseCase(gateRepository = get())
     }
 }
 
