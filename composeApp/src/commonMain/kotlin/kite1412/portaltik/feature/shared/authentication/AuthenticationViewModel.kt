@@ -22,7 +22,7 @@ class AuthenticationViewModel(
     var password by mutableStateOf("")
         private set
 
-    var authResult by mutableStateOf<AuthResult<User>?>(null)
+    var authResult by mutableStateOf<AuthResult<User?>>(Result.Loading)
         private set
 
     fun onEmailChange(email: String) {

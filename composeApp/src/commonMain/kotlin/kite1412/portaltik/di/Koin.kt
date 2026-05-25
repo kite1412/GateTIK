@@ -11,6 +11,7 @@ import kite1412.portaltik.feature.admin.mobile.home.MobileAdminHomeViewModel
 import kite1412.portaltik.feature.admin.mobile.parking.MobileAdminParkingViewModel
 import kite1412.portaltik.feature.admin.mobile.profile.MobileAdminProfileViewModel
 import kite1412.portaltik.feature.shared.authentication.AuthenticationViewModel
+import kite1412.portaltik.network.backend.backendModule
 import kite1412.portaltik.network.mock.mockRemoteModule
 import kite1412.portaltik.platformModule
 import org.koin.core.KoinApplication
@@ -80,7 +81,8 @@ private val appModule = platformModule +
         domainModule +
         viewModelModule +
         mockRemoteModule +
-        dataModule
+        dataModule +
+        backendModule
 
 fun initKoin(
     extraModules: List<Module> = emptyList(),

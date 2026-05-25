@@ -6,15 +6,17 @@ import kite1412.portaltik.util.Error
 import kite1412.portaltik.util.Result
 import kotlinx.coroutines.flow.Flow
 
-typealias AuthResult<T> = Result<T, Authentication.AuthError>
+typealias AuthResult<T> = Result<T, Error>
 
 interface Authentication {
+    val logTag: String get() = "Authentication"
+
     val signedInUser: Flow<User?>
 
     suspend fun signIn(
         email: String,
         password: String
-    ): AuthResult<User>
+    ): AuthResult<User?>
 
     suspend fun register(
         email: String,
