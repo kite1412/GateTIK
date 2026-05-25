@@ -87,6 +87,8 @@ fun MobileAdminGateScreen(
         parkingQuota = mainParkingQuota,
         latestAccessLog = viewModel.latestAccessLog,
         contentPadding = contentPadding,
+        onOpenGate = viewModel::openGate,
+        onCloseGate = viewModel::closeGate,
         modifier = modifier
     )
 }
@@ -98,6 +100,8 @@ private fun MobileAdminGateScreen(
     parkingQuota: LoadState<ParkingQuota?>,
     latestAccessLog: LoadState<AccessLog?>,
     contentPadding: PaddingValues,
+    onOpenGate: () -> Unit,
+    onCloseGate: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val scaffoldComponentsController = LocalScaffoldComponentsController.current
@@ -136,18 +140,13 @@ private fun MobileAdminGateScreen(
             Column(
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                GradientTextButton(
-                    text = "BUKA GATE",
-                    onClick = {},
-                    modifier = Modifier.fillMaxWidth(),
-                    leading = {
-                        Icon(
-                            painter = painterResource(PortalTikIcons.doorOpen),
-                            contentDescription = null,
-                            modifier = Modifier.size(20.dp),
-                            tint = White
-                        )
-                    }
+                GateActionButton(
+                    isOpen = true,
+                    onClick = onOpenGate
+                )
+                GateActionButton(
+                    isOpen = false,
+                    onClick = onCloseGate
                 )
 
                 OutlinedTextButton(
@@ -158,6 +157,29 @@ private fun MobileAdminGateScreen(
             }
         }
     }
+}
+
+@Composable
+private fun GateActionButton(
+    isOpen: Boolean,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    GradientTextButton(
+        text = (if (isOpen) "BUKA" else "TUTUP") + " GATE",
+        onClick = onClick,
+        modifier = modifier.fillMaxWidth(),
+        leading = {
+            Icon(
+                painter = painterResource(
+                    if (isOpen) PortalTikIcons.doorOpen else PortalTikIcons.doorClose
+                ),
+                contentDescription = null,
+                modifier = Modifier.size(20.dp),
+                tint = White
+            )
+        }
+    )
 }
 
 private val GateLockGlow = Color(0xFF2B57FF)
@@ -189,7 +211,7 @@ private fun GateStatusCard(
             .widthIn(max = 400.dp)
             .fillMaxWidth()
             .aspectRatio(1f),
-        contentPadding = androidx.compose.foundation.layout.PaddingValues(0.dp)
+        contentPadding = PaddingValues(0.dp)
     ) {
         Box(
             modifier = Modifier.fillMaxSize(),
@@ -381,7 +403,9 @@ private fun MobileAdminGateScreenPreview() {
                     iotDevice = LoadState.Success(null),
                     parkingQuota = LoadState.Success(null),
                     latestAccessLog = LoadState.Success(null),
-                    contentPadding = p
+                    contentPadding = p,
+                    onOpenGate = {},
+                    onCloseGate = {}
                 )
             }
         }
