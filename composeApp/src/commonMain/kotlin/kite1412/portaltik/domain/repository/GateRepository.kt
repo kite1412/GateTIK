@@ -12,4 +12,6 @@ interface GateRepository {
     suspend fun getMainGate(): GateResult<Gate?>
 
     suspend fun openGate(id: Int): GateResult<Boolean>
+
+    suspend fun closeGate(id: Int): GateResult<Boolean>
 }

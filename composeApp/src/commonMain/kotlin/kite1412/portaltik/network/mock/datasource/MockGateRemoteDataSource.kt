@@ -14,4 +14,5 @@ class MockGateRemoteDataSource : GateRemoteDataSource {
     }
 
     override suspend fun openGate(id: Int): Boolean = true
+    override suspend fun closeGate(id: Int): Boolean = true
 }

@@ -1,5 +1,6 @@
 package kite1412.portaltik.domain
 
+import kite1412.portaltik.domain.usecase.CloseGateUseCase
 import kite1412.portaltik.domain.usecase.GetIotDeviceUseCase
 import kite1412.portaltik.domain.usecase.GetMainCctvUseCase
 import kite1412.portaltik.domain.usecase.GetMainGateUseCase
@@ -26,6 +27,10 @@ private val useCaseModule = module {
 
     factory {
         OpenGateUseCase(gateRepository = get())
+    }
+
+    factory {
+        CloseGateUseCase(gateRepository = get())
     }
 }
 

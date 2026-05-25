@@ -8,4 +8,6 @@ interface GateRemoteDataSource {
     suspend fun getMainGate(): Gate?
 
     suspend fun openGate(id: Int): Boolean
+
+    suspend fun closeGate(id: Int): Boolean
 }

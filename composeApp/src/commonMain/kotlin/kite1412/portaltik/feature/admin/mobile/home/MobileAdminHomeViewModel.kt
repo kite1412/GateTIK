@@ -3,6 +3,7 @@ package kite1412.portaltik.feature.admin.mobile.home
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kite1412.portaltik.domain.Authentication
+import kite1412.portaltik.domain.usecase.CloseGateUseCase
 import kite1412.portaltik.domain.usecase.GetIotDeviceUseCase
 import kite1412.portaltik.domain.usecase.GetMainCctvUseCase
 import kite1412.portaltik.domain.usecase.GetMainGateUseCase
@@ -24,7 +25,8 @@ class MobileAdminHomeViewModel(
     getIotDeviceUseCase: GetIotDeviceUseCase,
     getMainCctvUseCase: GetMainCctvUseCase,
     getMainParkingQuotaUseCase: GetMainParkingQuotaUseCase,
-    private val openGateUseCase: OpenGateUseCase
+    private val openGateUseCase: OpenGateUseCase,
+    private val closeGateUseCase: CloseGateUseCase
 ) : ViewModel() {
     private var gateId = 0
     val signedInUser = authentication.signedInUser
@@ -50,6 +52,12 @@ class MobileAdminHomeViewModel(
     fun openGate() {
         viewModelScope.launch {
             openGateUseCase(gateId)
+        }
+    }
+
+    fun closeGate() {
+        viewModelScope.launch {
+            closeGateUseCase(gateId)
         }
     }
 }

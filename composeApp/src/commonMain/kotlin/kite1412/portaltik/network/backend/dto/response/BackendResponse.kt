@@ -1,10 +1,10 @@
-package kite1412.portaltik.network.backend.dto.model
+package kite1412.portaltik.network.backend.dto.response
 
 import kotlinx.serialization.Serializable
 
 @Serializable
 data class BackendResponse<T>(
-    val success: Boolean,
+    val success: Boolean = false,
     val message: String? = null,
-    val data: T?
+    val data: T? = null
 )

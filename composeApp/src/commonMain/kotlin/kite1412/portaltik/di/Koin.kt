@@ -29,7 +29,8 @@ private val mobileViewModelModule = module {
             getIotDeviceUseCase = get(),
             getMainCctvUseCase = get(),
             getMainParkingQuotaUseCase = get(),
-            openGateUseCase = get()
+            openGateUseCase = get(),
+            closeGateUseCase = get()
         )
     }
     viewModel {

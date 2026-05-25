@@ -1,11 +1,11 @@
-package kite1412.portaltik.network.backend.response
+package kite1412.portaltik.network.backend.dto.response
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlin.time.Instant
 
 @Serializable
-data class BackendOpenGate(
+data class BackendOpenGateResponse(
     val action: String,
     @SerialName("opened_at")
     val openedAt: Instant,

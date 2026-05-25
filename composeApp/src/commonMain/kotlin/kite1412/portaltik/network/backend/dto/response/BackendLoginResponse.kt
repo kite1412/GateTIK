@@ -1,4 +1,4 @@
-package kite1412.portaltik.network.backend.response
+package kite1412.portaltik.network.backend.dto.response
 
 import kite1412.portaltik.network.backend.dto.model.BackendUser
 import kotlinx.serialization.SerialName

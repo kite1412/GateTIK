@@ -1,28 +1,43 @@
 package kite1412.portaltik.network.backend.datasource
 
+import kite1412.portaltik.getDeviceType
 import kite1412.portaltik.model.Gate
 import kite1412.portaltik.network.backend.BackendClient
-import kite1412.portaltik.network.backend.dto.model.BackendResponse
-import kite1412.portaltik.network.backend.dto.request.BackendRequestOpenGate
-import kite1412.portaltik.network.backend.response.BackendOpenGate
+import kite1412.portaltik.network.backend.dto.request.BackendRequestGateAction
+import kite1412.portaltik.network.backend.dto.response.BackendCloseGateResponse
+import kite1412.portaltik.network.backend.dto.response.BackendOpenGateResponse
+import kite1412.portaltik.network.backend.dto.response.BackendResponse
 import kite1412.portaltik.network.domain.datasource.GateRemoteDataSource
 import kite1412.portaltik.network.mock.mockGate
 
 class BackendGateDataSource : GateRemoteDataSource {
+    private val deviceType = getDeviceType()
+
     override suspend fun getGates(): List<Gate> = listOf(mockGate)
 
     override suspend fun getMainGate(): Gate = mockGate
 
     override suspend fun openGate(id: Int): Boolean {
-        val res = BackendClient.post<BackendRequestOpenGate, BackendResponse<BackendOpenGate>>(
+        val res = BackendClient.post<BackendRequestGateAction, BackendResponse<BackendOpenGateResponse>>(
             path = "gate/open",
-            body = BackendRequestOpenGate(
-                gateId = id,
-                accessMethod = "mobile",
-                notes = "Request open from mobile device."
-            )
+            body = gateAction(id, true)
         )
 
         return res.success
     }
+
+    override suspend fun closeGate(id: Int): Boolean {
+        val res = BackendClient.post<BackendRequestGateAction, BackendResponse<BackendCloseGateResponse>>(
+            path = "gate/close",
+            body = gateAction(id, false)
+        )
+
+        return res.success
+    }
+
+    private fun gateAction(id: Int, open: Boolean) = BackendRequestGateAction(
+        gateId = id,
+        accessMethod = deviceType.name,
+        notes = "${if (open) "Open" else "Close"} request from ${deviceType.name}."
+    )
 }

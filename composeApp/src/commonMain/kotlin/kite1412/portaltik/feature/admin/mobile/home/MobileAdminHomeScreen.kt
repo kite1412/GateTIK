@@ -98,9 +98,8 @@ fun MobileAdminHomeScreen(
         parkingQuota = mainParkingQuota,
         cctv = mainCctv,
         contentPadding = contentPadding,
-        onGateControlClick = {
-            viewModel.openGate()
-        },
+        onOpenGate = viewModel::openGate,
+        onCloseGate = viewModel::closeGate,
         onGateClick = navigateToGate,
         onParkingClick = navigateToParking,
         onCctvClick = navigateToCctv,
@@ -116,7 +115,8 @@ private fun MobileAdminHomeScreen(
     parkingQuota: LoadState<ParkingQuota?>,
     cctv: LoadState<Cctv?>,
     contentPadding: PaddingValues,
-    onGateControlClick: (currentStatus: GateStatus) -> Unit,
+    onOpenGate: () -> Unit,
+    onCloseGate: () -> Unit,
     onGateClick: () -> Unit,
     onParkingClick: () -> Unit,
     onCctvClick: () -> Unit,
@@ -145,7 +145,8 @@ private fun MobileAdminHomeScreen(
             GateControlCard(
                 gate = gate,
                 iotDevice = iotDevice,
-                onGateControlClick = onGateControlClick
+                onOpenGate = onOpenGate,
+                onCloseGate = onCloseGate
             )
         }
         item {
@@ -231,7 +232,8 @@ private fun HeaderSection(
 private fun GateControlCard(
     gate: LoadState<Gate?>,
     iotDevice: LoadState<IotDevice?>,
-    onGateControlClick: (currentStatus: GateStatus) -> Unit
+    onOpenGate: () -> Unit,
+    onCloseGate: () -> Unit
 ) {
     val isGateSuccess = gate is LoadState.Success && gate.data != null
 
@@ -319,10 +321,20 @@ private fun GateControlCard(
 
             Spacer(modifier = Modifier.height(8.dp))
 
-            GateControlButton(
-                gateState = gate,
-                onClick = onGateControlClick
-            )
+            Column(
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                GateControlButton(
+                    isOpen = true,
+                    gateState = gate,
+                    onClick = onOpenGate
+                )
+                GateControlButton(
+                    isOpen = false,
+                    gateState = gate,
+                    onClick = onCloseGate
+                )
+            }
         }
 
         Box(
@@ -593,7 +605,8 @@ private fun MobileAdminHomeScreenPreview() {
                 parkingQuota = LoadState.Loading(),
                 cctv = LoadState.Loading(),
                 contentPadding = p,
-                onGateControlClick = {},
+                onOpenGate = {},
+                onCloseGate = {},
                 onGateClick = {},
                 onParkingClick = {},
                 onCctvClick = {}

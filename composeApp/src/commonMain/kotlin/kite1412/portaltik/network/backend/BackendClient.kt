@@ -9,6 +9,8 @@ import io.ktor.client.request.post
 import io.ktor.client.request.put
 import io.ktor.client.request.setBody
 import io.ktor.client.statement.HttpResponse
+import io.ktor.client.statement.request
+import io.ktor.http.fullPath
 import kite1412.portaltik.Logger
 import kite1412.portaltik.datastore.PortalTikDataStore
 import kite1412.portaltik.ktorHttpClient
@@ -24,7 +26,9 @@ object BackendClient : KoinComponent {
     suspend inline fun rawGet(
         path: String,
         block: HttpRequestBuilder.() -> Unit = {}
-    ): HttpResponse = httpClient.get(getPath(path), block)
+    ): HttpResponse = httpClient
+        .get(getPath(path), block)
+        .also(::log)
 
     suspend inline fun <reified Response> get(
         path: String,
@@ -45,20 +49,19 @@ object BackendClient : KoinComponent {
             }
         }
         block()
-    }
-        .also {
-            Logger.i(
-                tag = LOG_TAG,
-                message = "status $path: ${it.status.value}"
-            )
-        }
+    }.also(::log)
 
     suspend inline fun <reified Request : Any, reified Response> post(
         path: String,
         body: Request,
         useToken: Boolean = true,
         block: HttpRequestBuilder.() -> Unit = {}
-    ): Response = rawPost(path, body, useToken, block).body()
+    ): Response = rawPost(
+        path = path,
+        body = body,
+        useToken = useToken,
+        block = block
+    ).body()
 
     suspend inline fun <reified Request : Any, reified Response> put(
         path: String,
@@ -80,5 +83,12 @@ object BackendClient : KoinComponent {
         return httpClient
             .delete(path, block)
             .body()
+    }
+
+    fun log(response: HttpResponse) {
+        Logger.i(
+            tag = LOG_TAG,
+            message = "status ${response.request.url.fullPath}: ${response.status.value}"
+        )
     }
 }

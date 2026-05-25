@@ -36,9 +36,10 @@ import org.jetbrains.compose.resources.painterResource
 
 @Composable
 fun GateControlButton(
+    isOpen: Boolean,
     gateState: LoadState<Gate?>,
     modifier: Modifier = Modifier,
-    onClick: (currentStatus: GateStatus) -> Unit,
+    onClick: () -> Unit,
     color: Color = Blue500
 ) {
     val actionEnabled = gateState is LoadState.Success && gateState.data != null &&
@@ -47,15 +48,16 @@ fun GateControlButton(
     val background by animateColorAsState(
         targetValue = if (actionEnabled) White else White60
     )
+    val shape = RoundedCornerShape(16.dp)
 
     Box(
         modifier = modifier
             .fillMaxWidth()
             .heightIn(min = 32.dp)
-            .clip(RoundedCornerShape(16.dp))
+            .clip(shape)
             .background(background)
             .clickable(enabled = actionEnabled) {
-                if (actionEnabled) onClick(gateState.data.currentStatus)
+                if (actionEnabled) onClick()
             }
             .padding(vertical = 12.dp),
         contentAlignment = Alignment.Center
@@ -74,17 +76,15 @@ fun GateControlButton(
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     Icon(
-                        painter = painterResource(PortalTikIcons.doorOpen),
+                        painter = painterResource(
+                            if (isOpen) PortalTikIcons.doorOpen else PortalTikIcons.doorClose
+                        ),
                         contentDescription = null,
                         modifier = Modifier.size(20.dp),
                         tint = color
                     )
                     if (gate.currentStatus != GateStatus.OPENING) Text(
-                        text = when (gate.currentStatus) {
-                            GateStatus.OPEN -> "TUTUP GATE"
-                            GateStatus.CLOSED -> "BUKA GATE"
-                            GateStatus.OFFLINE -> "OFFLINE"
-                        },
+                        text = (if (isOpen) "BUKA" else "TUTUP") + " GATE",
                         style = MaterialTheme.typography.labelLarge.copy(
                             fontWeight = FontWeight.Bold
                         ),
@@ -102,6 +102,7 @@ private fun GateControlButtonPreview() {
     PortalTikTheme {
         Scaffold { p ->
               GateControlButton(
+                  isOpen = true,
                   gateState = LoadState.Loading(),
                   onClick = {},
                   modifier = Modifier.padding(p)

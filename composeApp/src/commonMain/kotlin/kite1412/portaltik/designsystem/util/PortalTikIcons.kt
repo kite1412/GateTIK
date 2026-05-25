@@ -6,6 +6,7 @@ import portaltik.composeapp.generated.resources.camera
 import portaltik.composeapp.generated.resources.car
 import portaltik.composeapp.generated.resources.chevron_right
 import portaltik.composeapp.generated.resources.dashboard
+import portaltik.composeapp.generated.resources.door_close
 import portaltik.composeapp.generated.resources.door_open
 import portaltik.composeapp.generated.resources.email
 import portaltik.composeapp.generated.resources.eye_close
@@ -55,4 +56,5 @@ object PortalTikIcons {
     val shield = Res.drawable.shield
     val idCard = Res.drawable.id_card
     val parkingOff = Res.drawable.parking_off
+    val doorClose = Res.drawable.door_close
 }

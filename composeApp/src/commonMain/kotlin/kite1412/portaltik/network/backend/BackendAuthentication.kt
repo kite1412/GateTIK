@@ -8,9 +8,9 @@ import kite1412.portaltik.domain.AuthResult
 import kite1412.portaltik.domain.Authentication
 import kite1412.portaltik.model.User
 import kite1412.portaltik.model.UserRole
-import kite1412.portaltik.network.backend.dto.model.BackendResponse
+import kite1412.portaltik.network.backend.dto.response.BackendResponse
 import kite1412.portaltik.network.backend.dto.request.BackendLogin
-import kite1412.portaltik.network.backend.response.BackendLoginResponse
+import kite1412.portaltik.network.backend.dto.response.BackendLoginResponse
 import kite1412.portaltik.util.Error
 import kite1412.portaltik.util.Success
 import kite1412.portaltik.util.Unknown
