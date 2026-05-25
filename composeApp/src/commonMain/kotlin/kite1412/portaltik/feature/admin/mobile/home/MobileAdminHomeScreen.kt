@@ -35,6 +35,7 @@ import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import kite1412.portaltik.CctvPlayer
 import kite1412.portaltik.designsystem.component.Badge
 import kite1412.portaltik.designsystem.component.Icon
 import kite1412.portaltik.designsystem.component.StatusIndicator
@@ -523,6 +524,8 @@ private fun CctvCard(
                 },
                 success = { cctv ->
                     if (cctv != null) {
+                        CctvPlayer(Modifier.fillMaxSize()) {}
+
                         Badge(
                             text = "LIVE",
                             containerColor = Red500,

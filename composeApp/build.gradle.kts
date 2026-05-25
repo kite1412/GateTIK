@@ -45,6 +45,7 @@ kotlin {
         androidMain.dependencies {
             implementation(libs.compose.uiToolingPreview)
             implementation(libs.androidx.activity.compose)
+            implementation(libs.libvlc.android)
         }
         commonMain.dependencies {
             implementation(libs.compose.runtime)
@@ -113,4 +114,5 @@ buildConfig {
     packageName = "kite1412.portaltik"
 
     buildConfigField("BACKEND_URL")
+    buildConfigField("CCTV_URL")
 }
