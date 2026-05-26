@@ -17,7 +17,7 @@ class MockAuthentication : Authentication {
     override suspend fun signIn(
         email: String,
         password: String
-    ): AuthResult<User?> = Success(
+    ): AuthResult<User> = Success(
         data = User(
             id = 0,
             fullName = "Mock User",

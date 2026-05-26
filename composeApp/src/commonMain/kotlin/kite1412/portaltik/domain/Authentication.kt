@@ -16,7 +16,7 @@ interface Authentication {
     suspend fun signIn(
         email: String,
         password: String
-    ): AuthResult<User?>
+    ): AuthResult<User>
 
     suspend fun register(
         email: String,

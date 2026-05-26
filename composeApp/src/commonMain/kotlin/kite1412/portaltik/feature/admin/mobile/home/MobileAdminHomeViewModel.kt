@@ -13,7 +13,8 @@ import kite1412.portaltik.model.IotDevice
 import kite1412.portaltik.ui.util.LoadState
 import kite1412.portaltik.ui.util.UiEvent
 import kite1412.portaltik.ui.util.stateIn
-import kite1412.portaltik.util.Result
+import kite1412.portaltik.util.onError
+import kite1412.portaltik.util.onSuccess
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -57,18 +58,35 @@ class MobileAdminHomeViewModel(
 
     fun openGate() {
         viewModelScope.launch {
-            val res = openGateUseCase(gateId)
-            if (res is Result.Success && res.data) _uiEvent
-                .emit(UiEvent.ShowSnackbar("Gate dibuka"))
-
-            if ((res is Result.Success && !res.data) || res is Result.Error) _uiEvent
-                .emit(UiEvent.ShowSnackbar("Gagal membuka gate"))
+            openGateUseCase(gateId)
+                .onSuccess { success ->
+                    _uiEvent.emit(
+                        UiEvent.ShowSnackbar(
+                            if (success) "Gate dibuka"
+                            else "Gagal membuka gate"
+                        )
+                    )
+                }
+                .onError {
+                    _uiEvent.emit(UiEvent.ShowSnackbar("Gagal membuka gate"))
+                }
         }
     }
 
     fun closeGate() {
         viewModelScope.launch {
             closeGateUseCase(gateId)
+                .onSuccess { success ->
+                    _uiEvent.emit(
+                        UiEvent.ShowSnackbar(
+                            if (success) "Gate ditutup"
+                            else "Gagal menutup gate"
+                        )
+                    )
+                }
+                .onError {
+                    _uiEvent.emit(UiEvent.ShowSnackbar("Gagal menutup gate"))
+                }
         }
     }
 }

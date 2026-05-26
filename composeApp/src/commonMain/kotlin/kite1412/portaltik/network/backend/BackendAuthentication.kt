@@ -8,12 +8,12 @@ import kite1412.portaltik.domain.AuthResult
 import kite1412.portaltik.domain.Authentication
 import kite1412.portaltik.model.User
 import kite1412.portaltik.model.UserRole
-import kite1412.portaltik.network.backend.dto.response.BackendResponse
 import kite1412.portaltik.network.backend.dto.request.BackendLogin
 import kite1412.portaltik.network.backend.dto.response.BackendLoginResponse
+import kite1412.portaltik.network.backend.dto.response.BackendResponse
+import kite1412.portaltik.network.domain.util.ServerError
 import kite1412.portaltik.util.Error
 import kite1412.portaltik.util.Success
-import kite1412.portaltik.util.Unknown
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -41,7 +41,7 @@ class BackendAuthentication(
     override suspend fun signIn(
         email: String,
         password: String
-    ): AuthResult<User?> = try {
+    ): AuthResult<User> = try {
         val res = BackendClient.rawPost(
             path = "auth/login",
             body = BackendLogin(
@@ -51,23 +51,23 @@ class BackendAuthentication(
             useToken = false
         )
         when (res.status.value) {
-            200 -> res.body<BackendResponse<BackendLoginResponse>>().data?.let {
+            200 -> return res.body<BackendResponse<BackendLoginResponse>>().data?.let {
                 val user = it.user.toModel()
                 _signedInUser.value = user
                 dataStore.setToken(it.token)
                 dataStore.setUser(user)
                 Success(user)
-            } ?: Error(Unknown())
-            401 -> Success(null)
+            } ?: Error(ServerError())
+            401 -> return Error(Authentication.AuthError.InvalidCredentials())
         }
-        Success(null)
+        Error(ServerError())
     } catch (e: Exception) {
         Logger.e(
             tag = logTag,
             message = "Failed to sign in",
             throwable = e
         )
-        Error(Unknown())
+        Error(ServerError())
     }
 
     override suspend fun register(
@@ -82,6 +82,6 @@ class BackendAuthentication(
         dataStore.deleteUser()
         Success(true)
     } catch (e: Exception) {
-        Error(Unknown())
+        Error(ServerError())
     }
 }

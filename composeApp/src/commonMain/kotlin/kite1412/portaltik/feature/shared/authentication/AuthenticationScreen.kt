@@ -20,6 +20,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.ripple
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -59,7 +60,9 @@ import kite1412.portaltik.designsystem.theme.White50
 import kite1412.portaltik.designsystem.theme.White60
 import kite1412.portaltik.designsystem.util.PortalTikIcons
 import kite1412.portaltik.ui.compositionlocal.LocalDarkMode
+import kite1412.portaltik.ui.compositionlocal.LocalSnackbarHostStateWrapper
 import kite1412.portaltik.ui.preview.DevicePreviews
+import kite1412.portaltik.ui.util.UiEvent
 import org.jetbrains.compose.resources.painterResource
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -69,10 +72,17 @@ fun AuthenticationScreen(
     modifier: Modifier = Modifier,
     viewModel: AuthenticationViewModel = koinViewModel()
 ) {
+    val isDarkMode = LocalDarkMode.current
+    val snackbarHostStateWrapper = LocalSnackbarHostStateWrapper.current
     val email = viewModel.email
     val password = viewModel.password
-    val isDarkMode = LocalDarkMode.current
 
+    LaunchedEffect(Unit) {
+        viewModel.uiEvent.collect { event ->
+            if (event is UiEvent.ShowSnackbar) snackbarHostStateWrapper
+                .showSnackbar(event.message)
+        }
+    }
     AuthenticationScreen(
         email = email,
         password = password,
