@@ -3,6 +3,7 @@ package kite1412.portaltik.ui.component
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
@@ -14,8 +15,10 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.ripple
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -56,7 +59,13 @@ fun GateControlButton(
             .heightIn(min = 32.dp)
             .clip(shape)
             .background(background)
-            .clickable(enabled = actionEnabled) {
+            .clickable(
+                enabled = actionEnabled,
+                interactionSource = remember { MutableInteractionSource() },
+                indication = ripple(
+                    color = Color.Black.copy(alpha = 0.4f)
+                )
+            ) {
                 if (actionEnabled) onClick()
             }
             .padding(vertical = 12.dp),

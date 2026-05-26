@@ -25,6 +25,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -69,9 +70,11 @@ import kite1412.portaltik.ui.component.GateControlButton
 import kite1412.portaltik.ui.component.SmallCircularProgressIndicator
 import kite1412.portaltik.ui.compositionlocal.LocalDarkMode
 import kite1412.portaltik.ui.compositionlocal.LocalScaffoldComponentsController
+import kite1412.portaltik.ui.compositionlocal.LocalSnackbarHostStateWrapper
 import kite1412.portaltik.ui.preview.DevicePreviews
 import kite1412.portaltik.ui.util.LoadState
 import kite1412.portaltik.ui.util.ScaffoldComponent
+import kite1412.portaltik.ui.util.UiEvent
 import kite1412.portaltik.util.now
 import kite1412.portaltik.util.toLocalDateTime
 import org.jetbrains.compose.resources.painterResource
@@ -86,12 +89,19 @@ fun MobileAdminHomeScreen(
     modifier: Modifier = Modifier,
     viewModel: MobileAdminHomeViewModel = koinViewModel()
 ) {
+    val snackbarHostStateWrapper = LocalSnackbarHostStateWrapper.current
     val signedInUser by viewModel.signedInUser.collectAsStateWithLifecycle()
     val mainGate by viewModel.mainGate.collectAsStateWithLifecycle()
     val mainIotDevice by viewModel.mainIotDevice.collectAsStateWithLifecycle()
     val mainCctv by viewModel.mainCctv.collectAsStateWithLifecycle()
     val mainParkingQuota by viewModel.mainParkingQuota.collectAsStateWithLifecycle()
 
+    LaunchedEffect(Unit) {
+        viewModel.uiEvent.collect { event ->
+            if (event is UiEvent.ShowSnackbar) snackbarHostStateWrapper
+                .showSnackbar(event.message)
+        }
+    }
     MobileAdminHomeScreen(
         userName = signedInUser?.fullName ?: "",
         gate = mainGate,

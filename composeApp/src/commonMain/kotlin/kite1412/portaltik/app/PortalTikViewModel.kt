@@ -13,7 +13,7 @@ import kotlinx.coroutines.flow.stateIn
 
 class PortalTikViewModel(
     dataStore: PortalTikDataStore,
-    authentication: Authentication,
+    authentication: Authentication
 ) : ViewModel() {
     private val scaffoldComponentStates = mutableStateMapOf<ScaffoldComponent, ScaffoldComponentState>()
     val signedInUser = authentication.signedInUser

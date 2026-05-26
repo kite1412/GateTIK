@@ -11,10 +11,14 @@ import kite1412.portaltik.domain.usecase.GetMainParkingQuotaUseCase
 import kite1412.portaltik.domain.usecase.OpenGateUseCase
 import kite1412.portaltik.model.IotDevice
 import kite1412.portaltik.ui.util.LoadState
+import kite1412.portaltik.ui.util.UiEvent
 import kite1412.portaltik.ui.util.stateIn
+import kite1412.portaltik.util.Result
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -29,6 +33,8 @@ class MobileAdminHomeViewModel(
     private val closeGateUseCase: CloseGateUseCase
 ) : ViewModel() {
     private var gateId = 0
+    private val _uiEvent = MutableSharedFlow<UiEvent>()
+    val uiEvent = _uiEvent.asSharedFlow()
     val signedInUser = authentication.signedInUser
         .stateIn(
             scope = viewModelScope,
@@ -51,7 +57,12 @@ class MobileAdminHomeViewModel(
 
     fun openGate() {
         viewModelScope.launch {
-            openGateUseCase(gateId)
+            val res = openGateUseCase(gateId)
+            if (res is Result.Success && res.data) _uiEvent
+                .emit(UiEvent.ShowSnackbar("Gate dibuka"))
+
+            if ((res is Result.Success && !res.data) || res is Result.Error) _uiEvent
+                .emit(UiEvent.ShowSnackbar("Gagal membuka gate"))
         }
     }
 
