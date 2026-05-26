@@ -3,6 +3,7 @@ package kite1412.portaltik.feature.admin.mobile.home
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kite1412.portaltik.domain.Authentication
+import kite1412.portaltik.domain.SessionStatus
 import kite1412.portaltik.domain.usecase.CloseGateUseCase
 import kite1412.portaltik.domain.usecase.GetIotDeviceUseCase
 import kite1412.portaltik.domain.usecase.GetMainCctvUseCase
@@ -20,6 +21,7 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -36,7 +38,11 @@ class MobileAdminHomeViewModel(
     private var gateId = 0
     private val _uiEvent = MutableSharedFlow<UiEvent>()
     val uiEvent = _uiEvent.asSharedFlow()
-    val signedInUser = authentication.signedInUser
+    @OptIn(ExperimentalCoroutinesApi::class)
+    val signedInUser = authentication.sessionStatus
+        .mapLatest { status ->
+            if (status is SessionStatus.SignedIn) status.user else null
+        }
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(5000),

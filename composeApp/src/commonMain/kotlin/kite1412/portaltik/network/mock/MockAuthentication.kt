@@ -2,6 +2,7 @@ package kite1412.portaltik.network.mock
 
 import kite1412.portaltik.domain.AuthResult
 import kite1412.portaltik.domain.Authentication
+import kite1412.portaltik.domain.SessionStatus
 import kite1412.portaltik.model.User
 import kite1412.portaltik.model.UserRole
 import kite1412.portaltik.model.UserStatus
@@ -11,43 +12,41 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
 class MockAuthentication : Authentication {
-    private val _loggedInUser = MutableStateFlow<User?>(null)
-    override val signedInUser: Flow<User?> = _loggedInUser.asStateFlow()
+    private val mockUser = User(
+        id = 0,
+        fullName = "Mock User",
+        email = "mock@portaltik.com",
+        role = UserRole.ADMIN,
+        status = UserStatus.ACTIVE,
+        instituteNumber = "mock-1"
+    )
+    private val _sessionStatus = MutableStateFlow<SessionStatus>(
+        SessionStatus.SignedIn(
+            token = "",
+            user = mockUser
+        )
+    )
+    override val sessionStatus: Flow<SessionStatus> = _sessionStatus.asStateFlow()
 
     override suspend fun signIn(
         email: String,
         password: String
-    ): AuthResult<User> = Success(
-        data = User(
-            id = 0,
-            fullName = "Mock User",
-            email = "mock@portaltik.com",
-            role = UserRole.ADMIN,
-            status = UserStatus.ACTIVE,
-            instituteNumber = "mock-1"
+    ): AuthResult<User> {
+        _sessionStatus.value = SessionStatus.SignedIn(
+            token = "",
+            user = mockUser
         )
-            .also {
-                _loggedInUser.value = it
-            }
-    )
+        return Success(mockUser)
+    }
 
     override suspend fun register(
         email: String,
         password: String,
         role: UserRole
-    ): AuthResult<User> = Success(
-        data = User(
-            id = 0,
-            fullName = "Mock User",
-            email = "mock@portaltik.com",
-            role = UserRole.ADMIN,
-            status = UserStatus.ACTIVE,
-            instituteNumber = "mock-1"
-        )
-    )
+    ): AuthResult<User> = Success(mockUser)
 
     override suspend fun logout(): AuthResult<Boolean> {
-        _loggedInUser.value = null
+        _sessionStatus.value = SessionStatus.SignedOut
 
         return Success(true)
     }

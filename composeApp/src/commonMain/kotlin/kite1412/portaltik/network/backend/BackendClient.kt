@@ -43,7 +43,7 @@ object BackendClient : KoinComponent {
     ): HttpResponse = httpClient.post(getPath(path)) {
         setBody(body)
         if (useToken) {
-            val token = dataStore.getToken() ?: throw IllegalStateException("Not Authenticated")
+            val token = dataStore.getAuthSession()?.token ?: throw IllegalStateException("Not Authenticated")
             headers {
                 append("Authorization", "Bearer $token")
             }

@@ -13,4 +13,5 @@ object StringPreferencesKey {
 
 object JsonPreferencesKey {
     const val USER = "user"
+    const val AUTH_SESSION = "auth_session"
 }

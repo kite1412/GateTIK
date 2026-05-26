@@ -1,5 +1,8 @@
 package kite1412.portaltik.app
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.slideInHorizontally
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -19,6 +22,7 @@ import kite1412.portaltik.designsystem.component.Destination
 import kite1412.portaltik.designsystem.component.NavigationScaffold
 import kite1412.portaltik.designsystem.extension.radialBackground
 import kite1412.portaltik.designsystem.theme.PortalTikTheme
+import kite1412.portaltik.domain.SessionStatus
 import kite1412.portaltik.ui.compositionlocal.LocalDarkMode
 import kite1412.portaltik.ui.compositionlocal.LocalScaffoldComponentsController
 import kite1412.portaltik.ui.compositionlocal.LocalSnackbarHostStateWrapper
@@ -33,12 +37,14 @@ import org.koin.compose.viewmodel.koinViewModel
 fun PortalTikApp() {
     val viewModel = koinViewModel<PortalTikViewModel>()
     val isDarkMode by viewModel.isDarkMode.collectAsStateWithLifecycle()
-    val signedInUser by viewModel.signedInUser.collectAsStateWithLifecycle()
+    val sessionStatus by viewModel.sessionStatus.collectAsStateWithLifecycle()
     val scaffoldComponentsController = viewModel.scaffoldComponentsController
     val navController = rememberNavController()
+    val user = if (sessionStatus is SessionStatus.SignedIn)
+        (sessionStatus as SessionStatus.SignedIn).user else null
     val appState = rememberPortalTikAppState(
         navController = navController,
-        userRole = signedInUser?.role
+        userRole = user?.role
     )
     val rootDestinationsProvider = appState.getRootDestinationsProvider()
     val snackbarHostStateWrapper = remember {
@@ -60,8 +66,8 @@ fun PortalTikApp() {
                     ?: emptyList(),
                 isDarkTheme = LocalDarkMode.current,
                 selectedDestination = appState.currentRootDestination?.toNavBarDestination() ?: Destination.Empty,
-                username = signedInUser?.fullName ?: "",
-                userEmail = signedInUser?.email ?: "",
+                username = user?.fullName ?: "",
+                userEmail = user?.email ?: "",
                 onDestinationClick = { des ->
                     appState.navigateToRootDestination(des.route)
                 },
@@ -78,17 +84,23 @@ fun PortalTikApp() {
                 }
             ) { p ->
                 Box(
-                    modifier = Modifier.fillMaxSize()
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .radialBackground()
                 ) {
-                    PortalTikNavHost(
-                        signedInUser = signedInUser,
-                        scaffoldPadding = p,
-                        navigateToRootDestination = { rootDestination ->
-                            appState.navigateToRootDestination(rootDestination.route)
-                        },
-                        modifier = Modifier.radialBackground(),
-                        navController = navController
-                    )
+                    AnimatedVisibility(
+                        visible = sessionStatus !is SessionStatus.Loading,
+                        enter = fadeIn() + slideInHorizontally()
+                    ) {
+                        PortalTikNavHost(
+                            signedInUser = user,
+                            scaffoldPadding = p,
+                            navigateToRootDestination = { rootDestination ->
+                                appState.navigateToRootDestination(rootDestination.route)
+                            },
+                            navController = navController
+                        )
+                    }
                     SnackbarHost(
                         hostState = snackbarHostStateWrapper.snackbarHostState,
                         modifier = Modifier

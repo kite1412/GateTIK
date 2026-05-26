@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import kite1412.portaltik.app.util.AppScaffoldComponentsController
 import kite1412.portaltik.datastore.PortalTikDataStore
 import kite1412.portaltik.domain.Authentication
+import kite1412.portaltik.domain.SessionStatus
 import kite1412.portaltik.ui.util.ScaffoldComponent
 import kite1412.portaltik.ui.util.ScaffoldComponentState
 import kotlinx.coroutines.flow.SharingStarted
@@ -16,11 +17,11 @@ class PortalTikViewModel(
     authentication: Authentication
 ) : ViewModel() {
     private val scaffoldComponentStates = mutableStateMapOf<ScaffoldComponent, ScaffoldComponentState>()
-    val signedInUser = authentication.signedInUser
+    val sessionStatus = authentication.sessionStatus
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(5000),
-            initialValue = null
+            initialValue = SessionStatus.Loading
         )
 
     val isDarkMode = dataStore

@@ -11,7 +11,7 @@ typealias AuthResult<T> = Result<T, Error>
 interface Authentication {
     val logTag: String get() = "Authentication"
 
-    val signedInUser: Flow<User?>
+    val sessionStatus: Flow<SessionStatus>
 
     suspend fun signIn(
         email: String,
@@ -37,4 +37,13 @@ interface Authentication {
             override val message: String = "Akun belum divalidasi."
         ) : AuthError
     }
+}
+
+sealed interface SessionStatus {
+    data object Loading : SessionStatus
+    data object SignedOut : SessionStatus
+    data class SignedIn(
+        val token: String,
+        val user: User
+    ) : SessionStatus
 }

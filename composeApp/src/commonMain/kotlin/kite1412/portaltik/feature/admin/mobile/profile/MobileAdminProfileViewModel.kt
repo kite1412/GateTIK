@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kite1412.portaltik.datastore.PortalTikDataStore
 import kite1412.portaltik.domain.Authentication
+import kite1412.portaltik.domain.SessionStatus
 import kite1412.portaltik.model.User
 import kite1412.portaltik.ui.util.LoadState
 import kite1412.portaltik.ui.util.stateIn
@@ -19,11 +20,9 @@ class MobileAdminProfileViewModel(
     val user: Flow<LoadState<User>> = flow {
         emit(LoadState.Loading("Memuat informasi akun"))
 
-        authentication.signedInUser
-            .first { it != null }
-            .let { user ->
-                if (user != null) emit(LoadState.Success(user))
-            }
+        val sessionStatus = authentication.sessionStatus.first()
+        if (sessionStatus is SessionStatus.SignedIn)
+            emit(LoadState.Success(sessionStatus.user))
     }
         .stateIn(viewModelScope)
 
