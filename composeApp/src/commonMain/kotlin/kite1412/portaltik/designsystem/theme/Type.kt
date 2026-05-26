@@ -28,18 +28,12 @@ val Typography @Composable get() = Typography(
     bodySmall = interTextStyle(12),
     bodyMedium = interTextStyle(16),
     bodyLarge = interTextStyle(20),
-    labelSmall = interTextStyle(12),
-    labelMedium = interTextStyle(14),
-    labelLarge = interTextStyle(16),
-    titleSmall = interTextStyle(20).copy(
-        fontWeight = FontWeight.Bold
-    ),
-    titleMedium = interTextStyle(24).copy(
-        fontWeight = FontWeight.Bold
-    ),
-    titleLarge = interTextStyle(28).copy(
-        fontWeight = FontWeight.Bold
-    )
+    labelSmall = interTextStyle(12).bold(),
+    labelMedium = interTextStyle(14).bold(),
+    labelLarge = interTextStyle(16).bold(),
+    titleSmall = interTextStyle(20).bold(),
+    titleMedium = interTextStyle(24).bold(),
+    titleLarge = interTextStyle(28).bold()
 )
 
 @Composable
@@ -50,3 +44,4 @@ private fun interTextStyle(fontSize: Int) = TextStyle(
     fontWeight = FontWeight.Normal
 )
 
+private fun TextStyle.bold() = copy(fontWeight = FontWeight.Bold)

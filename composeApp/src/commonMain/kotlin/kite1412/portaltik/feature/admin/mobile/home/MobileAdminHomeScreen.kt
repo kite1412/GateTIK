@@ -1,6 +1,9 @@
 package kite1412.portaltik.feature.admin.mobile.home
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -27,6 +30,9 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -77,6 +83,7 @@ import kite1412.portaltik.ui.util.ScaffoldComponent
 import kite1412.portaltik.ui.util.UiEvent
 import kite1412.portaltik.util.now
 import kite1412.portaltik.util.toLocalDateTime
+import kotlinx.coroutines.delay
 import org.jetbrains.compose.resources.painterResource
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -534,28 +541,46 @@ private fun CctvCard(
                 },
                 success = { cctv ->
                     if (cctv != null) {
-                        CctvPlayer(Modifier.fillMaxSize()) {}
+                        var showMessage by rememberSaveable { mutableStateOf(true) }
 
+                        LaunchedEffect(Unit) {
+                            if (showMessage) {
+                                delay(3000)
+                                showMessage = false
+                            }
+                        }
+                        CctvPlayer(Modifier.fillMaxSize()) {}
+                        this@Column.AnimatedVisibility(
+                            visible = showMessage,
+                            modifier = Modifier.align(Alignment.Center),
+                            exit = fadeOut(),
+                            enter = fadeIn()
+                        ) {
+                            Text(
+                                text = "Pastikan terhubung dengan Wi-Fi TIK",
+                                style = MaterialTheme.typography.labelSmall,
+                                color = White
+                            )
+                        }
                         Badge(
                             text = "LIVE",
                             containerColor = Red500,
                             contentColor = White,
                             modifier = Modifier
                                 .padding(16.dp)
-                                .align(Alignment.TopStart)
+                                .align(Alignment.TopEnd)
                         )
-
                         Row(
                             modifier = Modifier
                                 .align(Alignment.BottomStart)
                                 .padding(16.dp),
                             verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.spacedBy(8.dp)
+                            horizontalArrangement = Arrangement.spacedBy(4.dp)
                         ) {
                             Icon(
                                 painter = painterResource(PortalTikIcons.videoRecorder),
                                 contentDescription = null,
-                                modifier = Modifier.size(20.dp),
+                                modifier = Modifier.size(16.dp),
                                 tint = White
                             )
                             Text(
