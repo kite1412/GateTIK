@@ -28,6 +28,7 @@ private val mobileViewModelModule = module {
             getMainGateUseCase = get(),
             getMainCctvUseCase = get(),
             getMainParkingQuotaUseCase = get(),
+            accessLogRepository = get(),
             openGateUseCase = get(),
             closeGateUseCase = get()
         )

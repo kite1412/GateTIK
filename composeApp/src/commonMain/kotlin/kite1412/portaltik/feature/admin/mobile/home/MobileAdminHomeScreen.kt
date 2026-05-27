@@ -1,9 +1,11 @@
 package kite1412.portaltik.feature.admin.mobile.home
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInHorizontally
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -23,6 +25,8 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -39,35 +43,35 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.text.font.FontStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kite1412.portaltik.CctvPlayer
 import kite1412.portaltik.designsystem.component.Badge
 import kite1412.portaltik.designsystem.component.Icon
-import kite1412.portaltik.designsystem.component.StatusIndicator
 import kite1412.portaltik.designsystem.theme.Blue200
 import kite1412.portaltik.designsystem.theme.Blue200_50
 import kite1412.portaltik.designsystem.theme.Blue900
 import kite1412.portaltik.designsystem.theme.BlueIndigoGradient
 import kite1412.portaltik.designsystem.theme.Emerald500
-import kite1412.portaltik.designsystem.theme.Emerald700
 import kite1412.portaltik.designsystem.theme.Gray900
 import kite1412.portaltik.designsystem.theme.Gray950
 import kite1412.portaltik.designsystem.theme.PortalTikTheme
 import kite1412.portaltik.designsystem.theme.Red500
-import kite1412.portaltik.designsystem.theme.Red600
 import kite1412.portaltik.designsystem.theme.Slate400
 import kite1412.portaltik.designsystem.theme.Slate500
 import kite1412.portaltik.designsystem.theme.Slate900_95
 import kite1412.portaltik.designsystem.theme.White
 import kite1412.portaltik.designsystem.theme.White20
 import kite1412.portaltik.designsystem.theme.White55
-import kite1412.portaltik.designsystem.theme.Yellow300
+import kite1412.portaltik.designsystem.theme.White60
+import kite1412.portaltik.designsystem.theme.White80
 import kite1412.portaltik.designsystem.util.PortalTikIcons
+import kite1412.portaltik.model.AccessLog
 import kite1412.portaltik.model.Cctv
 import kite1412.portaltik.model.Gate
-import kite1412.portaltik.model.GateStatus
 import kite1412.portaltik.model.IotDeviceStatus
 import kite1412.portaltik.model.ParkingQuota
 import kite1412.portaltik.ui.component.ActionCard
@@ -81,6 +85,7 @@ import kite1412.portaltik.ui.util.LoadState
 import kite1412.portaltik.ui.util.ScaffoldComponent
 import kite1412.portaltik.ui.util.UiEvent
 import kite1412.portaltik.util.now
+import kite1412.portaltik.util.timeAgo
 import kite1412.portaltik.util.toLocalDateTime
 import kotlinx.coroutines.delay
 import org.jetbrains.compose.resources.painterResource
@@ -100,6 +105,7 @@ fun MobileAdminHomeScreen(
     val mainGate by viewModel.mainGate.collectAsStateWithLifecycle()
     val mainCctv by viewModel.mainCctv.collectAsStateWithLifecycle()
     val mainParkingQuota by viewModel.mainParkingQuota.collectAsStateWithLifecycle()
+    val latestAccessLog by viewModel.latestAccessLog.collectAsStateWithLifecycle()
 
     LaunchedEffect(Unit) {
         viewModel.uiEvent.collect { event ->
@@ -110,6 +116,7 @@ fun MobileAdminHomeScreen(
     MobileAdminHomeScreen(
         userName = signedInUser?.fullName ?: "",
         gate = mainGate,
+        latestAccessLog = latestAccessLog,
         parkingQuota = mainParkingQuota,
         cctv = mainCctv,
         contentPadding = contentPadding,
@@ -126,6 +133,7 @@ fun MobileAdminHomeScreen(
 private fun MobileAdminHomeScreen(
     userName: String,
     gate: LoadState<Gate?>,
+    latestAccessLog: AccessLog?,
     parkingQuota: LoadState<ParkingQuota?>,
     cctv: LoadState<Cctv?>,
     contentPadding: PaddingValues,
@@ -158,8 +166,16 @@ private fun MobileAdminHomeScreen(
         item {
             GateControlCard(
                 gate = gate,
+                latestAccessLog = latestAccessLog,
                 onOpenGate = onOpenGate,
                 onCloseGate = onCloseGate
+            )
+        }
+        item {
+            GateAccessButton(
+                isLocked = true,
+                onLockChange = {},
+                modifier = Modifier.fillMaxWidth()
             )
         }
         item { CctvCard(cctv = cctv) }
@@ -174,6 +190,48 @@ private fun MobileAdminHomeScreen(
                 onGateClick = onGateClick,
                 onParkingClick = onParkingClick,
                 onCctvClick = onCctvClick
+            )
+        }
+    }
+}
+
+@Composable
+private fun GateAccessButton(
+    isLocked: Boolean,
+    onLockChange: (Boolean) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val text = "${if (isLocked) "Buka " else  ""}Kunci Gate"
+    val color by animateColorAsState(
+        targetValue = if (isLocked) Emerald500 else Red500.copy(alpha = 0.7f)
+    )
+    val background by animateColorAsState(
+        targetValue = if (isLocked) Emerald500.copy(alpha = 0.1f) else Red500.copy(alpha = 0.1f)
+    )
+
+    Button(
+        onClick = { onLockChange(!isLocked) },
+        modifier = modifier,
+        colors = ButtonDefaults.buttonColors(
+            containerColor = background
+        ),
+        shape = RoundedCornerShape(16.dp)
+    ) {
+        Row(
+            modifier = Modifier.padding(vertical = 8.dp),
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Icon(
+                painter = painterResource(
+                    if (isLocked) PortalTikIcons.lockOpen else PortalTikIcons.lock
+                ),
+                contentDescription = text,
+                tint = color
+            )
+            Text(
+                text = text,
+                color = color
             )
         }
     }
@@ -244,8 +302,10 @@ private fun HeaderSection(
 @Composable
 private fun GateControlCard(
     gate: LoadState<Gate?>,
+    latestAccessLog: AccessLog?,
     onOpenGate: () -> Unit,
-    onCloseGate: () -> Unit
+    onCloseGate: () -> Unit,
+    isLocked: Boolean = true
 ) {
     val isGateSuccess = gate is LoadState.Success && gate.data != null
 
@@ -259,83 +319,79 @@ private fun GateControlCard(
         Column(
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            Text(
-                text = "GATE UTAMA",
-                style = MaterialTheme.typography.labelSmall,
-                color = White.copy(alpha = 0.6f),
-                letterSpacing = 1.sp
-            )
-
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            Column(
+                verticalArrangement = Arrangement.spacedBy(4.dp)
             ) {
-                val bodySmall = MaterialTheme.typography.bodySmall
-
-                LoadState(
-                    state = gate,
-                    loading = {
-                        SmallCircularProgressIndicator(color = Yellow300)
-                    },
-                    error = {
+                Text(
+                    text = "GATE UTAMA",
+                    style = MaterialTheme.typography.labelMedium,
+                    color = White80,
+                    letterSpacing = 1.sp
+                )
+                AnimatedVisibility(
+                    visible = isGateSuccess,
+                    enter = fadeIn() + slideInHorizontally { -it }
+                ) {
+                    (if (isGateSuccess) gate.data else null)?.let { gate ->
                         Text(
-                            text = "Gate tidak ditemukan",
-                            style = bodySmall
-                        )
-                    },
-                    success = { gate ->
-                        if (gate != null) Text(
-                            text = gate.currentStatus.toIdString().uppercase(),
-                            style = MaterialTheme.typography.titleMedium,
-                            color = White
-                        ) else Text(
-                            text = "Gate tidak ditemukan",
-                            style = bodySmall
+                            text = gate.gateName,
+                            style = MaterialTheme.typography.labelSmall,
+                            color = White60
                         )
                     }
-                )
-                StatusIndicator(
-                    color = if (isGateSuccess)
-                        if (gate.data.currentStatus != GateStatus.OFFLINE) Emerald700 else Red600
-                        else Yellow300
-                )
+                }
             }
 
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            Column(
+                verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                val color = White.copy(alpha = 0.6f)
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    val color = White.copy(alpha = 0.6f)
+                    val isDeviceOnline = if (gate is LoadState.Success)
+                        gate.data?.iotDevice?.status == IotDeviceStatus.ONLINE else false
+                    val contentColor = if (isDeviceOnline) Emerald500 else color
 
-                Icon(
-                    painter = painterResource(PortalTikIcons.wifi),
-                    contentDescription = null,
-                    modifier = Modifier.size(16.dp),
-                    tint = color
-                )
-                LoadState(
-                    state = gate,
-                    loading = {
-                        SmallCircularProgressIndicator(color = color)
-                    },
-                    error = {
-                        Text(
-                            text = "IoT device tidak ditemukan",
-                            style = MaterialTheme.typography.bodySmall,
-                            color = Red500
-                        )
-                    },
-                    success = { gate ->
-                        Text(
-                            text = "Perangkat " + if (gate?.iotDevice?.status == IotDeviceStatus.ONLINE) "terhubung" else "terputus",
-                            style = MaterialTheme.typography.bodySmall,
-                            color = color
-                        )
-                    }
-                )
+                    Icon(
+                        painter = painterResource(PortalTikIcons.wifi),
+                        contentDescription = null,
+                        tint = contentColor
+                    )
+                    LoadState(
+                        state = gate,
+                        loading = {
+                            SmallCircularProgressIndicator(color = color)
+                        },
+                        error = {
+                            Text(
+                                text = "IoT device tidak ditemukan",
+                                style = MaterialTheme.typography.bodySmall,
+                                color = Red500
+                            )
+                        },
+                        success = {
+                            Text(
+                                text = "Perangkat " + if (isDeviceOnline) "terhubung" else "terputus",
+                                color = contentColor,
+                                fontWeight = FontWeight.SemiBold
+                            )
+                        }
+                    )
+                }
+
+                latestAccessLog?.let { latestLog ->
+                    Text(
+                        text = "Terakhir diakses: ${latestLog.accessedAt.timeAgo()}",
+                        style = MaterialTheme.typography.labelSmall,
+                        color = White60,
+                        fontStyle = FontStyle.Italic
+                    )
+                }
             }
 
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(Modifier.height(8.dp))
 
             Column(
                 verticalArrangement = Arrangement.spacedBy(8.dp)
@@ -363,11 +419,17 @@ private fun GateControlCard(
                 ),
             contentAlignment = Alignment.Center
         ) {
+            val animatedColor by animateColorAsState(
+                targetValue = if (isLocked) Red500.copy(alpha = 0.7f) else White
+            )
+
             Icon(
-                painter = painterResource(PortalTikIcons.lock),
+                painter = painterResource(
+                    if (isLocked) PortalTikIcons.lock else PortalTikIcons.lockOpen
+                ),
                 contentDescription = null,
                 modifier = Modifier.size(32.dp),
-                tint = White
+                tint = animatedColor
             )
         }
     }
@@ -417,70 +479,59 @@ private fun ParkingStatusCard(
                 )
             }
 
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(4.dp)
+            Column(
+                modifier = Modifier.weight(1f),
+                verticalArrangement = Arrangement.spacedBy(4.dp)
             ) {
-                Column(
-                    modifier = Modifier.weight(1f),
-                    verticalArrangement = Arrangement.spacedBy(4.dp)
-                ) {
-                    Text(
-                        text = "Parkir (Mahasiswa)",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = if (isDarkMode) Slate400 else Slate500
-                    )
-                    val color = MaterialTheme.colorScheme.onSurface
+                Text(
+                    text = "Parkir (Mahasiswa)",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = if (isDarkMode) Slate400 else Slate500
+                )
+                val color = MaterialTheme.colorScheme.onSurface
 
-                    LoadState(
-                        state = parkingQuota,
-                        loading = {
-                            SmallCircularProgressIndicator(color = color)
-                        },
-                        error = {
-                            Text(
-                                text = "Tidak dapat memuat kuota parkir",
-                                style = MaterialTheme.typography.bodySmall,
-                                color = color
-                            )
-                        },
-                        success = { parkingQuota ->
-                            if (parkingQuota != null) Text(
-                                text = "${parkingQuota.usedSlots} / ${parkingQuota.totalSlots} slot",
-                                style = MaterialTheme.typography.titleSmall,
-                                color = color
-                            ) else Text(
-                                text = "Kuota parkir belum diatur"
-                            )
-                        }
-                    )
-                    Spacer(modifier = Modifier.height(4.dp))
+                LoadState(
+                    state = parkingQuota,
+                    loading = {
+                        SmallCircularProgressIndicator(color = color)
+                    },
+                    error = {
+                        Text(
+                            text = "Tidak dapat memuat kuota parkir",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = color
+                        )
+                    },
+                    success = { parkingQuota ->
+                        if (parkingQuota != null) Text(
+                            text = "${parkingQuota.usedSlots} / ${parkingQuota.totalSlots} slot",
+                            style = MaterialTheme.typography.titleSmall,
+                            color = color
+                        ) else Text(
+                            text = "Kuota parkir belum diatur"
+                        )
+                    }
+                )
+                Spacer(modifier = Modifier.height(4.dp))
 
-                    val progress by animateFloatAsState(
-                        targetValue = if (parkingQuota is LoadState.Success && parkingQuota.data != null) {
-                            val data = parkingQuota.data
+                val progress by animateFloatAsState(
+                    targetValue = if (parkingQuota is LoadState.Success && parkingQuota.data != null) {
+                        val data = parkingQuota.data
 
-                            data.usedSlots / data.totalSlots.toFloat()
-                        } else 0f
-                    )
+                        data.usedSlots / data.totalSlots.toFloat()
+                    } else 0f
+                )
 
-                    LinearProgressIndicator(
-                        progress = { progress },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(8.dp),
-                        color = Emerald500,
-                        trackColor = if (isDarkMode) White.copy(alpha = 0.1f) else Blue200.copy(alpha = 0.2f),
-                        strokeCap = StrokeCap.Round,
-                        drawStopIndicator = {},
-                        gapSize = 2.dp
-                    )
-                }
-
-                Icon(
-                    painter = painterResource(PortalTikIcons.chevronRight),
-                    contentDescription = "parkir mahasiswa",
-                    tint = if (isDarkMode) Slate400 else Slate500
+                LinearProgressIndicator(
+                    progress = { progress },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(8.dp),
+                    color = Emerald500,
+                    trackColor = if (isDarkMode) White.copy(alpha = 0.1f) else Blue200.copy(alpha = 0.2f),
+                    strokeCap = StrokeCap.Round,
+                    drawStopIndicator = {},
+                    gapSize = 2.dp
                 )
             }
         }
@@ -637,6 +688,7 @@ private fun MobileAdminHomeScreenPreview() {
             MobileAdminHomeScreen(
                 userName = "Aulia Rahman",
                 gate = LoadState.Loading(),
+                latestAccessLog = null,
                 parkingQuota = LoadState.Loading(),
                 cctv = LoadState.Loading(),
                 contentPadding = p,

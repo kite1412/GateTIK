@@ -15,6 +15,7 @@ import portaltik.composeapp.generated.resources.house
 import portaltik.composeapp.generated.resources.id_card
 import portaltik.composeapp.generated.resources.location_mark
 import portaltik.composeapp.generated.resources.lock
+import portaltik.composeapp.generated.resources.lock_open
 import portaltik.composeapp.generated.resources.logout
 import portaltik.composeapp.generated.resources.moon
 import portaltik.composeapp.generated.resources.parking_off
@@ -57,4 +58,5 @@ object PortalTikIcons {
     val idCard = Res.drawable.id_card
     val parkingOff = Res.drawable.parking_off
     val doorClose = Res.drawable.door_close
+    val lockOpen = Res.drawable.lock_open
 }
