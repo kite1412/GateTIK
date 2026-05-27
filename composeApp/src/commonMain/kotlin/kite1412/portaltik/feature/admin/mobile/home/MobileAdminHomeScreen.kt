@@ -94,7 +94,6 @@ import org.koin.compose.viewmodel.koinViewModel
 @Composable
 fun MobileAdminHomeScreen(
     contentPadding: PaddingValues,
-    navigateToGate: () -> Unit,
     navigateToParking: () -> Unit,
     navigateToCctv: () -> Unit,
     modifier: Modifier = Modifier,
@@ -122,7 +121,6 @@ fun MobileAdminHomeScreen(
         contentPadding = contentPadding,
         onOpenGate = viewModel::openGate,
         onCloseGate = viewModel::closeGate,
-        onGateClick = navigateToGate,
         onParkingClick = navigateToParking,
         onCctvClick = navigateToCctv,
         modifier = modifier
@@ -139,7 +137,6 @@ private fun MobileAdminHomeScreen(
     contentPadding: PaddingValues,
     onOpenGate: () -> Unit,
     onCloseGate: () -> Unit,
-    onGateClick: () -> Unit,
     onParkingClick: () -> Unit,
     onCctvClick: () -> Unit,
     modifier: Modifier = Modifier
@@ -187,7 +184,6 @@ private fun MobileAdminHomeScreen(
         }
         item {
             QuickActionsRow(
-                onGateClick = onGateClick,
                 onParkingClick = onParkingClick,
                 onCctvClick = onCctvClick
             )
@@ -548,7 +544,7 @@ private fun CctvCard(
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .aspectRatio(16f / 9f)
+                .aspectRatio(16f / 10f)
                 .clip(RoundedCornerShape(24.dp))
                 .background(
                     Brush.radialGradient(
@@ -651,7 +647,6 @@ private fun CctvCard(
 
 @Composable
 private fun QuickActionsRow(
-    onGateClick: () -> Unit,
     onParkingClick: () -> Unit,
     onCctvClick: () -> Unit
 ) {
@@ -659,12 +654,6 @@ private fun QuickActionsRow(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        ActionCard(
-            icon = painterResource(PortalTikIcons.doorOpen),
-            label = "Gate",
-            onClick = onGateClick,
-            modifier = Modifier.weight(1f)
-        )
         ActionCard(
             icon = painterResource(PortalTikIcons.car),
             label = "Parkir",
@@ -694,7 +683,6 @@ private fun MobileAdminHomeScreenPreview() {
                 contentPadding = p,
                 onOpenGate = {},
                 onCloseGate = {},
-                onGateClick = {},
                 onParkingClick = {},
                 onCctvClick = {}
             )

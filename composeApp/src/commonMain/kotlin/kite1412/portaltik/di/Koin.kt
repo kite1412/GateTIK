@@ -7,7 +7,6 @@ import kite1412.portaltik.datastore.dataStoreModule
 import kite1412.portaltik.domain.domainModule
 import kite1412.portaltik.feature.admin.desktop.dashboard.DesktopAdminDashboardViewModel
 import kite1412.portaltik.feature.admin.mobile.cctv.MobileAdminCctvViewModel
-import kite1412.portaltik.feature.admin.mobile.gate.MobileAdminGateViewModel
 import kite1412.portaltik.feature.admin.mobile.home.MobileAdminHomeViewModel
 import kite1412.portaltik.feature.admin.mobile.parking.MobileAdminParkingViewModel
 import kite1412.portaltik.feature.admin.mobile.profile.MobileAdminProfileViewModel
@@ -27,15 +26,6 @@ private val mobileViewModelModule = module {
             authentication = get(),
             getMainGateUseCase = get(),
             getMainCctvUseCase = get(),
-            getMainParkingQuotaUseCase = get(),
-            accessLogRepository = get(),
-            openGateUseCase = get(),
-            closeGateUseCase = get()
-        )
-    }
-    viewModel {
-        MobileAdminGateViewModel(
-            getMainGateUseCase = get(),
             getMainParkingQuotaUseCase = get(),
             accessLogRepository = get(),
             openGateUseCase = get(),

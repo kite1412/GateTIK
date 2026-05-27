@@ -11,7 +11,6 @@ import kite1412.portaltik.feature.Graph
 import kite1412.portaltik.feature.Route
 import kite1412.portaltik.feature.admin.desktop.dashboard.desktopAdminDashboardScreen
 import kite1412.portaltik.feature.admin.mobile.cctv.mobileAdminCctvScreen
-import kite1412.portaltik.feature.admin.mobile.gate.mobileAdminGateScreen
 import kite1412.portaltik.feature.admin.mobile.home.mobileAdminHomeScreen
 import kite1412.portaltik.feature.admin.mobile.parking.mobileAdminParkingScreen
 import kite1412.portaltik.feature.admin.mobile.profile.mobileAdminProfileScreen
@@ -54,19 +53,13 @@ object AdminGraph : Graph {
 
     object Mobile : RootDestinationsProvider {
         override val rootDestinations: List<RootDestination> = listOf(
-            Home, Gate, Parking, Cctv, Profile
+            Home, Parking, Cctv, Profile
         )
 
         object Home : RootDestination, Route("mobile_admin_home") {
             override val route: String = name
             override val icon: DrawableResource = PortalTikIcons.house
             override val label: String = "Home"
-        }
-
-        object Gate : RootDestination, Route("mobile_admin_gate") {
-            override val route: String = name
-            override val icon: DrawableResource = PortalTikIcons.doorOpen
-            override val label: String = "Gate"
         }
 
         object Parking : RootDestination, Route("mobile_admin_parking") {
@@ -99,11 +92,9 @@ private fun NavGraphBuilder.mobileAdminGraph(
 ) {
     mobileAdminHomeScreen(
         contentPadding = smallContentPadding(scaffoldPadding),
-        navigateToGate = { navigateToRootDestination(AdminGraph.Mobile.Gate) },
         navigateToParking = { navigateToRootDestination(AdminGraph.Mobile.Parking) },
-        navigateToCctv = { navigateToRootDestination(AdminGraph.Mobile.Cctv) },
+        navigateToCctv = { navigateToRootDestination(AdminGraph.Mobile.Cctv) }
     )
-    mobileAdminGateScreen(contentPadding = smallContentPadding(scaffoldPadding))
     mobileAdminParkingScreen(contentPadding = smallContentPadding(scaffoldPadding))
     mobileAdminCctvScreen(contentPadding = smallContentPadding(scaffoldPadding))
     mobileAdminProfileScreen(contentPadding = smallContentPadding(scaffoldPadding))
