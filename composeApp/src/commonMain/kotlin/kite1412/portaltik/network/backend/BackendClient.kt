@@ -25,15 +25,20 @@ object BackendClient : KoinComponent {
 
     suspend inline fun rawGet(
         path: String,
+        useToken: Boolean = true,
         block: HttpRequestBuilder.() -> Unit = {}
     ): HttpResponse = httpClient
-        .get(getPath(path), block)
+        .get(getPath(path)) {
+            if (useToken) attachToken()
+            block()
+        }
         .also(::log)
 
     suspend inline fun <reified Response> get(
         path: String,
+        withToken: Boolean = true,
         block: HttpRequestBuilder.() -> Unit = {}
-    ): Response = rawGet(path, block).body()
+    ): Response = rawGet(path, withToken, block).body()
 
     suspend inline fun <reified Request : Any> rawPost(
         path: String,
@@ -42,12 +47,7 @@ object BackendClient : KoinComponent {
         block: HttpRequestBuilder.() -> Unit = {}
     ): HttpResponse = httpClient.post(getPath(path)) {
         setBody(body)
-        if (useToken) {
-            val token = dataStore.getAuthSession()?.token ?: throw IllegalStateException("Not Authenticated")
-            headers {
-                append("Authorization", "Bearer $token")
-            }
-        }
+        if (useToken) attachToken()
         block()
     }.also(::log)
 
@@ -90,5 +90,12 @@ object BackendClient : KoinComponent {
             tag = LOG_TAG,
             message = "status ${response.request.url.fullPath}: ${response.status.value}"
         )
+    }
+
+    suspend fun HttpRequestBuilder.attachToken() {
+        val token = dataStore.getAuthSession()?.token ?: throw IllegalStateException("Not Authenticated")
+        headers {
+            append("Authorization", "Bearer $token")
+        }
     }
 }

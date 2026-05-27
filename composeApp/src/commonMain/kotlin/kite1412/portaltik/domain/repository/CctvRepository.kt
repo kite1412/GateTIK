@@ -7,7 +7,5 @@ import kite1412.portaltik.util.Result
 typealias CctvResult<T> = Result<T, Error>
 
 interface CctvRepository {
-    suspend fun getCctvs(): CctvResult<List<Cctv>>
-
     suspend fun getMainCctv(): CctvResult<Cctv?>
 }

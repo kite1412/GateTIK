@@ -3,19 +3,20 @@ package kite1412.portaltik.network.backend.datasource
 import kite1412.portaltik.getDeviceType
 import kite1412.portaltik.model.Gate
 import kite1412.portaltik.network.backend.BackendClient
+import kite1412.portaltik.network.backend.dto.model.BackendGate
 import kite1412.portaltik.network.backend.dto.request.BackendRequestGateAction
 import kite1412.portaltik.network.backend.dto.response.BackendCloseGateResponse
 import kite1412.portaltik.network.backend.dto.response.BackendOpenGateResponse
 import kite1412.portaltik.network.backend.dto.response.BackendResponse
 import kite1412.portaltik.network.domain.datasource.GateRemoteDataSource
-import kite1412.portaltik.network.mock.mockGate
 
 class BackendGateDataSource : GateRemoteDataSource {
     private val deviceType = getDeviceType()
 
-    override suspend fun getGates(): List<Gate> = listOf(mockGate)
-
-    override suspend fun getMainGate(): Gate = mockGate
+    override suspend fun getMainGate(): Gate? = BackendClient
+        .get<BackendResponse<BackendGate>>("gate/main")
+        .data
+        ?.toModel()
 
     override suspend fun openGate(id: Int): Boolean {
         val res = BackendClient.post<BackendRequestGateAction, BackendResponse<BackendOpenGateResponse>>(

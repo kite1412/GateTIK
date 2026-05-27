@@ -7,8 +7,6 @@ import kite1412.portaltik.util.Result
 typealias GateResult<T> = Result<T, Error>
 
 interface GateRepository {
-    suspend fun getGates(): GateResult<List<Gate>>
-
     suspend fun getMainGate(): GateResult<Gate?>
 
     suspend fun openGate(id: Int): GateResult<Boolean>

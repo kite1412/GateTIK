@@ -1,7 +1,6 @@
 package kite1412.portaltik.data.repository
 
 import kite1412.portaltik.Logger
-import kite1412.portaltik.data.util.tryOrThrowUnknown
 import kite1412.portaltik.domain.repository.GateRepository
 import kite1412.portaltik.domain.repository.GateResult
 import kite1412.portaltik.model.Gate
@@ -15,17 +14,18 @@ class GateRepositoryImpl(
 ) : GateRepository {
     private val logTag = "GateRepositoryImpl"
 
-    override suspend fun getGates(): GateResult<List<Gate>> = tryOrThrowUnknown(
-        logTag = logTag,
-        errorMessage = "Failed to get gates.",
-        action = remoteDataSource::getGates
-    )
+    override suspend fun getMainGate(): GateResult<Gate?> = try {
+        val gate = remoteDataSource.getMainGate()
 
-    override suspend fun getMainGate(): GateResult<Gate?> = tryOrThrowUnknown(
-        logTag = logTag,
-        errorMessage = "Failed to get main gate",
-        action = remoteDataSource::getMainGate
-    )
+        Success(gate)
+    } catch (e: Exception) {
+        Logger.e(
+            tag = logTag,
+            message = "Failed to get main gate",
+            throwable = e
+        )
+        Error(Unknown())
+    }
 
     override suspend fun openGate(id: Int): GateResult<Boolean> = try {
         val res = remoteDataSource.openGate(id)

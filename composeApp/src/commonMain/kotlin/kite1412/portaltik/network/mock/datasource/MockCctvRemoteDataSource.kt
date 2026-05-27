@@ -6,8 +6,6 @@ import kite1412.portaltik.network.mock.mockCctv
 import kotlinx.coroutines.delay
 
 class MockCctvRemoteDataSource : CctvRemoteDataSource {
-    override suspend fun getCctvs(): List<Cctv> = listOf(mockCctv)
-
     override suspend fun getMainCctv(): Cctv {
         delay(2000)
         return mockCctv
