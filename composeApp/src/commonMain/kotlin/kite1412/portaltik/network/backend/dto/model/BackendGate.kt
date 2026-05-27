@@ -18,7 +18,9 @@ data class BackendGate(
     @SerialName("created_at")
     val createdAt: Instant,
     @SerialName("updated_at")
-    val updatedAt: Instant
+    val updatedAt: Instant,
+    @SerialName("iot_devices")
+    val iotDevices: List<BackendIotDevice>
 ) {
     fun toModel() = Gate(
         id = id,
@@ -26,6 +28,7 @@ data class BackendGate(
         latitude = latitude,
         longitude = longitude,
         allowedRadiusMeter = allowedRadiusMeter,
+        iotDevice = iotDevices.first().toModel(),
         currentStatus = GateStatus.CLOSED,
         isActive = true
     )

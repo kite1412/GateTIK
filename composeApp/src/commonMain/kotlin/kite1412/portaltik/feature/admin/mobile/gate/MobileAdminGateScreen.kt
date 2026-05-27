@@ -57,7 +57,6 @@ import kite1412.portaltik.designsystem.theme.White55
 import kite1412.portaltik.designsystem.util.PortalTikIcons
 import kite1412.portaltik.model.AccessLog
 import kite1412.portaltik.model.Gate
-import kite1412.portaltik.model.IotDevice
 import kite1412.portaltik.model.IotDeviceStatus
 import kite1412.portaltik.model.ParkingQuota
 import kite1412.portaltik.ui.component.SmallCircularProgressIndicator
@@ -78,12 +77,10 @@ fun MobileAdminGateScreen(
     viewModel: MobileAdminGateViewModel = koinViewModel()
 ) {
     val mainGate by viewModel.mainGate.collectAsStateWithLifecycle()
-    val mainIotDevice by viewModel.mainIotDevice.collectAsStateWithLifecycle()
     val mainParkingQuota by viewModel.mainParkingQuota.collectAsStateWithLifecycle()
 
     MobileAdminGateScreen(
         gate = mainGate,
-        iotDevice = mainIotDevice,
         parkingQuota = mainParkingQuota,
         latestAccessLog = viewModel.latestAccessLog,
         contentPadding = contentPadding,
@@ -96,7 +93,6 @@ fun MobileAdminGateScreen(
 @Composable
 private fun MobileAdminGateScreen(
     gate: LoadState<Gate?>,
-    iotDevice: LoadState<IotDevice?>,
     parkingQuota: LoadState<ParkingQuota?>,
     latestAccessLog: LoadState<AccessLog?>,
     contentPadding: PaddingValues,
@@ -130,7 +126,6 @@ private fun MobileAdminGateScreen(
         item {
             StatusGrid(
                 gate = gate,
-                iotDevice = iotDevice,
                 parkingQuota = parkingQuota,
                 latestAccessLog = latestAccessLog
             )
@@ -269,7 +264,6 @@ private fun GateStatusCard(
 @Composable
 private fun StatusGrid(
     gate: LoadState<Gate?>,
-    iotDevice: LoadState<IotDevice?>,
     parkingQuota: LoadState<ParkingQuota?>,
     latestAccessLog: LoadState<AccessLog?>,
     modifier: Modifier = Modifier
@@ -282,7 +276,7 @@ private fun StatusGrid(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            val isIotDeviceSuccess = iotDevice is LoadState.Success && iotDevice.data != null
+            val isIotDeviceSuccess = gate is LoadState.Success && gate.data != null
 
             StatusGridItem(
                 label = "STATUS",
@@ -293,12 +287,12 @@ private fun StatusGrid(
             )
             StatusGridItem(
                 label = "KONEKSI",
-                value = if (isIotDeviceSuccess) iotDevice.data.status.name
+                value = if (isIotDeviceSuccess) gate.data.iotDevice.status.name
                         .lowercase()
                         .replaceFirstChar { it.uppercase() } else "Tidak Terkoneksi",
-                showLoading = iotDevice is LoadState.Loading,
+                showLoading = gate is LoadState.Loading,
                 valueColor = if (
-                        iotDevice is LoadState.Error || (isIotDeviceSuccess && iotDevice.data.status == IotDeviceStatus.OFFLINE)
+                        gate is LoadState.Error || (isIotDeviceSuccess && gate.data.iotDevice.status == IotDeviceStatus.OFFLINE)
                     ) Red500 else Emerald500,
                 icon = painterResource(PortalTikIcons.wifi),
                 modifier = Modifier.weight(1f)
@@ -400,7 +394,6 @@ private fun MobileAdminGateScreenPreview() {
             ) {
                 MobileAdminGateScreen(
                     gate = LoadState.Success(null),
-                    iotDevice = LoadState.Success(null),
                     parkingQuota = LoadState.Success(null),
                     latestAccessLog = LoadState.Success(null),
                     contentPadding = p,

@@ -6,8 +6,7 @@ data class IotDevice(
     val id: Int,
     val deviceName: String,
     val deviceUid: String,
-    val gateId: String,
-    val ipAddress: String,
+    val gateId: Int,
     val firmwareVersion: String,
     val status: IotDeviceStatus,
     val lastOnlineAt: Instant

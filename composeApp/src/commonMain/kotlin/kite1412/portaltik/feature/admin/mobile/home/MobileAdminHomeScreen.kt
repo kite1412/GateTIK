@@ -68,7 +68,6 @@ import kite1412.portaltik.designsystem.util.PortalTikIcons
 import kite1412.portaltik.model.Cctv
 import kite1412.portaltik.model.Gate
 import kite1412.portaltik.model.GateStatus
-import kite1412.portaltik.model.IotDevice
 import kite1412.portaltik.model.IotDeviceStatus
 import kite1412.portaltik.model.ParkingQuota
 import kite1412.portaltik.ui.component.ActionCard
@@ -99,7 +98,6 @@ fun MobileAdminHomeScreen(
     val snackbarHostStateWrapper = LocalSnackbarHostStateWrapper.current
     val signedInUser by viewModel.signedInUser.collectAsStateWithLifecycle()
     val mainGate by viewModel.mainGate.collectAsStateWithLifecycle()
-    val mainIotDevice by viewModel.mainIotDevice.collectAsStateWithLifecycle()
     val mainCctv by viewModel.mainCctv.collectAsStateWithLifecycle()
     val mainParkingQuota by viewModel.mainParkingQuota.collectAsStateWithLifecycle()
 
@@ -112,7 +110,6 @@ fun MobileAdminHomeScreen(
     MobileAdminHomeScreen(
         userName = signedInUser?.fullName ?: "",
         gate = mainGate,
-        iotDevice = mainIotDevice,
         parkingQuota = mainParkingQuota,
         cctv = mainCctv,
         contentPadding = contentPadding,
@@ -129,7 +126,6 @@ fun MobileAdminHomeScreen(
 private fun MobileAdminHomeScreen(
     userName: String,
     gate: LoadState<Gate?>,
-    iotDevice: LoadState<IotDevice?>,
     parkingQuota: LoadState<ParkingQuota?>,
     cctv: LoadState<Cctv?>,
     contentPadding: PaddingValues,
@@ -162,18 +158,17 @@ private fun MobileAdminHomeScreen(
         item {
             GateControlCard(
                 gate = gate,
-                iotDevice = iotDevice,
                 onOpenGate = onOpenGate,
                 onCloseGate = onCloseGate
             )
         }
+        item { CctvCard(cctv = cctv) }
         item {
             ParkingStatusCard(
                 isDarkMode = isDarkMode,
                 parkingQuota = parkingQuota
             )
         }
-        item { CctvCard(cctv = cctv) }
         item {
             QuickActionsRow(
                 onGateClick = onGateClick,
@@ -249,7 +244,6 @@ private fun HeaderSection(
 @Composable
 private fun GateControlCard(
     gate: LoadState<Gate?>,
-    iotDevice: LoadState<IotDevice?>,
     onOpenGate: () -> Unit,
     onCloseGate: () -> Unit
 ) {
@@ -320,16 +314,20 @@ private fun GateControlCard(
                     tint = color
                 )
                 LoadState(
-                    state = iotDevice,
+                    state = gate,
                     loading = {
                         SmallCircularProgressIndicator(color = color)
                     },
                     error = {
-                        Text("IoT device tidak ditemukan")
-                    },
-                    success = { device ->
                         Text(
-                            text = "Perangkat " + if (device?.status == IotDeviceStatus.ONLINE) "terhubung" else "terputus",
+                            text = "IoT device tidak ditemukan",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = Red500
+                        )
+                    },
+                    success = { gate ->
+                        Text(
+                            text = "Perangkat " + if (gate?.iotDevice?.status == IotDeviceStatus.ONLINE) "terhubung" else "terputus",
                             style = MaterialTheme.typography.bodySmall,
                             color = color
                         )
@@ -639,7 +637,6 @@ private fun MobileAdminHomeScreenPreview() {
             MobileAdminHomeScreen(
                 userName = "Aulia Rahman",
                 gate = LoadState.Loading(),
-                iotDevice = LoadState.Loading(),
                 parkingQuota = LoadState.Loading(),
                 cctv = LoadState.Loading(),
                 contentPadding = p,

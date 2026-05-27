@@ -10,25 +10,25 @@ import kite1412.portaltik.model.IotDeviceStatus
 import kite1412.portaltik.model.ParkingQuota
 import kotlin.time.Instant
 
+val mockIotDevice = IotDevice(
+    id = 1,
+    deviceName = "ESP32 Main Gate Controller",
+    deviceUid = "ESP32-MAIN-001",
+    gateId = 1,
+    firmwareVersion = "v1.2.4",
+    status = IotDeviceStatus.ONLINE,
+    lastOnlineAt = Instant.parse("2026-05-22T10:15:30Z")
+)
+
 val mockGate = Gate(
     id = 1,
     gateName = "Main Entrance Gate",
     latitude = -5.35723145,
     longitude = 105.31578291,
     allowedRadiusMeter = 50,
+    iotDevice = mockIotDevice,
     currentStatus = GateStatus.CLOSED,
     isActive = true
-)
-
-val mockIotDevice = IotDevice(
-    id = 1,
-    deviceName = "ESP32 Main Gate Controller",
-    deviceUid = "ESP32-MAIN-001",
-    gateId = mockGate.id.toString(),
-    ipAddress = "192.168.1.100",
-    firmwareVersion = "v1.2.4",
-    status = IotDeviceStatus.ONLINE,
-    lastOnlineAt = Instant.parse("2026-05-22T10:15:30Z")
 )
 
 val mockCctv = Cctv(

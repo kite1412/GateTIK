@@ -3,12 +3,10 @@ package kite1412.portaltik.data
 import kite1412.portaltik.data.repository.AccessLogRepositoryImpl
 import kite1412.portaltik.data.repository.CctvRepositoryImpl
 import kite1412.portaltik.data.repository.GateRepositoryImpl
-import kite1412.portaltik.data.repository.IotDeviceRepositoryImpl
 import kite1412.portaltik.data.repository.ParkingQuotaRepositoryImpl
 import kite1412.portaltik.domain.repository.AccessLogRepository
 import kite1412.portaltik.domain.repository.CctvRepository
 import kite1412.portaltik.domain.repository.GateRepository
-import kite1412.portaltik.domain.repository.IotDeviceRepository
 import kite1412.portaltik.domain.repository.ParkingQuotaRepository
 import org.koin.dsl.bind
 import org.koin.dsl.module
@@ -25,12 +23,6 @@ val dataModule = module {
             remoteDataSource = get()
         )
     } bind GateRepository::class
-
-    single {
-        IotDeviceRepositoryImpl(
-            remoteDataSource = get()
-        )
-    } bind IotDeviceRepository::class
 
     single {
         ParkingQuotaRepositoryImpl(

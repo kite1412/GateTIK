@@ -38,7 +38,7 @@ class BackendGateDataSource : GateRemoteDataSource {
 
     private fun gateAction(id: Int, open: Boolean) = BackendRequestGateAction(
         gateId = id,
-        accessMethod = deviceType.name,
+        accessMethod = deviceType.name.lowercase(),
         notes = "${if (open) "Open" else "Close"} request from ${deviceType.name}."
     )
 }

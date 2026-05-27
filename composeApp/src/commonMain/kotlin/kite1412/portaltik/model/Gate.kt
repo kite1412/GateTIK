@@ -6,6 +6,7 @@ data class Gate(
     val latitude: Double,
     val longitude: Double,
     val allowedRadiusMeter: Int,
+    val iotDevice: IotDevice,
     val currentStatus: GateStatus, // TODO delete later
     val isActive: Boolean // TODO delete later
 )

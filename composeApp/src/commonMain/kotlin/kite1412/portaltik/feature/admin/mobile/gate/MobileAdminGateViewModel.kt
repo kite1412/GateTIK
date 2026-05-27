@@ -7,7 +7,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kite1412.portaltik.domain.repository.AccessLogRepository
 import kite1412.portaltik.domain.usecase.CloseGateUseCase
-import kite1412.portaltik.domain.usecase.GetIotDeviceUseCase
 import kite1412.portaltik.domain.usecase.GetMainGateUseCase
 import kite1412.portaltik.domain.usecase.GetMainParkingQuotaUseCase
 import kite1412.portaltik.domain.usecase.OpenGateUseCase
@@ -22,7 +21,6 @@ import kotlinx.coroutines.launch
 
 class MobileAdminGateViewModel(
     getMainGateUseCase: GetMainGateUseCase,
-    getIotDeviceUseCase: GetIotDeviceUseCase,
     getMainParkingQuotaUseCase: GetMainParkingQuotaUseCase,
     private val accessLogRepository: AccessLogRepository,
     private val openGateUseCase: OpenGateUseCase,
@@ -34,9 +32,6 @@ class MobileAdminGateViewModel(
             if (it is LoadState.Success && it.data != null)
                 gateId = it.data.id
         }
-        .stateIn(viewModelScope)
-    val mainIotDevice = getIotDeviceUseCase
-        .fromGateLoadStateFlow(mainGate)
         .stateIn(viewModelScope)
     val mainParkingQuota = getMainParkingQuotaUseCase().stateIn(viewModelScope)
 
