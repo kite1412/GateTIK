@@ -21,6 +21,7 @@ koin = "4.2.1"
 kotlinLogging = "8.0.03"
 ktor = "3.5.0"
 libvlc = "3.7.0"
+vlcj = "4.12.1"
 
 [libraries]
 kotlin-gp = { group = "org.jetbrains.kotlin", name = "kotlin-gradle-plugin", version.ref = "kotlin" }
@@ -57,6 +58,7 @@ ktor-client-darwin = { group = "io.ktor", name = "ktor-client-darwin", version.r
 ktor-client-content-negotiation = { group = "io.ktor", name = "ktor-client-content-negotiation", version.ref = "ktor" }
 ktor-serialization-kotlinx-json = { group = "io.ktor", name = "ktor-serialization-kotlinx-json", version.ref = "ktor" }
 libvlc-android = { group = "org.videolan.android", name = "libvlc-all", version.ref = "libvlc" }
+vlcj = { group = "uk.co.caprica", name = "vlcj", version.ref = "vlcj" }
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }

@@ -80,6 +80,7 @@ kotlin {
             implementation(compose.desktop.currentOs)
             implementation(libs.kotlinx.coroutinesSwing)
             implementation(libs.kotlin.logging.jvm)
+            implementation(libs.vlcj)
         }
     }
 }
