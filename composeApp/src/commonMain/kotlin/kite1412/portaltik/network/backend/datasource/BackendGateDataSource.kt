@@ -1,6 +1,6 @@
 package kite1412.portaltik.network.backend.datasource
 
-import kite1412.portaltik.getDeviceType
+import kite1412.portaltik.getPlatform
 import kite1412.portaltik.model.Gate
 import kite1412.portaltik.network.backend.BackendClient
 import kite1412.portaltik.network.backend.dto.model.BackendGate
@@ -11,7 +11,7 @@ import kite1412.portaltik.network.backend.dto.response.BackendResponse
 import kite1412.portaltik.network.domain.datasource.GateRemoteDataSource
 
 class BackendGateDataSource : GateRemoteDataSource {
-    private val deviceType = getDeviceType()
+    private val platform = getPlatform()
 
     override suspend fun getMainGate(): Gate? = BackendClient
         .get<BackendResponse<BackendGate>>("gate/main")
@@ -38,7 +38,7 @@ class BackendGateDataSource : GateRemoteDataSource {
 
     private fun gateAction(id: Int, open: Boolean) = BackendRequestGateAction(
         gateId = id,
-        accessMethod = deviceType.name.lowercase(),
-        notes = "${if (open) "Open" else "Close"} request from ${deviceType.name}."
+        accessMethod = platform.name.lowercase(),
+        notes = "${if (open) "Open" else "Close"} request from ${platform.name} platform."
     )
 }

@@ -3,7 +3,7 @@ package kite1412.portaltik.feature.admin
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.navigation
-import kite1412.portaltik.DeviceType
+import kite1412.portaltik.PlatformType
 import kite1412.portaltik.app.normalContentPadding
 import kite1412.portaltik.app.smallContentPadding
 import kite1412.portaltik.designsystem.util.PortalTikIcons
@@ -14,7 +14,7 @@ import kite1412.portaltik.feature.admin.mobile.cctv.mobileAdminCctvScreen
 import kite1412.portaltik.feature.admin.mobile.home.mobileAdminHomeScreen
 import kite1412.portaltik.feature.admin.mobile.parking.mobileAdminParkingScreen
 import kite1412.portaltik.feature.admin.mobile.profile.mobileAdminProfileScreen
-import kite1412.portaltik.getDeviceType
+import kite1412.portaltik.getPlatform
 import kite1412.portaltik.ui.navigation.RootDestination
 import kite1412.portaltik.ui.navigation.RootDestinationsProvider
 import org.jetbrains.compose.resources.DrawableResource
@@ -23,7 +23,7 @@ fun NavGraphBuilder.adminGraph(
     scaffoldPadding: PaddingValues,
     navigateToRootDestination: (RootDestination) -> Unit
 ) {
-    val isDesktop = getDeviceType() == DeviceType.DESKTOP
+    val isDesktop = getPlatform().type == PlatformType.DESKTOP
 
     navigation(
         startDestination = if (isDesktop) AdminGraph.Desktop.Dashboard.name

@@ -6,6 +6,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.awt.SwingPanel
 import kite1412.portaltik.ui.util.LoadState
+import kite1412.portaltik.util.SupportedOS
+import kite1412.portaltik.util.getSupportedOS
 import uk.co.caprica.vlcj.player.component.CallbackMediaPlayerComponent
 import java.awt.BorderLayout
 import java.io.File
@@ -46,14 +48,10 @@ actual fun CctvPlayer(
     }
 }
 
-private fun isVlcInstalled(): Boolean {
-    val os = System.getProperty("os.name").lowercase()
-    return when {
-        os.contains("win") -> checkWindows()
-        os.contains("mac") -> checkMac()
-        os.contains("nix") || os.contains("nux") || os.contains("aix") -> checkLinux()
-        else -> false
-    }
+private fun isVlcInstalled(): Boolean = when (getSupportedOS()) {
+    SupportedOS.WINDOWS -> checkWindows()
+    SupportedOS.MACOS -> checkMac()
+    SupportedOS.LINUX -> checkLinux()
 }
 
 private fun checkWindows(): Boolean {
