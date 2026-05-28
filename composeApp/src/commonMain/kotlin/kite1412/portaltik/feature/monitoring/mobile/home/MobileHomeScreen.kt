@@ -74,6 +74,7 @@ import kite1412.portaltik.model.Cctv
 import kite1412.portaltik.model.Gate
 import kite1412.portaltik.model.IotDeviceStatus
 import kite1412.portaltik.model.ParkingQuota
+import kite1412.portaltik.model.UserRole
 import kite1412.portaltik.ui.component.ActionCard
 import kite1412.portaltik.ui.component.GateControlButton
 import kite1412.portaltik.ui.component.SmallCircularProgressIndicator
@@ -112,24 +113,28 @@ fun MobileHomeScreen(
                 .showSnackbar(event.message)
         }
     }
-    MobileHomeScreen(
-        userName = signedInUser?.fullName ?: "",
-        gate = mainGate,
-        latestAccessLog = latestAccessLog,
-        parkingQuota = mainParkingQuota,
-        cctv = mainCctv,
-        contentPadding = contentPadding,
-        onOpenGate = viewModel::openGate,
-        onCloseGate = viewModel::closeGate,
-        onParkingClick = navigateToParking,
-        onCctvClick = navigateToCctv,
-        modifier = modifier
-    )
+    signedInUser?.let { user ->
+        MobileHomeScreen(
+            userName = user.fullName,
+            userRole = user.role,
+            gate = mainGate,
+            latestAccessLog = latestAccessLog,
+            parkingQuota = mainParkingQuota,
+            cctv = mainCctv,
+            contentPadding = contentPadding,
+            onOpenGate = viewModel::openGate,
+            onCloseGate = viewModel::closeGate,
+            onParkingClick = navigateToParking,
+            onCctvClick = navigateToCctv,
+            modifier = modifier
+        )
+    }
 }
 
 @Composable
 private fun MobileHomeScreen(
     userName: String,
+    userRole: UserRole,
     gate: LoadState<Gate?>,
     latestAccessLog: AccessLog?,
     parkingQuota: LoadState<ParkingQuota?>,
@@ -156,6 +161,7 @@ private fun MobileHomeScreen(
         item {
             HeaderSection(
                 userName = userName,
+                userRole = userRole,
                 isDarkMode = isDarkMode,
                 modifier = Modifier.padding(start = 8.dp)
             )
@@ -236,6 +242,7 @@ private fun GateAccessButton(
 @Composable
 private fun HeaderSection(
     userName: String,
+    userRole: UserRole,
     isDarkMode: Boolean,
     modifier: Modifier = Modifier
 ) {
@@ -270,7 +277,7 @@ private fun HeaderSection(
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             Badge(
-                text = "ADMIN",
+                text = userRole.toIdString().uppercase(),
                 containerColor = if (isDarkMode) Blue900.copy(alpha = 0.4f) else Blue200.copy(alpha = 0.4f),
                 contentColor = if (isDarkMode) Blue200 else Blue900
             )
@@ -676,6 +683,7 @@ private fun MobileHomeScreenPreview() {
         Scaffold { p ->
             MobileHomeScreen(
                 userName = "Aulia Rahman",
+                userRole = UserRole.ADMIN,
                 gate = LoadState.Loading(),
                 latestAccessLog = null,
                 parkingQuota = LoadState.Loading(),
