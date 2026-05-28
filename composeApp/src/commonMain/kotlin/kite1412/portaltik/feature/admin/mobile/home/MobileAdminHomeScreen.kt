@@ -379,7 +379,7 @@ private fun GateControlCard(
 
                 latestAccessLog?.let { latestLog ->
                     Text(
-                        text = "Terakhir diakses: ${latestLog.accessedAt.timeAgo()}",
+                        text = "Terakhir diakses: ${latestLog.updatedAt.timeAgo()}",
                         style = MaterialTheme.typography.labelSmall,
                         color = White60,
                         fontStyle = FontStyle.Italic

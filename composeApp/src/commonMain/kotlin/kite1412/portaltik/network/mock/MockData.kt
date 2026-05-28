@@ -1,6 +1,8 @@
 package kite1412.portaltik.network.mock
 
+import kite1412.portaltik.model.AccessAction
 import kite1412.portaltik.model.AccessLog
+import kite1412.portaltik.model.AccessMethod
 import kite1412.portaltik.model.AccessStatus
 import kite1412.portaltik.model.Cctv
 import kite1412.portaltik.model.Gate
@@ -39,7 +41,7 @@ val mockCctv = Cctv(
 )
 
 val mockParkingQuota = ParkingQuota(
-    id = "PARKING-QUOTA-001",
+    id = 1,
     totalSlots = 100,
     usedSlots = 87,
     autoRestrictStudents = true
@@ -51,21 +53,21 @@ val mockAccessLogs = listOf(
         userId = 0,
         gateId = 1,
         status = AccessStatus.SUCCESS,
-        accessMethod = "RFID",
-        triggeredBy = "System",
+        accessMethod = AccessMethod.MOBILE,
+        action = AccessAction.OPEN,
         notes = "Access granted normally",
-        accessedAt = Instant.parse("2026-05-23T07:15:30Z"),
+        updatedAt = Instant.parse("2026-05-23T07:15:30Z"),
         createdAt = Instant.parse("2026-05-23T07:15:35Z")
     ),
     AccessLog(
         id = 2,
         userId = 0,
         gateId = 2,
-        status = AccessStatus.DENIED,
-        accessMethod = "Face Recognition",
-        triggeredBy = "Security",
+        status = AccessStatus.PENDING,
+        accessMethod = AccessMethod.MOBILE,
+        action = AccessAction.OPEN,
         notes = "Face mismatch detected",
-        accessedAt = Instant.parse("2026-05-23T08:02:10Z"),
+        updatedAt = Instant.parse("2026-05-23T08:02:10Z"),
         createdAt = Instant.parse("2026-05-23T08:02:15Z")
     ),
     AccessLog(
@@ -73,10 +75,10 @@ val mockAccessLogs = listOf(
         userId = 103,
         gateId = 1,
         status = AccessStatus.SUCCESS,
-        accessMethod = "QR Code",
-        triggeredBy = "Mobile App",
+        accessMethod = AccessMethod.MOBILE,
+        action = AccessAction.CLOSE,
         notes = null,
-        accessedAt = Instant.parse("2026-05-23T09:40:00Z"),
+        updatedAt = Instant.parse("2026-05-23T09:40:00Z"),
         createdAt = Instant.parse("2026-05-23T09:40:03Z")
     ),
     AccessLog(
@@ -84,10 +86,10 @@ val mockAccessLogs = listOf(
         userId = 104,
         gateId = 1,
         status = AccessStatus.FAILED,
-        accessMethod = null,
-        triggeredBy = "Manual Override",
+        accessMethod = AccessMethod.MOBILE,
+        action = AccessAction.CLOSE,
         notes = "Waiting for admin approval",
-        accessedAt = Instant.parse("2026-05-23T10:12:45Z"),
+        updatedAt = Instant.parse("2026-05-23T10:12:45Z"),
         createdAt = Instant.parse("2026-05-23T10:12:50Z")
     ),
     AccessLog(
@@ -95,10 +97,10 @@ val mockAccessLogs = listOf(
         userId = 105,
         gateId = 1,
         status = AccessStatus.SUCCESS,
-        accessMethod = "Fingerprint",
-        triggeredBy = "System",
+        accessMethod = AccessMethod.MOBILE,
+        action = AccessAction.OPEN,
         notes = "Fingerprint verified",
-        accessedAt = Instant.parse("2026-05-23T11:05:20Z"),
+        updatedAt = Instant.parse("2026-05-23T11:05:20Z"),
         createdAt = Instant.parse("2026-05-23T11:05:25Z")
     )
 )

@@ -59,15 +59,15 @@ class MobileAdminHomeViewModel(
     val mainCctv = getMainCctvUseCase().stateIn(viewModelScope)
     val mainParkingQuota = getMainParkingQuotaUseCase().stateIn(viewModelScope)
     val latestAccessLog = flow {
-        emit(accessLogRepository.getLatestLogs())
+        emit(accessLogRepository.getLatestOpenLog())
     }
-        .combine(mainGate) { logsRes, gateState ->
+        .combine(mainGate) { logRes, gateState ->
             var latestLog: AccessLog? = null
 
-            logsRes
-                .onSuccess { logs ->
+            logRes
+                .onSuccess { log ->
                     if (gateState is LoadState.Success && gateState.data != null)
-                        latestLog = logs.maxByOrNull { it.accessedAt }
+                        latestLog = log
                 }
 
             latestLog

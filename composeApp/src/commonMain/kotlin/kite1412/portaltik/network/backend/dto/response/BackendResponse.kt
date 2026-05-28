@@ -6,5 +6,6 @@ import kotlinx.serialization.Serializable
 data class BackendResponse<T>(
     val success: Boolean = false,
     val message: String? = null,
-    val data: T? = null
+    val data: T? = null,
+    val pagination: BackendPagination? = null
 )

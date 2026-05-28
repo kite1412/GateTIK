@@ -5,6 +5,7 @@ import io.ktor.client.request.HttpRequestBuilder
 import io.ktor.client.request.delete
 import io.ktor.client.request.get
 import io.ktor.client.request.headers
+import io.ktor.client.request.parameter
 import io.ktor.client.request.post
 import io.ktor.client.request.put
 import io.ktor.client.request.setBody
@@ -26,10 +27,14 @@ object BackendClient : KoinComponent {
     suspend inline fun rawGet(
         path: String,
         useToken: Boolean = true,
+        params: Map<String, String> = emptyMap(),
         block: HttpRequestBuilder.() -> Unit = {}
     ): HttpResponse = httpClient
         .get(getPath(path)) {
             if (useToken) attachToken()
+            if (params.isNotEmpty()) params.forEach { (k, v) ->
+                parameter(k, v)
+            }
             block()
         }
         .also(::log)
@@ -37,8 +42,14 @@ object BackendClient : KoinComponent {
     suspend inline fun <reified Response> get(
         path: String,
         withToken: Boolean = true,
+        params: Map<String, String> = emptyMap(),
         block: HttpRequestBuilder.() -> Unit = {}
-    ): Response = rawGet(path, withToken, block).body()
+    ): Response = rawGet(
+        path = path,
+        useToken = withToken,
+        params = params,
+        block = block
+    ).body()
 
     suspend inline fun <reified Request : Any> rawPost(
         path: String,

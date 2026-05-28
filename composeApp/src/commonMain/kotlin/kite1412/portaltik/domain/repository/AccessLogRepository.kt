@@ -7,5 +7,5 @@ import kite1412.portaltik.util.Result
 typealias AccessLogResult<T> = Result<T, Error>
 
 interface AccessLogRepository {
-    suspend fun getLatestLogs(): AccessLogResult<List<AccessLog>>
+    suspend fun getLatestOpenLog(): AccessLogResult<AccessLog?>
 }

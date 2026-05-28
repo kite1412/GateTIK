@@ -7,9 +7,9 @@ data class AccessLog(
     val userId: Int,
     val gateId: Int,
     val status: AccessStatus,
-    val accessMethod: String?,
-    val triggeredBy: String,
+    val accessMethod: AccessMethod,
+    val action: AccessAction,
     val notes: String?,
-    val accessedAt: Instant,
+    val updatedAt: Instant,
     val createdAt: Instant
 )
