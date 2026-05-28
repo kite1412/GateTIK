@@ -4,6 +4,8 @@ import org.koin.core.module.Module
 
 /**
  * Expected types:
- * - DataStore<Preferences>
+ * - [androidx.datastore.core.DataStore<androidx.datastore.preferences.core.Preferences>]
+ * - [LocationService]
+ * - [LocationPermissionController]
   */
 expect val platformModule: Module

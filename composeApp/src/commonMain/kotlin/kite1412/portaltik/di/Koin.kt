@@ -9,8 +9,9 @@ import kite1412.portaltik.feature.monitoring.desktop.dashboard.DesktopDashboardV
 import kite1412.portaltik.feature.monitoring.mobile.cctv.MobileCctvViewModel
 import kite1412.portaltik.feature.monitoring.mobile.home.MobileHomeViewModel
 import kite1412.portaltik.feature.monitoring.mobile.parking.MobileParkingViewModel
-import kite1412.portaltik.feature.shared.profile.ProfileViewModel
 import kite1412.portaltik.feature.shared.authentication.AuthenticationViewModel
+import kite1412.portaltik.feature.shared.gateaccess.GateAccessViewModel
+import kite1412.portaltik.feature.shared.profile.ProfileViewModel
 import kite1412.portaltik.network.backend.backendModule
 import kite1412.portaltik.network.mock.mockRemoteModule
 import kite1412.portaltik.platformModule
@@ -20,7 +21,25 @@ import org.koin.core.module.Module
 import org.koin.core.module.dsl.viewModel
 import org.koin.dsl.module
 
-private val mobileViewModelModule = module {
+private val sharedViewModelModule = module {
+    viewModel {
+        AuthenticationViewModel(
+            dataStore = get(),
+            authentication = get(),
+        )
+    }
+    viewModel {
+        ProfileViewModel(
+            authentication = get(),
+            dataStore = get()
+        )
+    }
+    viewModel {
+        GateAccessViewModel()
+    }
+}
+
+private val mobileMonitoringViewModelModule = module {
     viewModel {
         MobileHomeViewModel(
             authentication = get(),
@@ -42,23 +61,11 @@ private val mobileViewModelModule = module {
             getMainParkingQuotaUseCase = get()
         )
     }
-    viewModel {
-        ProfileViewModel(
-            authentication = get(),
-            dataStore = get()
-        )
-    }
 }
 
 private val viewModelModule = module {
-    includes(mobileViewModelModule)
+    includes(sharedViewModelModule, mobileMonitoringViewModelModule)
 
-    viewModel {
-        AuthenticationViewModel(
-            dataStore = get(),
-            authentication = get(),
-        )
-    }
     viewModel {
         PortalTikViewModel(
             dataStore = get(),
