@@ -1,4 +1,4 @@
-package kite1412.portaltik.feature.admin.mobile.cctv
+package kite1412.portaltik.feature.monitoring.mobile.cctv
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateColor
@@ -50,14 +50,14 @@ import org.jetbrains.compose.resources.painterResource
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
-fun MobileAdminCctvScreen(
+fun MobileCctvScreen(
     contentPadding: PaddingValues,
     modifier: Modifier = Modifier,
-    viewModel: MobileAdminCctvViewModel = koinViewModel()
+    viewModel: MobileCctvViewModel = koinViewModel()
 ) {
     val mainCctv by viewModel.mainCctv.collectAsStateWithLifecycle()
 
-    MobileAdminCctvScreen(
+    MobileCctvScreen(
         cctv = mainCctv,
         contentPadding = contentPadding,
         modifier = modifier
@@ -65,7 +65,7 @@ fun MobileAdminCctvScreen(
 }
 
 @Composable
-private fun MobileAdminCctvScreen(
+private fun MobileCctvScreen(
     cctv: LoadState<Cctv?>,
     contentPadding: PaddingValues,
     modifier: Modifier = Modifier
@@ -205,10 +205,10 @@ private fun CctvPlayer(
 
 @DevicePreviews
 @Composable
-private fun MobileAdminCctvScreenPreview() {
+private fun MobileCctvScreenPreview() {
     PortalTikTheme {
         Scaffold { p ->
-              MobileAdminCctvScreen(
+              MobileCctvScreen(
                   contentPadding = p
               )
         }

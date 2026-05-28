@@ -95,6 +95,7 @@ fun PortalTikApp() {
                         PortalTikNavHost(
                             signedInUser = user,
                             scaffoldPadding = p,
+                            rootDestinationsProvider = rootDestinationsProvider,
                             navigateToRootDestination = { rootDestination ->
                                 appState.navigateToRootDestination(rootDestination.route)
                             },

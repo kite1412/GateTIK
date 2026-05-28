@@ -1,4 +1,4 @@
-package kite1412.portaltik.feature.admin.mobile.profile
+package kite1412.portaltik.feature.shared.profile
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -13,7 +13,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
 
-class MobileAdminProfileViewModel(
+class ProfileViewModel(
     private val authentication: Authentication,
     private val dataStore: PortalTikDataStore
 ) : ViewModel() {

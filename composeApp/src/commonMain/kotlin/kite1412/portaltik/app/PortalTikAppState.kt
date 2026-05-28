@@ -7,7 +7,7 @@ import androidx.navigation.NavController
 import androidx.navigation.NavDestination
 import androidx.navigation.navOptions
 import kite1412.portaltik.PlatformType
-import kite1412.portaltik.feature.admin.AdminGraph
+import kite1412.portaltik.feature.monitoring.MonitoringGraph
 import kite1412.portaltik.feature.student.StudentGraph
 import kite1412.portaltik.getPlatform
 import kite1412.portaltik.model.UserRole
@@ -66,9 +66,10 @@ class PortalTikAppState(
     fun getRootDestinationsProvider(): RootDestinationsProvider? =
         userRole?.let { role ->
             val isDesktop = getPlatform().type == PlatformType.DESKTOP
+
             when (role) {
-                UserRole.ADMIN -> if (isDesktop) AdminGraph.Desktop else AdminGraph.Mobile
-                UserRole.STAFF -> TODO()
+                UserRole.ADMIN -> if (isDesktop) MonitoringGraph.Desktop else MonitoringGraph.Mobile
+                UserRole.STAFF -> if (isDesktop) MonitoringGraph.Desktop else MonitoringGraph.Mobile
                 UserRole.STUDENT -> StudentGraph
             }
         }

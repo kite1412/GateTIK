@@ -1,4 +1,4 @@
-package kite1412.portaltik.feature.admin.mobile.home
+package kite1412.portaltik.feature.monitoring.mobile.home
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateColorAsState
@@ -92,12 +92,12 @@ import org.jetbrains.compose.resources.painterResource
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
-fun MobileAdminHomeScreen(
+fun MobileHomeScreen(
     contentPadding: PaddingValues,
     navigateToParking: () -> Unit,
     navigateToCctv: () -> Unit,
     modifier: Modifier = Modifier,
-    viewModel: MobileAdminHomeViewModel = koinViewModel()
+    viewModel: MobileHomeViewModel = koinViewModel()
 ) {
     val snackbarHostStateWrapper = LocalSnackbarHostStateWrapper.current
     val signedInUser by viewModel.signedInUser.collectAsStateWithLifecycle()
@@ -112,7 +112,7 @@ fun MobileAdminHomeScreen(
                 .showSnackbar(event.message)
         }
     }
-    MobileAdminHomeScreen(
+    MobileHomeScreen(
         userName = signedInUser?.fullName ?: "",
         gate = mainGate,
         latestAccessLog = latestAccessLog,
@@ -128,7 +128,7 @@ fun MobileAdminHomeScreen(
 }
 
 @Composable
-private fun MobileAdminHomeScreen(
+private fun MobileHomeScreen(
     userName: String,
     gate: LoadState<Gate?>,
     latestAccessLog: AccessLog?,
@@ -671,10 +671,10 @@ private fun QuickActionsRow(
 
 @DevicePreviews
 @Composable
-private fun MobileAdminHomeScreenPreview() {
+private fun MobileHomeScreenPreview() {
     PortalTikTheme(darkTheme = isSystemInDarkTheme()) {
         Scaffold { p ->
-            MobileAdminHomeScreen(
+            MobileHomeScreen(
                 userName = "Aulia Rahman",
                 gate = LoadState.Loading(),
                 latestAccessLog = null,

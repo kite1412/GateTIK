@@ -1,4 +1,4 @@
-package kite1412.portaltik.feature.admin.mobile.parking
+package kite1412.portaltik.feature.monitoring.mobile.parking
 
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
@@ -54,14 +54,14 @@ import org.koin.compose.viewmodel.koinViewModel
 import kotlin.math.max
 
 @Composable
-fun MobileAdminParkingScreen(
+fun MobileParkingScreen(
     contentPadding: PaddingValues,
     modifier: Modifier = Modifier,
-    viewModel: MobileAdminParkingViewModel = koinViewModel()
+    viewModel: MobileParkingViewModel = koinViewModel()
 ) {
     val mainParkingQuota by viewModel.mainParkingQuota.collectAsStateWithLifecycle()
 
-    MobileAdminParkingScreen(
+    MobileParkingScreen(
         parkingQuota = mainParkingQuota,
         contentPadding = contentPadding,
         modifier = modifier
@@ -69,7 +69,7 @@ fun MobileAdminParkingScreen(
 }
 
 @Composable
-private fun MobileAdminParkingScreen(
+private fun MobileParkingScreen(
     parkingQuota: LoadState<ParkingQuota?>,
     contentPadding: PaddingValues,
     modifier: Modifier = Modifier
@@ -253,13 +253,13 @@ private fun OccupancyChartCard(
 
 @DevicePreviews
 @Composable
-private fun MobileAdminParkingScreenPreview() {
+private fun MobileParkingScreenPreview() {
     PortalTikTheme(darkTheme = isSystemInDarkTheme()) {
         Scaffold { p ->
             CompositionLocalProvider(
                 LocalScaffoldComponentsController provides MockScaffoldComponentController
             ) {
-                MobileAdminParkingScreen(
+                MobileParkingScreen(
                     parkingQuota = LoadState.Error("Error"),
                     contentPadding = p,
                     modifier = Modifier.radialBackground()

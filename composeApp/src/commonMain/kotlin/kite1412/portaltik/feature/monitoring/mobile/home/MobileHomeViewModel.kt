@@ -1,4 +1,4 @@
-package kite1412.portaltik.feature.admin.mobile.home
+package kite1412.portaltik.feature.monitoring.mobile.home
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -27,7 +27,7 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
-class MobileAdminHomeViewModel(
+class MobileHomeViewModel(
     authentication: Authentication,
     getMainGateUseCase: GetMainGateUseCase,
     getMainCctvUseCase: GetMainCctvUseCase,

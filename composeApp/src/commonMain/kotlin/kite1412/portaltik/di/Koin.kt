@@ -5,11 +5,11 @@ import kite1412.portaltik.common.commonModule
 import kite1412.portaltik.data.dataModule
 import kite1412.portaltik.datastore.dataStoreModule
 import kite1412.portaltik.domain.domainModule
-import kite1412.portaltik.feature.admin.desktop.dashboard.DesktopAdminDashboardViewModel
-import kite1412.portaltik.feature.admin.mobile.cctv.MobileAdminCctvViewModel
-import kite1412.portaltik.feature.admin.mobile.home.MobileAdminHomeViewModel
-import kite1412.portaltik.feature.admin.mobile.parking.MobileAdminParkingViewModel
-import kite1412.portaltik.feature.admin.mobile.profile.MobileAdminProfileViewModel
+import kite1412.portaltik.feature.monitoring.desktop.dashboard.DesktopDashboardViewModel
+import kite1412.portaltik.feature.monitoring.mobile.cctv.MobileCctvViewModel
+import kite1412.portaltik.feature.monitoring.mobile.home.MobileHomeViewModel
+import kite1412.portaltik.feature.monitoring.mobile.parking.MobileParkingViewModel
+import kite1412.portaltik.feature.shared.profile.ProfileViewModel
 import kite1412.portaltik.feature.shared.authentication.AuthenticationViewModel
 import kite1412.portaltik.network.backend.backendModule
 import kite1412.portaltik.network.mock.mockRemoteModule
@@ -22,7 +22,7 @@ import org.koin.dsl.module
 
 private val mobileViewModelModule = module {
     viewModel {
-        MobileAdminHomeViewModel(
+        MobileHomeViewModel(
             authentication = get(),
             getMainGateUseCase = get(),
             getMainCctvUseCase = get(),
@@ -33,17 +33,17 @@ private val mobileViewModelModule = module {
         )
     }
     viewModel {
-        MobileAdminCctvViewModel(
+        MobileCctvViewModel(
             getMainCctvUseCase = get()
         )
     }
     viewModel {
-        MobileAdminParkingViewModel(
+        MobileParkingViewModel(
             getMainParkingQuotaUseCase = get()
         )
     }
     viewModel {
-        MobileAdminProfileViewModel(
+        ProfileViewModel(
             authentication = get(),
             dataStore = get()
         )
@@ -66,7 +66,7 @@ private val viewModelModule = module {
         )
     }
     viewModel {
-        DesktopAdminDashboardViewModel()
+        DesktopDashboardViewModel()
     }
 }
 

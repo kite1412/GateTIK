@@ -1,4 +1,4 @@
-package kite1412.portaltik.feature.admin.mobile.profile
+package kite1412.portaltik.feature.shared.profile
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -52,14 +52,14 @@ import org.jetbrains.compose.resources.painterResource
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
-fun MobileAdminProfileScreen(
+fun ProfileScreen(
     contentPadding: PaddingValues,
     modifier: Modifier = Modifier,
-    viewModel: MobileAdminProfileViewModel = koinViewModel()
+    viewModel: ProfileViewModel = koinViewModel()
 ) {
     val user by viewModel.user.collectAsStateWithLifecycle(LoadState.Loading())
 
-    MobileAdminProfileScreen(
+    ProfileScreen(
         user = user,
         contentPadding = contentPadding,
         onDarkModeChange = viewModel::setDarkMode,
@@ -69,7 +69,7 @@ fun MobileAdminProfileScreen(
 }
 
 @Composable
-private fun MobileAdminProfileScreen(
+private fun ProfileScreen(
     user: LoadState<User>,
     contentPadding: PaddingValues,
     onDarkModeChange: (Boolean) -> Unit,
@@ -266,10 +266,10 @@ private fun ProfileHeaderCard(
 
 @DevicePreviews
 @Composable
-private fun MobileAdminProfileScreenPreview() {
+private fun ProfileScreenPreview() {
     PortalTikTheme {
         Scaffold { p ->
-              MobileAdminProfileScreen(
+              ProfileScreen(
                   contentPadding = p,
                   modifier = Modifier.padding(p)
               )

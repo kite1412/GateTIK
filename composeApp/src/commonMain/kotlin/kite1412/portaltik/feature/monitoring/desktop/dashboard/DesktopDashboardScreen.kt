@@ -1,4 +1,4 @@
-package kite1412.portaltik.feature.admin.desktop.dashboard
+package kite1412.portaltik.feature.monitoring.desktop.dashboard
 
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.aspectRatio
@@ -14,18 +14,18 @@ import kite1412.portaltik.ui.preview.DevicePreviews
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
-fun DesktopAdminDashboardScreen(
+fun DesktopDashboardScreen(
     contentPadding: PaddingValues,
     modifier: Modifier = Modifier,
-    viewModel: DesktopAdminDashboardViewModel = koinViewModel()
+    viewModel: DesktopDashboardViewModel = koinViewModel()
 ) {
-    DesktopAdminDashboardScreen(
+    DesktopDashboardScreen(
         contentPadding = contentPadding
     )
 }
 
 @Composable
-private fun DesktopAdminDashboardScreen(
+private fun DesktopDashboardScreen(
     contentPadding: PaddingValues,
     modifier: Modifier = Modifier
 ) {
@@ -39,10 +39,10 @@ private fun DesktopAdminDashboardScreen(
 
 @DevicePreviews
 @Composable
-private fun DashboardScreenPreview() {
+private fun DesktopDashboardScreenPreview() {
     PortalTikTheme {
         Scaffold { p ->
-            DesktopAdminDashboardScreen(
+            DesktopDashboardScreen(
                 contentPadding = PaddingValues(24.dp),
                 modifier = Modifier.padding(p)
             )
