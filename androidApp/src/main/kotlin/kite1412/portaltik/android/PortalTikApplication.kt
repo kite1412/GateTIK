@@ -12,7 +12,7 @@ import com.google.android.gms.location.GeofencingClient
 import com.google.android.gms.location.GeofencingRequest
 import com.google.android.gms.location.LocationServices
 import kite1412.portaltik.Logger
-import kite1412.portaltik.android.receiver.GeofenceBroadcastReceiver
+import kite1412.portaltik.android.receiver.GeofenceReceiver
 import kite1412.portaltik.common.AppCoroutineScope
 import kite1412.portaltik.di.initKoin
 import kite1412.portaltik.domain.Authentication
@@ -36,7 +36,7 @@ class PortalTikApplication : Application() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
             flags = flags or PendingIntent.FLAG_MUTABLE
         }
-        val intent = Intent(this, GeofenceBroadcastReceiver::class.java)
+        val intent = Intent(this, GeofenceReceiver::class.java)
         PendingIntent.getBroadcast(this, 0, intent, flags)
     }
 
