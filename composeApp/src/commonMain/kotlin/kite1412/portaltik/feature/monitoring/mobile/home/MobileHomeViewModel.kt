@@ -49,7 +49,7 @@ class MobileHomeViewModel(
             started = SharingStarted.WhileSubscribed(5000),
             initialValue = null
         )
-    val mainGate = getMainGateUseCase()
+    val mainGate = getMainGateUseCase.observeAsLoadStateFlow()
         .onEach {
             if (it is LoadState.Success && it.data != null) {
                 gateId = it.data.id

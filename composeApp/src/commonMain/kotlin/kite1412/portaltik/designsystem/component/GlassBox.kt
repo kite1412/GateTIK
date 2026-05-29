@@ -23,9 +23,9 @@ import kite1412.portaltik.ui.compositionlocal.LocalDarkMode
 fun GlassBox(
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(24.dp),
+    isDarkMode: Boolean = LocalDarkMode.current,
     content: @Composable BoxScope.() -> Unit
 ) {
-    val isDarkMode = LocalDarkMode.current
     val borderColor by animateColorAsState(if (!isDarkMode) Blue200_60 else White15)
     val backgroundColor by animateColorAsState(if (!isDarkMode) White60 else White10)
     val shape = RoundedCornerShape(24.dp)

@@ -30,11 +30,11 @@ private val DarkColorScheme = darkColorScheme(
 
 @Composable
 fun PortalTikTheme(
-    darkTheme: Boolean = LocalDarkMode.current,
+    darkMode: Boolean = LocalDarkMode.current,
     content: @Composable () -> Unit
 ) {
     val targetColorScheme = when {
-        darkTheme -> DarkColorScheme
+        darkMode -> DarkColorScheme
         else -> LightColorScheme
     }
 

@@ -10,7 +10,7 @@ import kite1412.portaltik.feature.monitoring.mobile.cctv.MobileCctvViewModel
 import kite1412.portaltik.feature.monitoring.mobile.home.MobileHomeViewModel
 import kite1412.portaltik.feature.monitoring.mobile.parking.MobileParkingViewModel
 import kite1412.portaltik.feature.shared.authentication.AuthenticationViewModel
-import kite1412.portaltik.feature.shared.gateaccess.GateAccessViewModel
+import kite1412.portaltik.feature.student.gateaccess.GateAccessViewModel
 import kite1412.portaltik.feature.shared.profile.ProfileViewModel
 import kite1412.portaltik.network.backend.backendModule
 import kite1412.portaltik.network.mock.mockRemoteModule
@@ -35,7 +35,13 @@ private val sharedViewModelModule = module {
         )
     }
     viewModel {
-        GateAccessViewModel()
+        GateAccessViewModel(
+            authentication = get(),
+            getMainParkingQuotaUseCase = get(),
+            locationPermissionController = get(),
+            getMainGateUseCase = get(),
+            openGateUseCase = get()
+        )
     }
 }
 

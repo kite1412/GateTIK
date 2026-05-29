@@ -517,7 +517,7 @@ private fun NavigationScaffoldPreviewContent() {
     )
     var selectedDestination by remember { mutableStateOf(destinations.first()) }
 
-    PortalTikTheme(darkTheme = false) {
+    PortalTikTheme(darkMode = false) {
         NavigationScaffold(
             destinations = destinations,
             isDarkTheme = false,

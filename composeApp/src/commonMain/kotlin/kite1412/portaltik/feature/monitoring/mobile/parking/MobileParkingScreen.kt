@@ -254,7 +254,7 @@ private fun OccupancyChartCard(
 @DevicePreviews
 @Composable
 private fun MobileParkingScreenPreview() {
-    PortalTikTheme(darkTheme = isSystemInDarkTheme()) {
+    PortalTikTheme(darkMode = isSystemInDarkTheme()) {
         Scaffold { p ->
             CompositionLocalProvider(
                 LocalScaffoldComponentsController provides MockScaffoldComponentController

@@ -1,7 +1,6 @@
 package kite1412.portaltik.network.backend.dto.model
 
 import kite1412.portaltik.model.Gate
-import kite1412.portaltik.model.GateStatus
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlin.time.Instant
@@ -28,8 +27,6 @@ data class BackendGate(
         latitude = latitude,
         longitude = longitude,
         allowedRadiusMeter = allowedRadiusMeter,
-        iotDevice = iotDevices.first().toModel(),
-        currentStatus = GateStatus.CLOSED,
-        isActive = true
+        iotDevice = iotDevices.first().toModel()
     )
 }

@@ -6,11 +6,22 @@ import kite1412.portaltik.model.AccessMethod
 import kite1412.portaltik.model.AccessStatus
 import kite1412.portaltik.model.Cctv
 import kite1412.portaltik.model.Gate
-import kite1412.portaltik.model.GateStatus
 import kite1412.portaltik.model.IotDevice
 import kite1412.portaltik.model.IotDeviceStatus
 import kite1412.portaltik.model.ParkingQuota
+import kite1412.portaltik.model.User
+import kite1412.portaltik.model.UserRole
+import kite1412.portaltik.model.UserStatus
 import kotlin.time.Instant
+
+val mockUser = User(
+    id = 0,
+    fullName = "Mock User",
+    email = "mock@portaltik.com",
+    role = UserRole.ADMIN,
+    status = UserStatus.ACTIVE,
+    instituteNumber = "mock-1"
+)
 
 val mockIotDevice = IotDevice(
     id = 1,
@@ -28,9 +39,7 @@ val mockGate = Gate(
     latitude = -5.35723145,
     longitude = 105.31578291,
     allowedRadiusMeter = 50,
-    iotDevice = mockIotDevice,
-    currentStatus = GateStatus.CLOSED,
-    isActive = true
+    iotDevice = mockIotDevice
 )
 
 val mockCctv = Cctv(

@@ -8,7 +8,6 @@ import kite1412.portaltik.app.smallContentPadding
 import kite1412.portaltik.feature.Graph
 import kite1412.portaltik.feature.Route
 import kite1412.portaltik.feature.shared.authentication.authenticationScreen
-import kite1412.portaltik.feature.shared.gateaccess.gateAccessScreen
 import kite1412.portaltik.feature.shared.profile.profileScreen
 import kite1412.portaltik.ui.navigation.RootDestination
 import kite1412.portaltik.ui.navigation.RootDestinationsProvider
@@ -28,12 +27,6 @@ fun NavGraphBuilder.sharedGraph(
         ) {
             profileScreen(contentPadding = smallContentPadding(scaffoldPadding))
         }
-        optionalRoute(
-            route = SharedGraph.GateAccessRoute,
-            rootDestinationsProvider = rootDestinationsProvider
-        ) {
-            gateAccessScreen(contentPadding = smallContentPadding(scaffoldPadding))
-        }
     }
 }
 
@@ -43,8 +36,6 @@ object SharedGraph : Graph {
     object AuthenticationRoute : Route("auth")
 
     object ProfileRoute : Route("profile")
-
-    object GateAccessRoute : Route("gate_access")
 }
 
 /**

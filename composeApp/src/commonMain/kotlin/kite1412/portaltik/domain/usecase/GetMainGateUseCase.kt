@@ -9,7 +9,17 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 
 class GetMainGateUseCase(private val gateRepository: GateRepository) {
-    operator fun invoke(): Flow<LoadState<Gate?>> = flow {
+    fun observeAsFlow(): Flow<Gate?> = flow {
+        gateRepository.getMainGate()
+            .onError {
+                emit(null)
+            }
+            .onSuccess { gate ->
+                emit(gate)
+            }
+    }
+
+    fun observeAsLoadStateFlow(): Flow<LoadState<Gate?>> = flow {
         emit(LoadState.Loading())
 
         gateRepository.getMainGate()
