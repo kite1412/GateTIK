@@ -1,17 +1,19 @@
 package kite1412.portaltik.network.backend.datasource
 
+import kite1412.portaltik.Location
 import kite1412.portaltik.getPlatform
 import kite1412.portaltik.model.Gate
 import kite1412.portaltik.network.backend.BackendClient
 import kite1412.portaltik.network.backend.dto.model.BackendGate
-import kite1412.portaltik.network.backend.dto.request.BackendRequestGateAction
+import kite1412.portaltik.network.backend.dto.request.BackendGateAccessRequest
+import kite1412.portaltik.network.backend.dto.request.BackendLocationGateAccessRequest
 import kite1412.portaltik.network.backend.dto.response.BackendCloseGateResponse
 import kite1412.portaltik.network.backend.dto.response.BackendOpenGateResponse
 import kite1412.portaltik.network.backend.dto.response.BackendResponse
 import kite1412.portaltik.network.domain.datasource.GateRemoteDataSource
 
 class BackendGateDataSource : GateRemoteDataSource {
-    private val platform = getPlatform()
+    private val accessMethod = getPlatform().name.lowercase()
 
     override suspend fun getMainGate(): Gate? = BackendClient
         .get<BackendResponse<BackendGate>>("gate/main")
@@ -19,26 +21,73 @@ class BackendGateDataSource : GateRemoteDataSource {
         ?.toModel()
 
     override suspend fun openGate(id: Int): Boolean {
-        val res = BackendClient.post<BackendRequestGateAction, BackendResponse<BackendOpenGateResponse>>(
+        val res = BackendClient.post<BackendGateAccessRequest, BackendResponse<BackendOpenGateResponse>>(
             path = "gate/open",
-            body = gateAction(id, true)
+            body = gateAccess(id, true)
         )
 
         return res.success
     }
 
     override suspend fun closeGate(id: Int): Boolean {
-        val res = BackendClient.post<BackendRequestGateAction, BackendResponse<BackendCloseGateResponse>>(
+        val res = BackendClient.post<BackendGateAccessRequest, BackendResponse<BackendCloseGateResponse>>(
             path = "gate/close",
-            body = gateAction(id, false)
+            body = gateAccess(id, false)
         )
 
         return res.success
     }
 
-    private fun gateAction(id: Int, open: Boolean) = BackendRequestGateAction(
+    override suspend fun enterGate(
+        id: Int,
+        location: Location
+    ): Boolean {
+        val res = BackendClient.post<BackendLocationGateAccessRequest, BackendResponse<BackendOpenGateResponse>>(
+            path = "gate/entry",
+            body = locationGateAccess(
+                id = id,
+                open = true,
+                location = location
+            )
+        )
+
+        return res.success
+    }
+
+    override suspend fun exitGate(
+        id: Int,
+        location: Location
+    ): Boolean {
+        val res = BackendClient.post<BackendLocationGateAccessRequest, BackendResponse<BackendCloseGateResponse>>(
+            path = "gate/exit",
+            body = locationGateAccess(
+                id = id,
+                open = false,
+                location = location
+            )
+        )
+
+        return res.success
+    }
+
+    private fun gateAccess(id: Int, open: Boolean) = BackendGateAccessRequest(
         gateId = id,
-        accessMethod = platform.name.lowercase(),
-        notes = "${if (open) "Open" else "Close"} request from ${platform.name} platform."
+        accessMethod = accessMethod,
+        notes = actionNotes(open)
     )
+
+    private fun locationGateAccess(
+        id: Int,
+        open: Boolean,
+        location: Location
+    ) = BackendLocationGateAccessRequest(
+        gateId = id,
+        accessMethod = accessMethod,
+        latitude = location.latitude,
+        longitude = location.longitude,
+        notes = actionNotes(open)
+    )
+
+    private fun actionNotes(isOpen: Boolean) =
+        "${if (isOpen) "Open" else "Close"} request from $accessMethod platform."
 }

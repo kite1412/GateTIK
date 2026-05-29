@@ -11,7 +11,7 @@ import kite1412.portaltik.domain.Authentication
 import kite1412.portaltik.domain.SessionStatus
 import kite1412.portaltik.model.User
 import kite1412.portaltik.model.UserRole
-import kite1412.portaltik.network.backend.dto.request.BackendLogin
+import kite1412.portaltik.network.backend.dto.request.BackendLoginRequest
 import kite1412.portaltik.network.backend.dto.response.BackendLoginResponse
 import kite1412.portaltik.network.backend.dto.response.BackendResponse
 import kite1412.portaltik.network.domain.util.ServerError
@@ -47,7 +47,7 @@ class BackendAuthentication(
     ): AuthResult<User> = try {
         val res = BackendClient.rawPost(
             path = "auth/login",
-            body = BackendLogin(
+            body = BackendLoginRequest(
                 email = email,
                 password = password
             ),

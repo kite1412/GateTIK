@@ -4,7 +4,7 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class BackendRequestGateAction(
+data class BackendGateAccessRequest(
     @SerialName("gate_id")
     val gateId: Int,
     @SerialName("access_method")
