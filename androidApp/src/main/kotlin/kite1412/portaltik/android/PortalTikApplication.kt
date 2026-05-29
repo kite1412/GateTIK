@@ -32,9 +32,9 @@ class PortalTikApplication : Application() {
     private val gateRepository by lazy { get<GateRepository>() }
 
     private val geofencePendingIntent: PendingIntent by lazy {
-        val flags = PendingIntent.FLAG_UPDATE_CURRENT
+        var flags = PendingIntent.FLAG_UPDATE_CURRENT
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            flags or PendingIntent.FLAG_MUTABLE
+            flags = flags or PendingIntent.FLAG_MUTABLE
         }
         val intent = Intent(this, GeofenceBroadcastReceiver::class.java)
         PendingIntent.getBroadcast(this, 0, intent, flags)

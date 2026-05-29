@@ -3,7 +3,14 @@ package kite1412.portaltik
 import kotlinx.coroutines.flow.Flow
 
 interface LocationService {
-    suspend fun getCurrentLocation(): Flow<Location>
+    fun observeLocationState(): Flow<LocationState>
+}
+
+sealed interface LocationState {
+    object Unavailable : LocationState
+    data class Available(
+        val currentLocation: Location
+    ) : LocationState
 }
 
 data class Location(

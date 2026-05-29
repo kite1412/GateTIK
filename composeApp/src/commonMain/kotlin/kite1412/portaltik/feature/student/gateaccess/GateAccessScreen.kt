@@ -31,12 +31,20 @@ import androidx.compose.ui.draw.BlurredEdgeTreatment
 import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.text.LinkAnnotation
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontStyle
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.withLink
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import kite1412.portaltik.LocationState
 import kite1412.portaltik.designsystem.component.GlassBox
 import kite1412.portaltik.designsystem.component.Icon
+import kite1412.portaltik.designsystem.extension.linkStyle
 import kite1412.portaltik.designsystem.theme.BlueIndigoGradient
 import kite1412.portaltik.designsystem.theme.Emerald700
 import kite1412.portaltik.designsystem.theme.Gray900
@@ -47,11 +55,14 @@ import kite1412.portaltik.designsystem.theme.White
 import kite1412.portaltik.designsystem.theme.White30
 import kite1412.portaltik.designsystem.theme.White60
 import kite1412.portaltik.designsystem.util.PortalTikIcons
+import kite1412.portaltik.designsystem.util.WindowWidthSize
+import kite1412.portaltik.designsystem.util.rememberWindowWidthSize
 import kite1412.portaltik.model.ParkingQuota
 import kite1412.portaltik.model.User
 import kite1412.portaltik.model.UserRole
 import kite1412.portaltik.network.mock.mockParkingQuota
 import kite1412.portaltik.network.mock.mockUser
+import kite1412.portaltik.rememberLocationPermissionRequester
 import kite1412.portaltik.ui.component.GateControlButton
 import kite1412.portaltik.ui.component.HeaderSection
 import kite1412.portaltik.ui.component.ParkingQuotaCard
@@ -61,8 +72,6 @@ import kite1412.portaltik.ui.preview.DevicePreviews
 import kite1412.portaltik.ui.util.LoadState
 import kite1412.portaltik.ui.util.MockScaffoldComponentController
 import kite1412.portaltik.ui.util.ScaffoldComponent
-import kite1412.portaltik.ui.util.WindowWidthSize
-import kite1412.portaltik.ui.util.rememberWindowWidthSize
 import org.jetbrains.compose.resources.painterResource
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -74,16 +83,19 @@ fun GateAccessScreen(
 ) {
     val user by viewModel.user.collectAsStateWithLifecycle()
     val parkingQuota by viewModel.parkingQuota.collectAsStateWithLifecycle()
+    val locationState by viewModel.locationState.collectAsStateWithLifecycle()
 
     user?.let { user ->
         GateAccessScreen(
             user = user,
             parkingQuota = parkingQuota,
+            locationState = locationState,
             isLocationPermissionGranted = viewModel.isLocationPermissionGranted,
-            isGateLocked = true,
+            isGateLocked = false,
             isDarkMode = LocalDarkMode.current,
             contentPadding = contentPadding,
             onGateOpen = viewModel::openGate,
+            onLocationPermissionChange = viewModel::updateIsLocationPermissionGranted,
             modifier = modifier
         )
     }
@@ -93,11 +105,13 @@ fun GateAccessScreen(
 private fun GateAccessScreen(
     user: User,
     parkingQuota: LoadState<ParkingQuota?>,
+    locationState: LocationState,
     isLocationPermissionGranted: Boolean,
     isGateLocked: Boolean,
     isDarkMode: Boolean,
     contentPadding: PaddingValues,
     onGateOpen: () -> Unit,
+    onLocationPermissionChange: (granted: Boolean) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val navBarHeight = LocalScaffoldComponentsController.current
@@ -105,19 +119,20 @@ private fun GateAccessScreen(
         .size
         .height
     val windowWidthSize = rememberWindowWidthSize()
+    val locationPermissionRequester = rememberLocationPermissionRequester(onLocationPermissionChange)
 
     Box(
         modifier = modifier
             .fillMaxSize()
             .padding(contentPadding)
     ) {
-        if (isLocationPermissionGranted) LazyColumn(
+        if (isLocationPermissionGranted && locationState is LocationState.Available) LazyColumn(
             modifier = modifier
-                .fillMaxSize()
-                .padding(
-                    bottom = if (windowWidthSize == WindowWidthSize.COMPACT) navBarHeight
+                .fillMaxSize(),
+            contentPadding = PaddingValues(
+                bottom = if (windowWidthSize == WindowWidthSize.COMPACT) navBarHeight
                     else 0.dp
-                ),
+            ),
             verticalArrangement = Arrangement.spacedBy(24.dp)
         ) {
             item {
@@ -148,19 +163,58 @@ private fun GateAccessScreen(
                 }
             }
         } else LocationPermissionWarning(
-            modifier = Modifier.align(Alignment.Center)
+            isDarkMode = isDarkMode,
+            isLocationPermissionGranted = isLocationPermissionGranted,
+            onRequestPermissionClick = locationPermissionRequester,
+            modifier = Modifier
+                .padding(
+                    bottom = if (windowWidthSize == WindowWidthSize.COMPACT) navBarHeight
+                    else 0.dp
+                )
+                .align(Alignment.Center)
         )
     }
 }
 
 @Composable
-private fun LocationPermissionWarning(modifier: Modifier = Modifier) {
+private fun LocationPermissionWarning(
+    isDarkMode: Boolean,
+    isLocationPermissionGranted: Boolean,
+    onRequestPermissionClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
     Column(
         modifier = modifier,
-        verticalArrangement = Arrangement.spacedBy(16.dp),
+        verticalArrangement = Arrangement.spacedBy(8.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-
+        PulsingIcon(
+            basePulseColor = Red500.copy(alpha = 0.3f),
+            painter = painterResource(PortalTikIcons.locationMark)
+        )
+        Text(
+            text = buildAnnotatedString {
+                if (!isLocationPermissionGranted) {
+                    append("Aktifkan izin lokasi untuk dapat membuka gate, ")
+                    withLink(
+                        link = LinkAnnotation.Clickable(
+                            tag = "request_permission",
+                            linkInteractionListener = {
+                                onRequestPermissionClick()
+                            }
+                        )
+                    ) {
+                        linkStyle(isDarkMode) {
+                            append("Izinkan")
+                        }
+                    }
+                } else {
+                    append("Aktifkan berbagi lokasi untuk dapat membuka gate")
+                }
+            },
+            textAlign = TextAlign.Center,
+            style = MaterialTheme.typography.labelMedium
+        )
     }
 }
 
@@ -172,26 +226,10 @@ private fun GateStatusCard(
     onGateOpen: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val infiniteTransition = rememberInfiniteTransition()
     val baseColor by animateColorAsState(
         targetValue = if (isLocked) Red500 else Emerald700
     )
-    val blurColor by infiniteTransition.animateColor(
-        initialValue = baseColor.copy(alpha = 0.3f),
-        targetValue = baseColor.copy(alpha = 0.1f),
-        animationSpec = infiniteRepeatable(
-            animation = tween(durationMillis = 1500),
-            repeatMode = RepeatMode.Reverse
-        )
-    )
-    val radialColor by infiniteTransition.animateColor(
-        initialValue = baseColor.copy(alpha = 0.1f),
-        targetValue = baseColor.copy(alpha = 0.05f),
-        animationSpec = infiniteRepeatable(
-            animation = tween(durationMillis = 1500),
-            repeatMode = RepeatMode.Reverse
-        )
-    )
+
 
     GlassBox(
         modifier = modifier
@@ -204,54 +242,13 @@ private fun GateStatusCard(
             modifier = Modifier.fillMaxSize(),
             contentAlignment = Alignment.Center
         ) {
-            Box(
-                modifier = Modifier
-                    .size(160.dp)
-                    .blur(
-                        radius = 10.dp,
-                        edgeTreatment = BlurredEdgeTreatment.Unbounded
-                    )
-                    .background(
-                        color = blurColor,
-                        shape = CircleShape
-                    )
-            )
-            Box(
-                modifier = Modifier
-                    .size(200.dp)
-                    .blur(
-                        radius = 5.dp,
-                        edgeTreatment = BlurredEdgeTreatment.Unbounded
-                    )
-                    .background(
-                        color = radialColor,
-                        shape = CircleShape
-                    )
-            )
-            Box(
-                modifier = Modifier
-                    .size(140.dp)
-                    .clip(CircleShape)
-                    .background(
-                        brush = Brush.linearGradient(
-                            colors = listOf(
-                                baseColor,
-                                baseColor.copy(alpha = 0.6f)
-                            )
-                        )
-                    ),
-                contentAlignment = Alignment.Center
-            ) {
-                Icon(
-                    painter = painterResource(
-                        if (isLocked) PortalTikIcons.lock
-                        else PortalTikIcons.lockOpen
-                    ),
-                    contentDescription = null,
-                    modifier = Modifier.size(64.dp),
-                    tint = White
+            PulsingIcon(
+                basePulseColor = baseColor,
+                painter = painterResource(
+                    if (isLocked) PortalTikIcons.lock
+                    else PortalTikIcons.lockOpen
                 )
-            }
+            )
             if (isLocked) Text(
                 text = "Gate dikunci, hubungi admin untuk membuka gate.",
                 modifier = Modifier
@@ -284,6 +281,82 @@ private fun GateStatusCard(
     }
 }
 
+@Composable
+private fun PulsingIcon(
+    basePulseColor: Color,
+    painter: Painter,
+    modifier: Modifier = Modifier
+) {
+    val infiniteTransition = rememberInfiniteTransition()
+    val innerBlurColor by infiniteTransition.animateColor(
+        initialValue = basePulseColor.copy(alpha = 0.3f),
+        targetValue = basePulseColor.copy(alpha = 0.1f),
+        animationSpec = infiniteRepeatable(
+            animation = tween(durationMillis = 1500),
+            repeatMode = RepeatMode.Reverse
+        )
+    )
+    val outerBlurColor by infiniteTransition.animateColor(
+        initialValue = basePulseColor.copy(alpha = 0.1f),
+        targetValue = basePulseColor.copy(alpha = 0.05f),
+        animationSpec = infiniteRepeatable(
+            animation = tween(durationMillis = 1500),
+            repeatMode = RepeatMode.Reverse
+        )
+    )
+
+    Box(
+        modifier = modifier,
+        contentAlignment = Alignment.Center
+    ) {
+        Box(
+            modifier = Modifier
+                .size(160.dp)
+                .blur(
+                    radius = 10.dp,
+                    edgeTreatment = BlurredEdgeTreatment.Unbounded
+                )
+                .background(
+                    color = innerBlurColor,
+                    shape = CircleShape
+                )
+        )
+        Box(
+            modifier = Modifier
+                .size(200.dp)
+                .blur(
+                    radius = 5.dp,
+                    edgeTreatment = BlurredEdgeTreatment.Unbounded
+                )
+                .background(
+                    color = outerBlurColor,
+                    shape = CircleShape
+                )
+        )
+        Box(
+            modifier = Modifier
+                .size(140.dp)
+                .clip(CircleShape)
+                .background(
+                    brush = Brush.linearGradient(
+                        colors = listOf(
+                            basePulseColor,
+                            basePulseColor.copy(alpha = 0.6f)
+                        )
+                    )
+                ),
+            contentAlignment = Alignment.Center
+        ) {
+            Icon(
+                painter = painter,
+                contentDescription = null,
+                modifier = Modifier.size(64.dp),
+                tint = White
+            )
+        }
+    }
+}
+
 @DevicePreviews
 @Composable
 private fun GateAccessScreenPreview() {
@@ -298,12 +371,14 @@ private fun GateAccessScreenPreview() {
                     user = mockUser.copy(
                         role = UserRole.STUDENT
                     ),
-                    isLocationPermissionGranted = true,
+                    locationState = LocationState.Unavailable,
+                    isLocationPermissionGranted = false,
                     isGateLocked = false,
                     parkingQuota = LoadState.Success(mockParkingQuota),
                     isDarkMode = darkMode,
                     contentPadding = p,
                     onGateOpen = {},
+                    onLocationPermissionChange = {},
                     modifier = Modifier.padding(p)
                 )
             }

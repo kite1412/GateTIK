@@ -1,6 +1,6 @@
 package kite1412.portaltik
 
-interface LocationPermissionController {
+expect object LocationPermissionController {
     fun isPermissionGranted(): Boolean
     fun getPermissionString(): String
 }

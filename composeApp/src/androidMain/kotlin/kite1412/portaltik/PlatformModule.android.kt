@@ -23,16 +23,10 @@ actual val platformModule: Module = module {
 
     single {
         AndroidLocationService(
-            context = get(),
-            permissionController = get()
-        )
-    } bind LocationService::class
-
-    single {
-        AndroidLocationPermissionController(
+            appScope = get(),
             context = get()
         )
-    } bind LocationPermissionController::class
+    } bind LocationService::class
 }
 
 private fun createDataStore(context: Context): DataStore<Preferences> =

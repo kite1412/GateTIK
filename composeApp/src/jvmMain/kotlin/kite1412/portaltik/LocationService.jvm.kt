@@ -4,5 +4,5 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 
 class UnsupportedJvmLocationService : LocationService {
-    override suspend fun getCurrentLocation(): Flow<Location> = flow {}
+    override fun observeLocationState(): Flow<LocationState> = flow {}
 }

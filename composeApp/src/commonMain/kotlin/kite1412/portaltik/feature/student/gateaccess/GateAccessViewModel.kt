@@ -6,6 +6,8 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kite1412.portaltik.LocationPermissionController
+import kite1412.portaltik.LocationService
+import kite1412.portaltik.LocationState
 import kite1412.portaltik.domain.Authentication
 import kite1412.portaltik.domain.SessionStatus
 import kite1412.portaltik.domain.usecase.GetMainGateUseCase
@@ -24,7 +26,7 @@ import kotlinx.coroutines.launch
 class GateAccessViewModel(
     authentication: Authentication,
     getMainParkingQuotaUseCase: GetMainParkingQuotaUseCase,
-    locationPermissionController: LocationPermissionController,
+    locationService: LocationService,
     private val getMainGateUseCase: GetMainGateUseCase,
     private val openGateUseCase: OpenGateUseCase
 ) : ViewModel() {
@@ -40,8 +42,15 @@ class GateAccessViewModel(
             initialValue = null
         )
     val parkingQuota = getMainParkingQuotaUseCase().stateIn(viewModelScope)
+    val locationState = locationService
+        .observeLocationState()
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.Eagerly,
+            initialValue = LocationState.Unavailable
+        )
     var isLocationPermissionGranted by mutableStateOf(
-        locationPermissionController.isPermissionGranted()
+        LocationPermissionController.isPermissionGranted()
     )
         private set
 
@@ -51,5 +60,9 @@ class GateAccessViewModel(
                 openGateUseCase(gate.id)
             }
         }
+    }
+
+    fun updateIsLocationPermissionGranted(value: Boolean) {
+        isLocationPermissionGranted = value
     }
 }
