@@ -3,6 +3,7 @@ package kite1412.portaltik.feature.student.gateaccess
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kite1412.portaltik.LocationPermissionController
@@ -19,6 +20,8 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -42,17 +45,24 @@ class GateAccessViewModel(
             initialValue = null
         )
     val parkingQuota = getMainParkingQuotaUseCase().stateIn(viewModelScope)
-    val locationState = locationService
-        .observeLocationState()
-        .stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.Eagerly,
-            initialValue = LocationState.Unavailable
-        )
     var isLocationPermissionGranted by mutableStateOf(
         LocationPermissionController.isPermissionGranted()
     )
         private set
+    @OptIn(ExperimentalCoroutinesApi::class)
+    val locationState by lazy {
+        snapshotFlow { isLocationPermissionGranted }
+            .flatMapLatest { granted ->
+                if (granted) locationService
+                    .observeLocationState()
+                else flowOf(LocationState.Unavailable)
+            }
+            .stateIn(
+                scope = viewModelScope,
+                started = SharingStarted.Eagerly,
+                initialValue = LocationState.Unavailable
+            )
+    }
 
     fun openGate() {
         viewModelScope.launch {
