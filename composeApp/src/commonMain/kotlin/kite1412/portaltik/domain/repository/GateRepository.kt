@@ -1,5 +1,6 @@
 package kite1412.portaltik.domain.repository
 
+import kite1412.portaltik.Location
 import kite1412.portaltik.model.Gate
 import kite1412.portaltik.util.Error
 import kite1412.portaltik.util.Result
@@ -12,4 +13,8 @@ interface GateRepository {
     suspend fun openGate(id: Int): GateResult<Boolean>
 
     suspend fun closeGate(id: Int): GateResult<Boolean>
+
+    suspend fun enterGate(id: Int, location: Location): GateResult<Boolean>
+
+    suspend fun exitGate(id: Int, location: Location): GateResult<Boolean>
 }
