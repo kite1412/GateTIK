@@ -14,6 +14,14 @@ actual val platformModule: Module = module {
     single<DataStore<Preferences>> {
         createDataStore()
     }
+
+    single {
+        UnsupportedJvmLocationService()
+    }
+
+    single {
+        UnsupportedJvmLocationPermissionController()
+    }
 }
 
 private fun createDataStore() = createDataStore(
