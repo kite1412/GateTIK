@@ -1,9 +1,15 @@
 package kite1412.portaltik
 
 import android.annotation.SuppressLint
+import android.content.BroadcastReceiver
 import android.content.Context
+import android.content.Intent
+import android.content.IntentFilter
 import android.location.Location
+import android.location.LocationManager
 import android.os.Looper
+import androidx.core.content.ContextCompat
+import androidx.core.location.LocationManagerCompat
 import com.google.android.gms.location.LocationCallback
 import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationResult
@@ -23,9 +29,12 @@ class AndroidLocationService(
     private val context: Context
 ) : LocationService {
     private val logTag = "PortalTikLocationService"
+    private val locationManager =
+        context.getSystemService(Context.LOCATION_SERVICE) as LocationManager
     private val fusedLocationClient by lazy {
         LocationServices.getFusedLocationProviderClient(context)
     }
+    private var lastLocation: LocationData? = null
     @delegate:SuppressLint("MissingPermission")
     private val requestLocationUpdates: SharedFlow<LocationState> by lazy {
         callbackFlow {
@@ -34,17 +43,37 @@ class AndroidLocationService(
                 return@callbackFlow
             }
 
-            val callback = object : LocationCallback() {
+            val locationCallback = object : LocationCallback() {
                 override fun onLocationResult(res: LocationResult) {
                     res.lastLocation?.toLocationData()?.let {
                         Logger.d(
                             tag = logTag,
                             message = "Current location: $it"
                         )
+                        lastLocation = it
                         trySend(LocationState.Available(it))
                     }
                 }
             }
+            val receiver = object : BroadcastReceiver() {
+                override fun onReceive(
+                    context: Context?,
+                    intent: Intent?
+                ) {
+                    if (!isLocationEnabled()) trySend(LocationState.Unavailable)
+                    else lastLocation?.let { lastLocation ->
+                        trySend(LocationState.Available(lastLocation))
+                    }
+                }
+            }
+            val filter = IntentFilter(LocationManager.MODE_CHANGED_ACTION)
+
+            ContextCompat.registerReceiver(
+                /*context =*/context,
+                /*receiver =*/receiver,
+                /*filter =*/filter,
+                /*flags =*/ContextCompat.RECEIVER_NOT_EXPORTED
+            )
 
             fusedLocationClient.requestLocationUpdates(
                 /*p0 =*/LocationRequest.Builder(
@@ -54,12 +83,13 @@ class AndroidLocationService(
                     .setMinUpdateIntervalMillis(2000L)
                     .setMinUpdateDistanceMeters(5f)
                     .build(),
-                /*p1 =*/callback,
+                /*p1 =*/locationCallback,
                 /*p2*/Looper.getMainLooper()
             )
 
             awaitClose {
-                fusedLocationClient.removeLocationUpdates(callback)
+                fusedLocationClient.removeLocationUpdates(locationCallback)
+                context.unregisterReceiver(receiver)
             }
         }
             .shareIn(
@@ -70,6 +100,10 @@ class AndroidLocationService(
     }
 
     override fun observeLocationState(): Flow<LocationState> = requestLocationUpdates
+
+    private fun isLocationEnabled(): Boolean {
+        return LocationManagerCompat.isLocationEnabled(locationManager)
+    }
 
     private fun Location.toLocationData() = LocationData(
         latitude = latitude,
