@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -138,9 +139,12 @@ private fun AuthenticationScreen(
     val gradientColor1 by animateColorAsState(if (isDarkMode) BlueSlateGradient[0] else LighterBlueLightBlueGradient[0])
     val gradientColor2 by animateColorAsState(if (isDarkMode) BlueSlateGradient[1] else LighterBlueLightBlueGradient[1])
     val backgroundBrush = Brush.verticalGradient(listOf(gradientColor1, gradientColor2))
+    val toggleBorderColor by animateColorAsState(if (isDarkMode) White15 else Blue200_60)
+    val toggleBackgroundColor by animateColorAsState(if (isDarkMode) White10 else White)
+    val toggleIconColor by animateColorAsState(if (isDarkMode) White else Blue500)
     var isSignIn by retain { mutableStateOf(true) }
 
-    Box(
+    Column(
         modifier = modifier
             .fillMaxSize()
             .background(backgroundBrush)
@@ -149,14 +153,16 @@ private fun AuthenticationScreen(
                 else this
             }
             .padding(contentPadding),
-        contentAlignment = Alignment.Center
+        verticalArrangement = Arrangement.spacedBy(
+            space = 16.dp,
+            alignment = Alignment.CenterVertically
+        ),
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        val toggleBorderColor by animateColorAsState(if (isDarkMode) White15 else Blue200_60)
-        val toggleBackgroundColor by animateColorAsState(if (isDarkMode) White10 else White)
-        val toggleIconColor by animateColorAsState(if (isDarkMode) White else Blue500)
-
-        Column(
-            verticalArrangement = Arrangement.spacedBy(8.dp)
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
         ) {
             AnimatedContent(
                 targetState = isSignIn,
@@ -172,139 +178,137 @@ private fun AuthenticationScreen(
                     fontSize = 32.sp
                 )
             }
-            GlassBox(
+            Box(
                 modifier = Modifier
-                    .widthIn(max = 500.dp)
-                    .fillMaxWidth(),
-                contentPadding = PaddingValues(
-                    horizontal = 24.dp,
-                    vertical = 32.dp
-                )
+                    .size(44.dp)
+                    .border(
+                        width = 1.dp,
+                        color = toggleBorderColor,
+                        shape = CircleShape
+                    )
+                    .background(
+                        color = toggleBackgroundColor,
+                        shape = CircleShape
+                    )
+                    .clickable(
+                        interactionSource = remember { MutableInteractionSource() },
+                        indication = ripple(bounded = false),
+                        onClick = onToggleDarkMode
+                    ),
+                contentAlignment = Alignment.Center
             ) {
-                val titleColor by animateColorAsState(if (isDarkMode) White else MaterialTheme.colorScheme.onSurface)
-                val subtitleColor by animateColorAsState(if (isDarkMode) White60 else RoyalBlue800_60)
-                val secondaryTextColor by animateColorAsState(if (isDarkMode) White50 else MaterialTheme.colorScheme.onSurfaceVariant)
-                val linkColor by animateColorAsState(if (!isDarkMode) Blue500 else Blue300)
+                Icon(
+                    painter = painterResource(if (isDarkMode) PortalTikIcons.sun else PortalTikIcons.moon),
+                    contentDescription = "Toggle Theme",
+                    tint = toggleIconColor,
+                    modifier = Modifier.size(24.dp)
+                )
+            }
+        }
+        GlassBox(
+            modifier = Modifier
+                .widthIn(max = 500.dp)
+                .fillMaxWidth(),
+            contentPadding = PaddingValues(
+                horizontal = 24.dp,
+                vertical = 32.dp
+            )
+        ) {
+            val titleColor by animateColorAsState(if (isDarkMode) White else MaterialTheme.colorScheme.onSurface)
+            val subtitleColor by animateColorAsState(if (isDarkMode) White60 else RoyalBlue800_60)
+            val secondaryTextColor by animateColorAsState(if (isDarkMode) White50 else MaterialTheme.colorScheme.onSurfaceVariant)
+            val linkColor by animateColorAsState(if (!isDarkMode) Blue500 else Blue300)
 
-                LazyColumn(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.spacedBy(24.dp)
-                ) {
-                    item {
-                        Column(
-                            verticalArrangement = Arrangement.spacedBy(8.dp),
-                            horizontalAlignment = Alignment.CenterHorizontally
-                        ) {
-                            Icon(
-                                painter = painterResource(PortalTikIcons.unila),
-                                contentDescription = "App Icon",
-                                modifier = Modifier.size(64.dp)
-                            )
-                            Text(
-                                text = "Portal TIK",
-                                style = MaterialTheme.typography.titleMedium,
-                                color = titleColor
-                            )
-                            Text(
-                                text = "Sistem Smart Gate TIK UNILA",
-                                style = MaterialTheme.typography.bodyMedium,
-                                color = subtitleColor
-                            )
-                        }
-                    }
-                    item {
-                        Form(
-                            isSignIn = isSignIn,
-                            fullName = fullName,
-                            email = email,
-                            password = password,
-                            confirmPassword = confirmPassword,
-                            onFullNameChange = onFullNameChange,
-                            onEmailChange = onEmailChange,
-                            onPasswordChange = onPasswordChange,
-                            onConfirmPasswordChange = onConfirmPasswordChange,
-                            isDarkMode = isDarkMode
+            LazyColumn(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(24.dp)
+            ) {
+                item {
+                    Column(
+                        verticalArrangement = Arrangement.spacedBy(8.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Icon(
+                            painter = painterResource(PortalTikIcons.unila),
+                            contentDescription = "App Icon",
+                            modifier = Modifier.size(64.dp)
                         )
-                    }
-                    item {
-                        GradientTextButton(
-                            text = if (!isInProgress) "Masuk" else "",
-                            onClick = {
-                                if (isSignIn) onSignIn(email, password)
-                                else onSignUp(fullName, email, password, confirmPassword)
-                            },
-                            modifier = Modifier.fillMaxWidth(),
-                            enabled = email.isNotBlank() && password.isNotBlank()
-                                    && (if (!isSignIn) fullName.isNotBlank() && password.length >= 8 && confirmPassword == password else true)
-                                    && !isInProgress,
-                            leading = if (isInProgress) {
-                                {
-                                    SmallCircularProgressIndicator(color = White30)
-                                }
-                            } else null
-                        )
-                    }
-                    item {
                         Text(
-                            text = buildAnnotatedString {
-                                withStyle(
-                                    style = SpanStyle(
-                                        color = secondaryTextColor
-                                    )
-                                ) {
-                                    append(if (isSignIn) "Belum punya akun? " else "Sudah punya akun? ")
-                                }
-                                withLink(
-                                    link = LinkAnnotation.Clickable(
-                                        "state-change",
-                                        linkInteractionListener = { isSignIn = !isSignIn }
-                                    )
-                                ) {
-                                    withStyle(
-                                        style = SpanStyle(
-                                            color = linkColor,
-                                            fontWeight = FontWeight.Bold
-                                        )
-                                    ) {
-                                        append(if (isSignIn) "Daftar" else "Masuk")
-                                    }
-                                }
-                            },
-                            style = MaterialTheme.typography.bodySmall,
-                            textAlign = TextAlign.Center
+                            text = "Portal TIK",
+                            style = MaterialTheme.typography.titleMedium,
+                            color = titleColor
+                        )
+                        Text(
+                            text = "Sistem Smart Gate TIK UNILA",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = subtitleColor
                         )
                     }
                 }
+                item {
+                    Form(
+                        isSignIn = isSignIn,
+                        fullName = fullName,
+                        email = email,
+                        password = password,
+                        confirmPassword = confirmPassword,
+                        onFullNameChange = onFullNameChange,
+                        onEmailChange = onEmailChange,
+                        onPasswordChange = onPasswordChange,
+                        onConfirmPasswordChange = onConfirmPasswordChange,
+                        isDarkMode = isDarkMode
+                    )
+                }
+                item {
+                    GradientTextButton(
+                        text = if (!isInProgress) "Masuk" else "",
+                        onClick = {
+                            if (isSignIn) onSignIn(email, password)
+                            else onSignUp(fullName, email, password, confirmPassword)
+                        },
+                        modifier = Modifier.fillMaxWidth(),
+                        enabled = email.isNotBlank() && password.isNotBlank()
+                                && (if (!isSignIn) fullName.isNotBlank() && password.length >= 8 && confirmPassword == password else true)
+                                && !isInProgress,
+                        leading = if (isInProgress) {
+                            {
+                                SmallCircularProgressIndicator(color = White30)
+                            }
+                        } else null
+                    )
+                }
+                item {
+                    Text(
+                        text = buildAnnotatedString {
+                            withStyle(
+                                style = SpanStyle(
+                                    color = secondaryTextColor
+                                )
+                            ) {
+                                append(if (isSignIn) "Belum punya akun? " else "Sudah punya akun? ")
+                            }
+                            withLink(
+                                link = LinkAnnotation.Clickable(
+                                    "state-change",
+                                    linkInteractionListener = { isSignIn = !isSignIn }
+                                )
+                            ) {
+                                withStyle(
+                                    style = SpanStyle(
+                                        color = linkColor,
+                                        fontWeight = FontWeight.Bold
+                                    )
+                                ) {
+                                    append(if (isSignIn) "Daftar" else "Masuk")
+                                }
+                            }
+                        },
+                        style = MaterialTheme.typography.bodySmall,
+                        textAlign = TextAlign.Center
+                    )
+                }
             }
-        }
-        Box(
-            modifier = Modifier
-                .align(Alignment.TopEnd)
-                .padding(top = 16.dp)
-                .size(44.dp)
-                .border(
-                    width = 1.dp,
-                    color = toggleBorderColor,
-                    shape = CircleShape
-                )
-                .background(
-                    color = toggleBackgroundColor,
-                    shape = CircleShape
-                )
-                .clickable(
-                    interactionSource = remember { MutableInteractionSource() },
-                    indication = ripple(bounded = false),
-                    onClick = onToggleDarkMode
-                ),
-            contentAlignment = Alignment.Center
-        ) {
-            Icon(
-                painter = painterResource(if (isDarkMode) PortalTikIcons.sun else PortalTikIcons.moon),
-                contentDescription = "Toggle Theme",
-                tint = toggleIconColor,
-                modifier = Modifier.size(24.dp)
-            )
         }
     }
 }
@@ -339,8 +343,7 @@ private fun Form(
                 label = buildAnnotatedString { append("NAMA LENGKAP") },
                 placeholder = "Masukkan nama lengkap",
                 icon = PortalTikIcons.person,
-                iconColor = iconColor,
-                isDarkMode = isDarkMode
+                iconColor = iconColor
             )
         }
         FormOutlinedTextField(
@@ -351,7 +354,6 @@ private fun Form(
             placeholder = "@students.unila.ac.id",
             icon = PortalTikIcons.email,
             iconColor = iconColor,
-            isDarkMode = isDarkMode,
             keyboardType = KeyboardType.Email
         )
         FormOutlinedTextField(
@@ -362,7 +364,6 @@ private fun Form(
             placeholder = "Password",
             icon = PortalTikIcons.lock,
             iconColor = iconColor,
-            isDarkMode = isDarkMode,
             visualTransformation = if (showPassword) VisualTransformation.None
                 else PasswordVisualTransformation(),
             keyboardType = KeyboardType.Password,
@@ -382,7 +383,6 @@ private fun Form(
                 placeholder = "Ulangi password",
                 icon = PortalTikIcons.lock,
                 iconColor = iconColor,
-                isDarkMode = isDarkMode,
                 visualTransformation = if (showConfirmPassword) VisualTransformation.None
                     else PasswordVisualTransformation(),
                 keyboardType = KeyboardType.Password,
@@ -426,7 +426,6 @@ private fun FormOutlinedTextField(
     placeholder: String,
     icon: DrawableResource,
     iconColor: Color,
-    isDarkMode: Boolean,
     modifier: Modifier = Modifier,
     visualTransformation: VisualTransformation = VisualTransformation.None,
     keyboardType: KeyboardType = KeyboardType.Text,

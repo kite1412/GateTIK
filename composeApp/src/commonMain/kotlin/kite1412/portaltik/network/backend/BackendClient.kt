@@ -14,8 +14,8 @@ import io.ktor.client.statement.request
 import io.ktor.http.fullPath
 import kite1412.portaltik.Logger
 import kite1412.portaltik.datastore.PortalTikDataStore
-import kite1412.portaltik.ktorHttpClient
 import kite1412.portaltik.network.backend.util.getPath
+import kite1412.portaltik.network.domain.ktorHttpClient
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 
