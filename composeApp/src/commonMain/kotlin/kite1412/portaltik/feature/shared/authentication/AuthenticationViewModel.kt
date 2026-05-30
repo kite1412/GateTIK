@@ -23,26 +23,38 @@ class AuthenticationViewModel(
 ) : ViewModel() {
     private val _uiEvent = MutableSharedFlow<UiEvent>()
     val uiEvent = _uiEvent.asSharedFlow()
-
     var email by mutableStateOf("")
         private set
-
+    var fullName by mutableStateOf("")
+        private set
     var password by mutableStateOf("")
         private set
-
+    var confirmPassword by mutableStateOf("")
+        private set
     var authResult by mutableStateOf<AuthResult<User>>(Result.Loading)
+        private set
+    var isInProgress by mutableStateOf(false)
         private set
 
     fun onEmailChange(email: String) {
         this.email = email
     }
 
+    fun onFullNameChange(name: String) {
+        this.fullName = name
+    }
+
     fun onPasswordChange(password: String) {
         this.password = password
     }
 
+    fun onConfirmPasswordChange(password: String) {
+        this.confirmPassword = password
+    }
+
     fun signIn(email: String, password: String) {
         viewModelScope.launch {
+            isInProgress = true
             authResult = Result.Loading
             authResult = authentication.signIn(email, password)
             authResult
@@ -54,6 +66,7 @@ class AuthenticationViewModel(
                         _uiEvent.emit(UiEvent.ShowSnackbar(it.message))
                     }
                 }
+            isInProgress = false
         }
     }
 
