@@ -3,10 +3,17 @@ package kite1412.portaltik.feature.shared.authentication
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -19,10 +26,12 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -33,10 +42,12 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.retain.retain
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.AnnotatedString
@@ -48,10 +59,14 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.withLink
 import androidx.compose.ui.text.withStyle
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import kite1412.portaltik.PickResult
+import kite1412.portaltik.PickedFile
 import kite1412.portaltik.designsystem.component.GlassBox
 import kite1412.portaltik.designsystem.component.GradientTextButton
 import kite1412.portaltik.designsystem.component.Icon
@@ -72,11 +87,14 @@ import kite1412.portaltik.designsystem.theme.White30
 import kite1412.portaltik.designsystem.theme.White50
 import kite1412.portaltik.designsystem.theme.White60
 import kite1412.portaltik.designsystem.util.PortalTikIcons
+import kite1412.portaltik.rememberFilePicker
 import kite1412.portaltik.ui.component.SmallCircularProgressIndicator
 import kite1412.portaltik.ui.compositionlocal.LocalDarkMode
 import kite1412.portaltik.ui.compositionlocal.LocalSnackbarHostStateWrapper
 import kite1412.portaltik.ui.preview.DevicePreviews
 import kite1412.portaltik.ui.util.UiEvent
+import kite1412.portaltik.util.mb
+import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.painterResource
 import org.koin.compose.viewmodel.koinViewModel
@@ -93,6 +111,7 @@ fun AuthenticationScreen(
     val fullName = viewModel.fullName
     val password = viewModel.password
     val confirmPassword = viewModel.confirmPassword
+    val idCard = viewModel.idCard
 
     LaunchedEffect(Unit) {
         viewModel.uiEvent.collect { event ->
@@ -105,14 +124,16 @@ fun AuthenticationScreen(
         fullName = fullName,
         password = password,
         confirmPassword = confirmPassword,
+        idCard = idCard,
         isInProgress = viewModel.isInProgress,
         contentPadding = contentPadding,
         onEmailChange = viewModel::onEmailChange,
         onFullNameChange = viewModel::onFullNameChange,
         onPasswordChange = viewModel::onPasswordChange,
         onConfirmPasswordChange = viewModel::onConfirmPasswordChange,
+        onIdCardPick = viewModel::onIdCardPick,
         onSignIn = viewModel::signIn,
-        onSignUp = { _, _, _, _ -> },
+        onSignUp = { _, _, _, _, _ -> },
         onToggleDarkMode = { viewModel.toggleDarkMode(isDarkMode) },
         modifier = modifier,
     )
@@ -124,14 +145,16 @@ private fun AuthenticationScreen(
     fullName: String,
     password: String,
     confirmPassword: String,
+    idCard: PickedFile?,
     isInProgress: Boolean,
     contentPadding: PaddingValues,
     onEmailChange: (String) -> Unit,
     onFullNameChange: (String) -> Unit,
     onPasswordChange: (String) -> Unit,
     onConfirmPasswordChange: (String) -> Unit,
+    onIdCardPick: (PickResult) -> Unit,
     onSignIn: (email: String, password: String) -> Unit,
-    onSignUp: (fullName: String, email: String, password: String, confirmPassword: String) -> Unit,
+    onSignUp: (fullName: String, email: String, password: String, confirmPassword: String, idCard: PickedFile) -> Unit,
     onToggleDarkMode: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -218,11 +241,13 @@ private fun AuthenticationScreen(
             val subtitleColor by animateColorAsState(if (isDarkMode) White60 else RoyalBlue800_60)
             val secondaryTextColor by animateColorAsState(if (isDarkMode) White50 else MaterialTheme.colorScheme.onSurfaceVariant)
             val linkColor by animateColorAsState(if (!isDarkMode) Blue500 else Blue300)
+            val lazyListState = rememberLazyListState()
 
             LazyColumn(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(24.dp)
+                verticalArrangement = Arrangement.spacedBy(24.dp),
+                state = lazyListState
             ) {
                 item {
                     Column(
@@ -253,10 +278,12 @@ private fun AuthenticationScreen(
                         email = email,
                         password = password,
                         confirmPassword = confirmPassword,
+                        idCard = idCard,
                         onFullNameChange = onFullNameChange,
                         onEmailChange = onEmailChange,
                         onPasswordChange = onPasswordChange,
                         onConfirmPasswordChange = onConfirmPasswordChange,
+                        onIdCardPick = onIdCardPick,
                         isDarkMode = isDarkMode
                     )
                 }
@@ -265,11 +292,13 @@ private fun AuthenticationScreen(
                         text = if (!isInProgress) "Masuk" else "",
                         onClick = {
                             if (isSignIn) onSignIn(email, password)
-                            else onSignUp(fullName, email, password, confirmPassword)
+                            else idCard?.let { idCard ->
+                                onSignUp(fullName, email, password, confirmPassword, idCard)
+                            }
                         },
                         modifier = Modifier.fillMaxWidth(),
                         enabled = email.isNotBlank() && password.isNotBlank()
-                                && (if (!isSignIn) fullName.isNotBlank() && password.length >= 8 && confirmPassword == password else true)
+                                && (if (!isSignIn) fullName.isNotBlank() && password.length >= 8 && confirmPassword == password && idCard != null else true)
                                 && !isInProgress,
                         leading = if (isInProgress) {
                             {
@@ -309,6 +338,36 @@ private fun AuthenticationScreen(
                     )
                 }
             }
+            this@Column.AnimatedVisibility(
+                visible = lazyListState.canScrollForward,
+                modifier = Modifier.align(Alignment.BottomEnd),
+                enter = fadeIn() + slideInVertically { it },
+                exit = fadeOut() + slideOutVertically { it }
+            ) {
+                val infiniteTransition = rememberInfiniteTransition()
+                val yOffset by infiniteTransition.animateFloat(
+                    initialValue = 0f,
+                    targetValue = 16f,
+                    animationSpec = infiniteRepeatable(
+                        animation = tween(300),
+                        repeatMode = RepeatMode.Reverse
+                    )
+                )
+
+                GlassBox(
+                    modifier = Modifier.offset {
+                        val px = yOffset.toDp().roundToPx()
+                        IntOffset(x = 0, y = px)
+                    },
+                    contentPadding = PaddingValues(8.dp)
+                ) {
+                    Icon(
+                        painter = painterResource(PortalTikIcons.chevronRight),
+                        contentDescription = null,
+                        modifier = Modifier.rotate(90f)
+                    )
+                }
+            }
         }
     }
 }
@@ -320,10 +379,12 @@ private fun Form(
     email: String,
     password: String,
     confirmPassword: String,
+    idCard: PickedFile?,
     onEmailChange: (String) -> Unit,
     onFullNameChange: (String) -> Unit,
     onPasswordChange: (String) -> Unit,
     onConfirmPasswordChange: (String) -> Unit,
+    onIdCardPick: (PickResult) -> Unit,
     isDarkMode: Boolean,
     modifier: Modifier = Modifier
 ) {
@@ -394,6 +455,79 @@ private fun Form(
                     )
                 }
             )
+        }
+        AnimatedVisibility(!isSignIn) {
+            IdCardPicker(
+                label = "KTM",
+                pickedFile = idCard,
+                isDarkMode = isDarkMode,
+                onFilePick = onIdCardPick
+            )
+        }
+    }
+}
+
+@Composable
+private fun IdCardPicker(
+    label: String,
+    pickedFile: PickedFile?,
+    isDarkMode: Boolean,
+    onFilePick: (PickResult) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val filePicker = rememberFilePicker(
+        acceptedMimeTypes = arrayOf("image/png", "image/jpeg"),
+        maxFileSize = 2.mb
+    )
+    val scope = rememberCoroutineScope()
+    val labelColor by animateColorAsState(if (!isDarkMode) RoyalBlue800_50 else White50)
+
+    Column(
+        modifier = modifier,
+        verticalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        Text(
+            text = label,
+            style = MaterialTheme.typography.labelSmall,
+            color = labelColor
+        )
+        GlassBox(
+            modifier = Modifier
+                .clickable(
+                    indication = null,
+                    interactionSource = null
+                ) {
+                    scope.launch {
+                        onFilePick(filePicker.pickFile())
+                    }
+                },
+            contentPadding = PaddingValues(16.dp)
+        ) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(
+                    space = 8.dp,
+                    alignment = Alignment.CenterHorizontally
+                )
+            ) {
+                val labelMedium = MaterialTheme.typography.labelMedium
+                val color = MaterialTheme.colorScheme.onBackground
+
+                Icon(
+                    painter = painterResource(PortalTikIcons.idCard),
+                    contentDescription = null,
+                    modifier = Modifier.size((labelMedium.fontSize.value * 2).dp),
+                    tint = color
+                )
+                Text(
+                    text = pickedFile?.name ?: label,
+                    style = labelMedium,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    color = color
+                )
+            }
         }
     }
 }
@@ -467,14 +601,16 @@ private fun AuthenticationScreenPreview() {
                 fullName = fullName,
                 password = password,
                 confirmPassword = confirmPassword,
+                idCard = null,
                 isInProgress = true,
                 contentPadding = PaddingValues(0.dp),
                 onEmailChange = { email = it },
                 onFullNameChange = { fullName = it },
                 onPasswordChange = { password = it },
                 onConfirmPasswordChange = { confirmPassword = it },
+                onIdCardPick = {},
                 onSignIn = {_, _ ->},
-                onSignUp = {_, _, _, _ ->},
+                onSignUp = {_, _, _, _, _ ->},
                 onToggleDarkMode = {},
                 modifier = Modifier.padding(p)
             )

@@ -82,7 +82,7 @@ fun NavigationScaffold(
     username: String,
     userEmail: String,
     onDestinationClick: (Destination) -> Unit,
-    onLogoutClick: () -> Unit,
+    onSignOutClick: () -> Unit,
     modifier: Modifier = Modifier,
     showNavigationBar: Boolean = true,
     windowWidthSize: WindowWidthSize = rememberWindowWidthSize(),
@@ -125,7 +125,7 @@ fun NavigationScaffold(
                 onDestinationClick = onDestinationClick,
                 userName = username,
                 userEmail = userEmail,
-                onLogoutClick = onLogoutClick
+                onLogoutClick = onSignOutClick
             )
         }
 
@@ -525,7 +525,7 @@ private fun NavigationScaffoldPreviewContent() {
             onDestinationClick = { selectedDestination = it },
             username = "Aulia Rahman",
             userEmail = "admin@campus.edu",
-            onLogoutClick = {}
+            onSignOutClick = {}
         ) {
             Box(
                 modifier = Modifier.fillMaxSize(),

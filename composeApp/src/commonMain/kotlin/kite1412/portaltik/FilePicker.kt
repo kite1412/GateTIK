@@ -49,7 +49,7 @@ data class PickedFile(
 @JvmInline
 value class FileSize(
     val bytes: Long
-) : Comparable<Long> {
+) {
     override fun toString(): String =
         when {
             bytes >= 1024L * 1024L * 1024L ->
@@ -64,6 +64,6 @@ value class FileSize(
             else ->
                 "$bytes B"
         }
-
-    override fun compareTo(other: Long): Int = bytes.compareTo(other)
 }
+
+infix fun Long.isLargerThan(fileSize: FileSize) = this > fileSize.bytes

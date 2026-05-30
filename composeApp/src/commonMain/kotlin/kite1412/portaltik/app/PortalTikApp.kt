@@ -71,7 +71,7 @@ fun PortalTikApp() {
                 onDestinationClick = { des ->
                     appState.navigateToRootDestination(des.route)
                 },
-                onLogoutClick = {},
+                onSignOutClick = viewModel::onSignOutClick,
                 showNavigationBar = appState.currentRootDestination != null &&
                     viewModel.scaffoldComponentsController
                         .getState(ScaffoldComponent.NAV_BAR)

@@ -11,10 +11,11 @@ import kite1412.portaltik.ui.util.ScaffoldComponent
 import kite1412.portaltik.ui.util.ScaffoldComponentState
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 
 class PortalTikViewModel(
     dataStore: PortalTikDataStore,
-    authentication: Authentication
+    private val authentication: Authentication
 ) : ViewModel() {
     private val scaffoldComponentStates = mutableStateMapOf<ScaffoldComponent, ScaffoldComponentState>()
     val sessionStatus = authentication.sessionStatus
@@ -32,4 +33,10 @@ class PortalTikViewModel(
             initialValue = null
         )
     val scaffoldComponentsController = AppScaffoldComponentsController(scaffoldComponentStates)
+
+    fun onSignOutClick() {
+        viewModelScope.launch {
+            authentication.logout()
+        }
+    }
 }

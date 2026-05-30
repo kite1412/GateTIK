@@ -44,7 +44,7 @@ actual fun rememberFilePicker(
 
                     if (cursor.moveToFirst()) {
                         val size = cursor.getLong(sizeIndex)
-                        if (maxFileSize >= size) {
+                        if (size isLargerThan maxFileSize) {
                             callback?.invoke(PickResult.Failed(FailReason.FileSizeExceeded(maxFileSize)))
                             callback = null
                             return@rememberLauncherForActivityResult

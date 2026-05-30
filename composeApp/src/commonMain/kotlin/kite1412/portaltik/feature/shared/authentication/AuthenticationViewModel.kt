@@ -5,6 +5,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import kite1412.portaltik.PickResult
+import kite1412.portaltik.PickedFile
 import kite1412.portaltik.datastore.PortalTikDataStore
 import kite1412.portaltik.domain.AuthResult
 import kite1412.portaltik.domain.Authentication
@@ -31,6 +33,8 @@ class AuthenticationViewModel(
         private set
     var confirmPassword by mutableStateOf("")
         private set
+    var idCard by mutableStateOf<PickedFile?>(null)
+        private set
     var authResult by mutableStateOf<AuthResult<User>>(Result.Loading)
         private set
     var isInProgress by mutableStateOf(false)
@@ -50,6 +54,17 @@ class AuthenticationViewModel(
 
     fun onConfirmPasswordChange(password: String) {
         this.confirmPassword = password
+    }
+
+    fun onIdCardPick(result: PickResult) {
+        viewModelScope.launch {
+            when (result) {
+                is PickResult.Success -> this@AuthenticationViewModel.idCard = result.file
+                is PickResult.Failed -> result.reason.message?.let { message ->
+                    _uiEvent.emit(UiEvent.ShowSnackbar(message))
+                }
+            }
+        }
     }
 
     fun signIn(email: String, password: String) {
