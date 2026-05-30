@@ -19,6 +19,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -162,7 +163,7 @@ private fun GateAccessScreen(
                     )
                 }
             }
-        } else LocationPermissionWarning(
+        } else if (!isLocationPermissionGranted || locationState is LocationState.Unavailable) LocationWarning(
             isDarkMode = isDarkMode,
             isLocationPermissionGranted = isLocationPermissionGranted,
             onRequestPermissionClick = locationPermissionRequester,
@@ -172,12 +173,26 @@ private fun GateAccessScreen(
                     else 0.dp
                 )
                 .align(Alignment.Center)
-        )
+        ) else Column(
+            modifier = Modifier.align(Alignment.Center),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            val color = MaterialTheme.colorScheme.onBackground
+
+            CircularProgressIndicator(color = color)
+            Text(
+                text = "Memuat informasi lokasi",
+                style = MaterialTheme.typography.labelMedium,
+                fontStyle = FontStyle.Italic,
+                color = color
+            )
+        }
     }
 }
 
 @Composable
-private fun LocationPermissionWarning(
+private fun LocationWarning(
     isDarkMode: Boolean,
     isLocationPermissionGranted: Boolean,
     onRequestPermissionClick: () -> Unit,

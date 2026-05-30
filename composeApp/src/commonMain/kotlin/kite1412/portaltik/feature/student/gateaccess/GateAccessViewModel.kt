@@ -50,19 +50,17 @@ class GateAccessViewModel(
     )
         private set
     @OptIn(ExperimentalCoroutinesApi::class)
-    val locationState by lazy {
-        snapshotFlow { isLocationPermissionGranted }
-            .flatMapLatest { granted ->
-                if (granted) locationService
-                    .observeLocationState()
-                else flowOf(LocationState.Unavailable)
-            }
-            .stateIn(
-                scope = viewModelScope,
-                started = SharingStarted.Eagerly,
-                initialValue = LocationState.Unavailable
-            )
-    }
+    val locationState = snapshotFlow { isLocationPermissionGranted }
+        .flatMapLatest { granted ->
+            if (granted) locationService
+                .observeLocationState()
+            else flowOf(LocationState.Loading)
+        }
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.Eagerly,
+            initialValue = LocationState.Loading
+        )
 
     fun openGate() {
         viewModelScope.launch {

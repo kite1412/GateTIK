@@ -42,6 +42,7 @@ class AndroidLocationService(
                 close()
                 return@callbackFlow
             }
+            trySend(LocationState.Loading)
 
             val locationCallback = object : LocationCallback() {
                 override fun onLocationResult(res: LocationResult) {
@@ -60,8 +61,13 @@ class AndroidLocationService(
                     context: Context?,
                     intent: Intent?
                 ) {
-                    if (!isLocationEnabled()) trySend(LocationState.Unavailable)
-                    else lastLocation?.let { lastLocation ->
+                    if (!isLocationEnabled()) {
+                        Logger.d(
+                            tag = logTag,
+                            message = "Location disabled"
+                        )
+                        trySend(LocationState.Unavailable)
+                    } else lastLocation?.let { lastLocation ->
                         trySend(LocationState.Available(lastLocation))
                     }
                 }

@@ -7,6 +7,7 @@ interface LocationService {
 }
 
 sealed interface LocationState {
+    object Loading : LocationState
     object Unavailable : LocationState
     data class Available(
         val currentLocation: Location
