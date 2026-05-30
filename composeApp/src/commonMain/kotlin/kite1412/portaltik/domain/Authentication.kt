@@ -1,7 +1,7 @@
 package kite1412.portaltik.domain
 
+import kite1412.portaltik.File
 import kite1412.portaltik.model.User
-import kite1412.portaltik.model.UserRole
 import kite1412.portaltik.util.Error
 import kite1412.portaltik.util.Result
 import kotlinx.coroutines.flow.Flow
@@ -18,10 +18,13 @@ interface Authentication {
         password: String
     ): AuthResult<User>
 
-    suspend fun register(
+    suspend fun signUp(
+        fullName: String,
         email: String,
+        npmNip: String,
         password: String,
-        role: UserRole
+        confirmPassword: String,
+        ktm: File
     ): AuthResult<User>
 
     suspend fun logout(): AuthResult<Boolean>
@@ -35,6 +38,9 @@ interface Authentication {
         ) : AuthError
         data class AccountNotValidated(
             override val message: String = "Akun belum divalidasi."
+        ) : AuthError
+        data class BadRequest(
+            override val message: String
         ) : AuthError
     }
 }

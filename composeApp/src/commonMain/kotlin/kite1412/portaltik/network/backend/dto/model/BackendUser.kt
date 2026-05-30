@@ -14,7 +14,7 @@ data class BackendUser(
     @SerialName("npm_nip")
     val npmNip: String,
     @SerialName("phone_number")
-    val phoneNumber: String,
+    val phoneNumber: String? = null,
     val role: BackendUserRole,
     val status: BackendUserStatus,
     @SerialName("profile_photo")

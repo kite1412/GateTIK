@@ -54,7 +54,7 @@ class JvmFilePicker(
             return PickResult.Failed(FailReason.UnsupportedMimeType)
 
         return PickResult.Success(
-            PickedFile(
+            File(
                 name = file.name,
                 mimeType = mimeType,
                 bytes = file.readBytes()

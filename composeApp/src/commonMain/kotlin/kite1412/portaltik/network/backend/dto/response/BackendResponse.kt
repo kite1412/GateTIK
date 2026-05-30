@@ -7,5 +7,6 @@ data class BackendResponse<T>(
     val success: Boolean = false,
     val message: String? = null,
     val data: T? = null,
-    val pagination: BackendPagination? = null
+    val pagination: BackendPagination? = null,
+    val errors: Map<String, List<String>>? = null
 )

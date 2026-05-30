@@ -1,10 +1,10 @@
 package kite1412.portaltik.network.mock
 
+import kite1412.portaltik.File
 import kite1412.portaltik.domain.AuthResult
 import kite1412.portaltik.domain.Authentication
 import kite1412.portaltik.domain.SessionStatus
 import kite1412.portaltik.model.User
-import kite1412.portaltik.model.UserRole
 import kite1412.portaltik.util.Success
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -30,10 +30,13 @@ class MockAuthentication : Authentication {
         return Success(mockUser)
     }
 
-    override suspend fun register(
+    override suspend fun signUp(
+        fullName: String,
         email: String,
+        npmNip: String,
         password: String,
-        role: UserRole
+        confirmPassword: String,
+        ktm: File
     ): AuthResult<User> = Success(mockUser)
 
     override suspend fun logout(): AuthResult<Boolean> {

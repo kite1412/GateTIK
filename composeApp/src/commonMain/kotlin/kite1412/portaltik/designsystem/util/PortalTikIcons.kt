@@ -18,6 +18,7 @@ import portaltik.composeapp.generated.resources.lock
 import portaltik.composeapp.generated.resources.lock_open
 import portaltik.composeapp.generated.resources.logout
 import portaltik.composeapp.generated.resources.moon
+import portaltik.composeapp.generated.resources.numbers
 import portaltik.composeapp.generated.resources.parking_off
 import portaltik.composeapp.generated.resources.person
 import portaltik.composeapp.generated.resources.phone
@@ -59,4 +60,5 @@ object PortalTikIcons {
     val parkingOff = Res.drawable.parking_off
     val doorClose = Res.drawable.door_close
     val lockOpen = Res.drawable.lock_open
+    val numbers = Res.drawable.numbers
 }

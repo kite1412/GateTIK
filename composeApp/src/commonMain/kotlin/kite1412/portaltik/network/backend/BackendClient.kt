@@ -51,16 +51,24 @@ object BackendClient : KoinComponent {
         block = block
     ).body()
 
+    suspend inline fun rawPost(
+        path: String,
+        useToken: Boolean = true,
+        block: HttpRequestBuilder.() -> Unit = {}
+    ) = httpClient.post(getPath(path)) {
+        if (useToken) attachToken()
+        block()
+    }.also(::log)
+
     suspend inline fun <reified Request : Any> rawPost(
         path: String,
         body: Request,
         useToken: Boolean = true,
         block: HttpRequestBuilder.() -> Unit = {}
-    ): HttpResponse = httpClient.post(getPath(path)) {
+    ): HttpResponse = rawPost(path, useToken) {
         setBody(body)
-        if (useToken) attachToken()
         block()
-    }.also(::log)
+    }
 
     suspend inline fun <reified Request : Any, reified Response> post(
         path: String,

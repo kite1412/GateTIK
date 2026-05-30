@@ -10,7 +10,7 @@ interface FilePicker {
 }
 
 sealed interface PickResult {
-    data class Success(val file: PickedFile) : PickResult
+    data class Success(val file: File) : PickResult
     data class Failed(val reason: FailReason) : PickResult
 }
 
@@ -20,7 +20,7 @@ sealed class FailReason(val message: String?) {
     object Unknown : FailReason(null)
 }
 
-data class PickedFile(
+data class File(
     val name: String,
     val mimeType: String?,
     val bytes: ByteArray
@@ -29,7 +29,7 @@ data class PickedFile(
         if (this === other) return true
         if (javaClass != other?.javaClass) return false
 
-        other as PickedFile
+        other as File
 
         if (name != other.name) return false
         if (mimeType != other.mimeType) return false

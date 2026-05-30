@@ -5,8 +5,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import kite1412.portaltik.File
 import kite1412.portaltik.PickResult
-import kite1412.portaltik.PickedFile
 import kite1412.portaltik.datastore.PortalTikDataStore
 import kite1412.portaltik.domain.AuthResult
 import kite1412.portaltik.domain.Authentication
@@ -21,31 +21,43 @@ import kotlinx.coroutines.launch
 
 class AuthenticationViewModel(
     private val dataStore: PortalTikDataStore,
-    private val authentication: Authentication,
+    private val authentication: Authentication
 ) : ViewModel() {
     private val _uiEvent = MutableSharedFlow<UiEvent>()
     val uiEvent = _uiEvent.asSharedFlow()
-    var email by mutableStateOf("")
+    var isSignIn by mutableStateOf(true)
         private set
     var fullName by mutableStateOf("")
+        private set
+    var email by mutableStateOf("")
+        private set
+    var npmNip by mutableStateOf("")
         private set
     var password by mutableStateOf("")
         private set
     var confirmPassword by mutableStateOf("")
         private set
-    var idCard by mutableStateOf<PickedFile?>(null)
+    var idCard by mutableStateOf<File?>(null)
         private set
     var authResult by mutableStateOf<AuthResult<User>>(Result.Loading)
         private set
     var isInProgress by mutableStateOf(false)
         private set
 
-    fun onEmailChange(email: String) {
-        this.email = email
+    fun onIsSignInChange(value: Boolean) {
+        this.isSignIn = value
     }
 
     fun onFullNameChange(name: String) {
         this.fullName = name
+    }
+
+    fun onEmailChange(email: String) {
+        this.email = email
+    }
+
+    fun onNpmNipChange(value: String) {
+        this.npmNip = value
     }
 
     fun onPasswordChange(password: String) {
@@ -72,9 +84,48 @@ class AuthenticationViewModel(
             isInProgress = true
             authResult = Result.Loading
             authResult = authentication.signIn(email, password)
-            authResult
                 .onSuccess {
                     _uiEvent.emit(UiEvent.ShowSnackbar("Login berhasil"))
+                }
+                .onError {
+                    if (it is Authentication.AuthError) {
+                        _uiEvent.emit(UiEvent.ShowSnackbar(it.message))
+                    }
+                }
+            isInProgress = false
+        }
+    }
+
+    fun signUp(
+        fullName: String,
+        email: String,
+        npmNip: String,
+        password: String,
+        confirmPassword: String,
+        idCard: File
+    ) {
+        viewModelScope.launch {
+            isInProgress = true
+            authResult = Result.Loading
+            authResult = authentication.signUp(
+                fullName = fullName,
+                email = email,
+                npmNip = npmNip,
+                password = password,
+                confirmPassword = confirmPassword,
+                ktm = idCard
+            )
+                .onSuccess {
+                    _uiEvent.emit(UiEvent.ShowSnackbar("Registrasi berhasil, harap tunggu validasi admin"))
+                    with(this@AuthenticationViewModel) {
+                        this.isSignIn = true
+                        this.fullName = ""
+                        this.email = ""
+                        this.npmNip = ""
+                        this.password = ""
+                        this.confirmPassword = ""
+                        this.idCard = null
+                    }
                 }
                 .onError {
                     if (it is Authentication.AuthError) {

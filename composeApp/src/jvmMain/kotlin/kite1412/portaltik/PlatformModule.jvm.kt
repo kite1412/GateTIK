@@ -7,6 +7,7 @@ import androidx.datastore.preferences.core.PreferencesFileSerializer
 import kite1412.portaltik.datastore.createDataStore
 import kite1412.portaltik.datastore.dataStoreFileName
 import org.koin.core.module.Module
+import org.koin.dsl.bind
 import org.koin.dsl.module
 import java.io.File
 
@@ -17,7 +18,7 @@ actual val platformModule: Module = module {
 
     single {
         UnsupportedJvmLocationService()
-    }
+    } bind LocationService::class
 }
 
 private fun createDataStore() = createDataStore(

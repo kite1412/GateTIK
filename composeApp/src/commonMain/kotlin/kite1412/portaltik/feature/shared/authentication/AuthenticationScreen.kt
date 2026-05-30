@@ -65,8 +65,8 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import kite1412.portaltik.File
 import kite1412.portaltik.PickResult
-import kite1412.portaltik.PickedFile
 import kite1412.portaltik.designsystem.component.GlassBox
 import kite1412.portaltik.designsystem.component.GradientTextButton
 import kite1412.portaltik.designsystem.component.Icon
@@ -107,8 +107,9 @@ fun AuthenticationScreen(
 ) {
     val isDarkMode = LocalDarkMode.current
     val snackbarHostStateWrapper = LocalSnackbarHostStateWrapper.current
-    val email = viewModel.email
     val fullName = viewModel.fullName
+    val email = viewModel.email
+    val npmNip = viewModel.npmNip
     val password = viewModel.password
     val confirmPassword = viewModel.confirmPassword
     val idCard = viewModel.idCard
@@ -120,20 +121,24 @@ fun AuthenticationScreen(
         }
     }
     AuthenticationScreen(
-        email = email,
+        isSignIn = viewModel.isSignIn,
         fullName = fullName,
+        email = email,
+        npmNip = npmNip,
         password = password,
         confirmPassword = confirmPassword,
         idCard = idCard,
         isInProgress = viewModel.isInProgress,
         contentPadding = contentPadding,
-        onEmailChange = viewModel::onEmailChange,
+        onIsSignInChange = viewModel::onIsSignInChange,
         onFullNameChange = viewModel::onFullNameChange,
+        onEmailChange = viewModel::onEmailChange,
+        onNpmNipChange = viewModel::onNpmNipChange,
         onPasswordChange = viewModel::onPasswordChange,
         onConfirmPasswordChange = viewModel::onConfirmPasswordChange,
         onIdCardPick = viewModel::onIdCardPick,
         onSignIn = viewModel::signIn,
-        onSignUp = { _, _, _, _, _ -> },
+        onSignUp = viewModel::signUp,
         onToggleDarkMode = { viewModel.toggleDarkMode(isDarkMode) },
         modifier = modifier,
     )
@@ -141,20 +146,31 @@ fun AuthenticationScreen(
 
 @Composable
 private fun AuthenticationScreen(
-    email: String,
+    isSignIn: Boolean,
     fullName: String,
+    email: String,
+    npmNip: String,
     password: String,
     confirmPassword: String,
-    idCard: PickedFile?,
+    idCard: File?,
     isInProgress: Boolean,
     contentPadding: PaddingValues,
-    onEmailChange: (String) -> Unit,
+    onIsSignInChange: (Boolean) -> Unit,
     onFullNameChange: (String) -> Unit,
+    onEmailChange: (String) -> Unit,
+    onNpmNipChange: (String) -> Unit,
     onPasswordChange: (String) -> Unit,
     onConfirmPasswordChange: (String) -> Unit,
     onIdCardPick: (PickResult) -> Unit,
     onSignIn: (email: String, password: String) -> Unit,
-    onSignUp: (fullName: String, email: String, password: String, confirmPassword: String, idCard: PickedFile) -> Unit,
+    onSignUp: (
+        fullName: String,
+        email: String,
+        npmNip: String,
+        password: String,
+        confirmPassword: String,
+        idCard: File
+    ) -> Unit,
     onToggleDarkMode: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -165,7 +181,6 @@ private fun AuthenticationScreen(
     val toggleBorderColor by animateColorAsState(if (isDarkMode) White15 else Blue200_60)
     val toggleBackgroundColor by animateColorAsState(if (isDarkMode) White10 else White)
     val toggleIconColor by animateColorAsState(if (isDarkMode) White else Blue500)
-    var isSignIn by retain { mutableStateOf(true) }
 
     Column(
         modifier = modifier
@@ -183,7 +198,9 @@ private fun AuthenticationScreen(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Row(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier
+                .widthIn(max = 500.dp)
+                .fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
@@ -276,11 +293,13 @@ private fun AuthenticationScreen(
                         isSignIn = isSignIn,
                         fullName = fullName,
                         email = email,
+                        npmNip = npmNip,
                         password = password,
                         confirmPassword = confirmPassword,
                         idCard = idCard,
                         onFullNameChange = onFullNameChange,
                         onEmailChange = onEmailChange,
+                        onNpmNipChange = onNpmNipChange,
                         onPasswordChange = onPasswordChange,
                         onConfirmPasswordChange = onConfirmPasswordChange,
                         onIdCardPick = onIdCardPick,
@@ -293,7 +312,14 @@ private fun AuthenticationScreen(
                         onClick = {
                             if (isSignIn) onSignIn(email, password)
                             else idCard?.let { idCard ->
-                                onSignUp(fullName, email, password, confirmPassword, idCard)
+                                onSignUp(
+                                    fullName,
+                                    email,
+                                    npmNip,
+                                    password,
+                                    confirmPassword,
+                                    idCard
+                                )
                             }
                         },
                         modifier = Modifier.fillMaxWidth(),
@@ -320,7 +346,7 @@ private fun AuthenticationScreen(
                             withLink(
                                 link = LinkAnnotation.Clickable(
                                     "state-change",
-                                    linkInteractionListener = { isSignIn = !isSignIn }
+                                    linkInteractionListener = { onIsSignInChange(!isSignIn) }
                                 )
                             ) {
                                 withStyle(
@@ -377,11 +403,13 @@ private fun Form(
     isSignIn: Boolean,
     fullName: String,
     email: String,
+    npmNip: String,
     password: String,
     confirmPassword: String,
-    idCard: PickedFile?,
-    onEmailChange: (String) -> Unit,
+    idCard: File?,
     onFullNameChange: (String) -> Unit,
+    onEmailChange: (String) -> Unit,
+    onNpmNipChange: (String) -> Unit,
     onPasswordChange: (String) -> Unit,
     onConfirmPasswordChange: (String) -> Unit,
     onIdCardPick: (PickResult) -> Unit,
@@ -417,6 +445,16 @@ private fun Form(
             iconColor = iconColor,
             keyboardType = KeyboardType.Email
         )
+        AnimatedVisibility(!isSignIn) {
+            FormOutlinedTextField(
+                value = npmNip,
+                onValueChange = onNpmNipChange,
+                label = buildAnnotatedString { append("NPM/NIP") },
+                placeholder = "NPM/NIP",
+                icon = PortalTikIcons.numbers,
+                iconColor = iconColor
+            )
+        }
         FormOutlinedTextField(
             value = password,
             onValueChange = onPasswordChange,
@@ -470,7 +508,7 @@ private fun Form(
 @Composable
 private fun IdCardPicker(
     label: String,
-    pickedFile: PickedFile?,
+    pickedFile: File?,
     isDarkMode: Boolean,
     onFilePick: (PickResult) -> Unit,
     modifier: Modifier = Modifier
@@ -589,28 +627,33 @@ private fun FormOutlinedTextField(
 @DevicePreviews
 @Composable
 private fun AuthenticationScreenPreview() {
-    var email by remember { mutableStateOf("") }
     var fullName by remember { mutableStateOf("") }
+    var email by remember { mutableStateOf("") }
+    var npmNip by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var confirmPassword by remember { mutableStateOf("") }
 
     PortalTikTheme {
         Scaffold { p ->
             AuthenticationScreen(
-                email = email,
+                isSignIn = true,
                 fullName = fullName,
+                email = email,
+                npmNip = npmNip,
                 password = password,
                 confirmPassword = confirmPassword,
                 idCard = null,
                 isInProgress = true,
                 contentPadding = PaddingValues(0.dp),
-                onEmailChange = { email = it },
+                onIsSignInChange = {},
                 onFullNameChange = { fullName = it },
+                onEmailChange = { email = it },
+                onNpmNipChange = { npmNip = it },
                 onPasswordChange = { password = it },
                 onConfirmPasswordChange = { confirmPassword = it },
                 onIdCardPick = {},
                 onSignIn = {_, _ ->},
-                onSignUp = {_, _, _, _, _ ->},
+                onSignUp = {_, _, _, _, _, _ ->},
                 onToggleDarkMode = {},
                 modifier = Modifier.padding(p)
             )

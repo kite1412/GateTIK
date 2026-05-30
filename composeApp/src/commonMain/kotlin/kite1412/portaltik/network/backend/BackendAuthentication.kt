@@ -1,6 +1,12 @@
 package kite1412.portaltik.network.backend
 
 import io.ktor.client.call.body
+import io.ktor.client.request.forms.MultiPartFormDataContent
+import io.ktor.client.request.forms.formData
+import io.ktor.client.request.setBody
+import io.ktor.http.Headers
+import io.ktor.http.HttpHeaders
+import kite1412.portaltik.File
 import kite1412.portaltik.Logger
 import kite1412.portaltik.common.AppCoroutineScope
 import kite1412.portaltik.datastore.PortalTikDataStore
@@ -10,8 +16,8 @@ import kite1412.portaltik.domain.AuthResult
 import kite1412.portaltik.domain.Authentication
 import kite1412.portaltik.domain.SessionStatus
 import kite1412.portaltik.model.User
-import kite1412.portaltik.model.UserRole
-import kite1412.portaltik.network.backend.dto.request.BackendLoginRequest
+import kite1412.portaltik.network.backend.dto.model.BackendUser
+import kite1412.portaltik.network.backend.dto.request.BackendSignInRequest
 import kite1412.portaltik.network.backend.dto.response.BackendLoginResponse
 import kite1412.portaltik.network.backend.dto.response.BackendResponse
 import kite1412.portaltik.network.domain.util.ServerError
@@ -47,7 +53,7 @@ class BackendAuthentication(
     ): AuthResult<User> = try {
         val res = BackendClient.rawPost(
             path = "auth/login",
-            body = BackendLoginRequest(
+            body = BackendSignInRequest(
                 email = email,
                 password = password
             ),
@@ -76,12 +82,64 @@ class BackendAuthentication(
         Error(ServerError())
     }
 
-    override suspend fun register(
+    override suspend fun signUp(
+        fullName: String,
         email: String,
+        npmNip: String,
         password: String,
-        role: UserRole
-    ): AuthResult<User> {
-        TODO("Not yet implemented")
+        confirmPassword: String,
+        ktm: File
+    ): AuthResult<User> = try {
+        if (ktm.mimeType == null) return Error(Authentication.AuthError.BadRequest("File KTM tidak valid"))
+        val res = BackendClient.rawPost(
+            path = "auth/register",
+            useToken = false
+        ) {
+            setBody(
+                MultiPartFormDataContent(
+                    formData {
+                        append("full_name", fullName)
+                        append("email", email)
+                        append("npm_nip", npmNip)
+                        append("password", password)
+                        append("password_confirmation", confirmPassword)
+                        append(
+                            key = "ktm",
+                            value = ktm.bytes,
+                            headers = Headers.build {
+                                append(
+                                    name = HttpHeaders.ContentDisposition,
+                                    value = "filename=\"${ktm.name}\""
+                                )
+                                append(
+                                    name = HttpHeaders.ContentType,
+                                    value = ktm.mimeType
+                                )
+                            }
+                        )
+                    }
+                )
+            )
+        }.body<BackendResponse<BackendUser>>()
+
+        if (res.errors != null) {
+            val errors = res.errors
+            when {
+                errors.contains("email") -> return Error(Authentication.AuthError.BadRequest("Email sudah digunakan"))
+                errors.contains("npm_nip") -> return Error(Authentication.AuthError.BadRequest("NPM/NIP sudah digunakan"))
+                errors.contains("password") -> return Error(Authentication.AuthError.BadRequest("Password dan konfirmasi password tidak sesuai"))
+            }
+        }
+
+        res.data?.toModel()?.let(::Success)
+            ?: Error(Authentication.AuthError.BadRequest("Gagal registrasi, harap coba lagi"))
+    } catch (e: Exception) {
+        Logger.e(
+            tag = logTag,
+            message = "Failed to sign up",
+            throwable = e
+        )
+        Error(ServerError())
     }
 
     override suspend fun logout(): AuthResult<Boolean> = try {

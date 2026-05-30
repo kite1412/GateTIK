@@ -62,7 +62,7 @@ actual fun rememberFilePicker(
                 return@rememberLauncherForActivityResult
             }
 
-            PickedFile(
+            File(
                 name = name ?: "unknown",
                 mimeType = mimeType,
                 bytes = resolver.openInputStream(uri)!!.use {
