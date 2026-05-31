@@ -8,15 +8,15 @@ import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
-import kite1412.portaltik.designsystem.theme.Blue200_60
-import kite1412.portaltik.designsystem.theme.White10
-import kite1412.portaltik.designsystem.theme.White15
-import kite1412.portaltik.designsystem.theme.White60
+import kite1412.portaltik.designsystem.theme.Gray200
+import kite1412.portaltik.designsystem.theme.Slate900
+import kite1412.portaltik.designsystem.theme.White30
 import kite1412.portaltik.ui.compositionlocal.LocalDarkMode
 
 @Composable
@@ -26,14 +26,14 @@ fun GlassBox(
     isDarkMode: Boolean = LocalDarkMode.current,
     content: @Composable BoxScope.() -> Unit
 ) {
-    val borderColor by animateColorAsState(if (!isDarkMode) Blue200_60 else White15)
-    val backgroundColor by animateColorAsState(if (!isDarkMode) White60 else White10)
+    val borderColor by animateColorAsState(if (isDarkMode) Gray200.copy(alpha = 0.2f) else MaterialTheme.colorScheme.primary)
+    val backgroundColor by animateColorAsState(if (isDarkMode) Slate900.copy(alpha = 0.2f) else White30)
     val shape = RoundedCornerShape(24.dp)
 
     Box(
         modifier = modifier
             .border(
-                width = 2.dp,
+                width = 1.dp,
                 color = borderColor,
                 shape = shape
             )

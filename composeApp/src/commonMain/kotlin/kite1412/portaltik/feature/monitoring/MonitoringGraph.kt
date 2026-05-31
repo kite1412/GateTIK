@@ -9,6 +9,7 @@ import kite1412.portaltik.app.smallContentPadding
 import kite1412.portaltik.designsystem.util.PortalTikIcons
 import kite1412.portaltik.feature.Graph
 import kite1412.portaltik.feature.Route
+import kite1412.portaltik.feature.monitoring.desktop.cctv.desktopCctvScreen
 import kite1412.portaltik.feature.monitoring.desktop.dashboard.desktopDashboardScreen
 import kite1412.portaltik.feature.monitoring.mobile.cctv.mobileCctvScreen
 import kite1412.portaltik.feature.monitoring.mobile.home.mobileHomeScreen
@@ -117,6 +118,7 @@ object MonitoringGraph : Graph {
 
 private fun NavGraphBuilder.desktopMonitoringGraph(scaffoldPadding: PaddingValues) {
     desktopDashboardScreen(contentPadding = normalContentPadding(scaffoldPadding))
+    desktopCctvScreen(contentPadding = normalContentPadding(scaffoldPadding))
 }
 
 private fun NavGraphBuilder.mobileMonitoringGraph(

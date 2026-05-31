@@ -5,6 +5,7 @@ import kite1412.portaltik.common.commonModule
 import kite1412.portaltik.data.dataModule
 import kite1412.portaltik.datastore.dataStoreModule
 import kite1412.portaltik.domain.domainModule
+import kite1412.portaltik.feature.monitoring.desktop.cctv.DesktopCctvViewModel
 import kite1412.portaltik.feature.monitoring.desktop.dashboard.DesktopDashboardViewModel
 import kite1412.portaltik.feature.monitoring.mobile.cctv.MobileCctvViewModel
 import kite1412.portaltik.feature.monitoring.mobile.home.MobileHomeViewModel
@@ -69,18 +70,28 @@ private val mobileMonitoringViewModelModule = module {
     }
 }
 
+private val desktopMonitoringViewModel = module {
+    viewModel {
+        DesktopDashboardViewModel(
+            authentication = get(),
+            dataStore = get()
+        )
+    }
+    viewModel {
+        DesktopCctvViewModel(
+            authentication = get(),
+            dataStore = get()
+        )
+    }
+}
+
 private val viewModelModule = module {
-    includes(sharedViewModelModule, mobileMonitoringViewModelModule)
+    includes(sharedViewModelModule, mobileMonitoringViewModelModule, desktopMonitoringViewModel)
 
     viewModel {
         PortalTikViewModel(
             dataStore = get(),
             authentication = get()
-        )
-    }
-    viewModel {
-        DesktopDashboardViewModel(
-            dataStore = get()
         )
     }
 }

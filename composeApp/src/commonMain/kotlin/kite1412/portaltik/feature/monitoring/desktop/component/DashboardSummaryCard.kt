@@ -1,9 +1,10 @@
-package kite1412.portaltik.ui.component
+package kite1412.portaltik.feature.monitoring.desktop.component
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -41,7 +42,7 @@ fun DashboardSummaryCard(
                 maxWidth = 200.dp
             )
             .fillMaxSize(),
-        contentPadding = androidx.compose.foundation.layout.PaddingValues(16.dp)
+        contentPadding = PaddingValues(16.dp)
     ) {
         Column(
             verticalArrangement = Arrangement.spacedBy(16.dp)
@@ -85,7 +86,7 @@ fun DashboardSummaryCard(
             ) {
                 Text(
                     text = value,
-                    style = MaterialTheme.typography.headlineMedium.copy(
+                    style = MaterialTheme.typography.labelMedium.copy(
                         fontWeight = FontWeight.Bold,
                         fontSize = 24.sp
                     ),

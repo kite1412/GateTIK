@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -19,11 +18,11 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -31,7 +30,7 @@ import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import kite1412.portaltik.CctvPlayer
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kite1412.portaltik.designsystem.component.Badge
 import kite1412.portaltik.designsystem.component.GlassBox
 import kite1412.portaltik.designsystem.component.Icon
@@ -44,14 +43,17 @@ import kite1412.portaltik.designsystem.theme.Yellow500
 import kite1412.portaltik.designsystem.util.PortalTikIcons
 import kite1412.portaltik.designsystem.util.WindowWidthSize
 import kite1412.portaltik.designsystem.util.rememberWindowWidthSize
-import kite1412.portaltik.ui.component.BorderedHeaderSection
-import kite1412.portaltik.ui.component.DashboardSummaryCard
+import kite1412.portaltik.feature.monitoring.desktop.component.DashboardSummaryCard
+import kite1412.portaltik.feature.monitoring.desktop.component.DesktopLayout
+import kite1412.portaltik.feature.monitoring.desktop.component.LiveCameraSection
+import kite1412.portaltik.feature.monitoring.desktop.util.desktopBaseModifier
+import kite1412.portaltik.model.ParkingQuota
+import kite1412.portaltik.model.UserRole
 import kite1412.portaltik.ui.component.GateControlButton
 import kite1412.portaltik.ui.component.ParkingQuotaCard
 import kite1412.portaltik.ui.compositionlocal.LocalDarkMode
 import kite1412.portaltik.ui.preview.DevicePreviews
 import kite1412.portaltik.ui.util.LoadState
-import kite1412.portaltik.ui.util.consumeSideNavBarWidth
 import org.jetbrains.compose.resources.painterResource
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -61,15 +63,21 @@ fun DesktopDashboardScreen(
     modifier: Modifier = Modifier,
     viewModel: DesktopDashboardViewModel = koinViewModel()
 ) {
-    DesktopDashboardScreen(
-        contentPadding = contentPadding,
-        onThemeToggle = viewModel::updateDarkMode,
-        modifier = modifier
-    )
+    val user by viewModel.signedInUser.collectAsStateWithLifecycle()
+
+    user?.let { user ->
+        DesktopDashboardScreen(
+            userRole = user.role,
+            contentPadding = contentPadding,
+            onThemeToggle = viewModel::updateDarkMode,
+            modifier = modifier
+        )
+    }
 }
 
 @Composable
 private fun DesktopDashboardScreen(
+    userRole: UserRole,
     contentPadding: PaddingValues,
     onThemeToggle: (darkMode: Boolean) -> Unit,
     modifier: Modifier = Modifier
@@ -77,16 +85,12 @@ private fun DesktopDashboardScreen(
     val windowWidthSize = rememberWindowWidthSize()
     val isLargeWindow = windowWidthSize == WindowWidthSize.LARGE
 
-    Column(
-        modifier = modifier
-            .fillMaxSize()
-            .consumeSideNavBarWidth()
+    DesktopLayout(
+        title = "Dashboard",
+        userRole = userRole,
+        onThemeToggle = onThemeToggle,
+        modifier = modifier.desktopBaseModifier()
     ) {
-        BorderedHeaderSection(
-            title = "Dashboard",
-            badgeText = "ADMIN",
-            onThemeToggle = onThemeToggle
-        )
         LazyColumn(
             modifier = Modifier.fillMaxSize(),
             contentPadding = contentPadding,
@@ -100,7 +104,7 @@ private fun DesktopDashboardScreen(
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(IntrinsicSize.Max),
-                    horizontalArrangement = Arrangement.spacedBy(24.dp)
+                    horizontalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
                     if (isLargeWindow) Column(
                         modifier = Modifier.weight(1f),
@@ -124,6 +128,7 @@ private fun DesktopDashboardScreen(
                             .fillMaxHeight()
                     )
                     if (isLargeWindow) LiveCameraSection(
+                        cameraName = "CAM-01 · Gerbang Utama",
                         modifier = Modifier
                             .weight(2f)
                             .fillMaxHeight()
@@ -131,7 +136,9 @@ private fun DesktopDashboardScreen(
                 }
             }
             if (!isLargeWindow) item {
-                LiveCameraSection()
+                LiveCameraSection(
+                    cameraName = "CAM-01 · Gerbang Utama"
+                )
             }
             item {
                 AccessTrendSection()
@@ -299,7 +306,7 @@ private fun ParkingOccupancyCardSection(
 
             ParkingQuotaCard(
                 parkingQuota = LoadState.Success(
-                    kite1412.portaltik.model.ParkingQuota(
+                    ParkingQuota(
                         id = 1,
                         totalSlots = 50,
                         usedSlots = 0,
@@ -351,81 +358,6 @@ private fun ParkingOccupancyCardSection(
             Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.CenterEnd) {
                 Text(
                     text = "Lihat Detail ↗",
-                    style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Bold),
-                    color = Blue500
-                )
-            }
-        }
-    }
-}
-
-@Composable
-private fun LiveCameraSection(modifier: Modifier = Modifier) {
-    GlassBox(modifier = modifier, contentPadding = PaddingValues(0.dp)) {
-        Column {
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .aspectRatio(16f / 9f)
-                    .background(Color.Black, RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp))
-            ) {
-                CctvPlayer(
-                    modifier = Modifier.fillMaxSize()
-                ) {}
-
-                Badge(
-                    text = "LIVE",
-                    containerColor = Red500,
-                    contentColor = Color.White,
-                    modifier = Modifier.padding(16.dp),
-                    leadingIcon = {
-                        Box(
-                            modifier = Modifier
-                                .size(6.dp)
-                                .background(Color.White, CircleShape)
-                        )
-                    }
-                )
-
-                Column(
-                    modifier = Modifier
-                        .align(Alignment.BottomStart)
-                        .padding(16.dp)
-                ) {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Icon(
-                            painter = painterResource(PortalTikIcons.videoRecorder),
-                            contentDescription = null,
-                            modifier = Modifier.size(14.dp),
-                            tint = Color.White
-                        )
-                        Spacer(modifier = Modifier.width(6.dp))
-                        Text(
-                            text = "CAM-01 · Gerbang Utama",
-                            style = MaterialTheme.typography.labelSmall,
-                            color = Color.White
-                        )
-                    }
-                }
-            }
-
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(
-                    text = "KAMERA LANGSUNG",
-                    style = MaterialTheme.typography.labelSmall.copy(
-                        fontWeight = FontWeight.Bold,
-                        letterSpacing = 1.sp
-                    ),
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-                Text(
-                    text = "Layar Penuh ↗",
                     style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Bold),
                     color = Blue500
                 )
