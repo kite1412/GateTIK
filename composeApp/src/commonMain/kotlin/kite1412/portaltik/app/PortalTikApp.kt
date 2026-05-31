@@ -67,7 +67,7 @@ fun PortalTikApp() {
                         ?.rootDestinations
                         ?.map(RootDestination::toNavBarDestination)
                         ?: emptyList(),
-                    isDarkTheme = LocalDarkMode.current,
+                    isDarkMode = LocalDarkMode.current,
                     selectedDestination = appState.currentRootDestination?.toNavBarDestination() ?: Destination.Empty,
                     username = user?.fullName ?: "",
                     userEmail = user?.email ?: "",

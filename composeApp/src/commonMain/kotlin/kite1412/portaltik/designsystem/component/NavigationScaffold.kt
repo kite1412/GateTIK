@@ -77,7 +77,7 @@ import androidx.compose.material3.Icon as ComposeIcon
 @Composable
 fun NavigationScaffold(
     destinations: List<Destination>,
-    isDarkTheme: Boolean,
+    isDarkMode: Boolean,
     selectedDestination: Destination,
     username: String,
     userEmail: String,
@@ -108,7 +108,7 @@ fun NavigationScaffold(
         ) {
             SideNavigationRail(
                 destinations = destinations,
-                isDarkTheme = isDarkTheme,
+                isDarkMode = isDarkMode,
                 selectedDestination = selectedDestination,
                 onDestinationClick = onDestinationClick
             )
@@ -122,7 +122,7 @@ fun NavigationScaffold(
         ) {
             SideNavigationDrawer(
                 destinations = destinations,
-                isDarkTheme = isDarkTheme,
+                isDarkMode = isDarkMode,
                 selectedDestination = selectedDestination,
                 onDestinationClick = onDestinationClick,
                 userName = username,
@@ -140,7 +140,7 @@ fun NavigationScaffold(
         ) {
             BottomNavigationBar(
                 destinations = destinations,
-                isDarkTheme = isDarkTheme,
+                isDarkMode = isDarkMode,
                 selectedDestination = selectedDestination,
                 onDestinationClick = onDestinationClick
             )
@@ -171,18 +171,18 @@ private fun navBarSizeConsumerModifier(density: Density, consumer: ((DpSize) -> 
     } else Modifier
 
 @Composable
-private fun containerColor(isDarkTheme: Boolean) = animateColorAsState(
-    targetValue = if (isDarkTheme) Slate900.copy(alpha = 0.2f) else White30
+private fun containerColor(isDarkMode: Boolean) = animateColorAsState(
+    targetValue = if (isDarkMode) Slate900.copy(alpha = 0.2f) else White30
 )
 
 @Composable
-private fun BoxScope.EndBorder(isDarkTheme: Boolean) {
+private fun BoxScope.EndBorder(isDarkMode: Boolean) {
     VerticalDivider(
         modifier = Modifier
             .fillMaxHeight()
             .align(Alignment.TopEnd),
         thickness = 1.dp,
-        color = if (isDarkTheme) Gray200.copy(alpha = 0.2f) else MaterialTheme.colorScheme.primary
+        color = if (isDarkMode) Gray200.copy(alpha = 0.2f) else MaterialTheme.colorScheme.primary
     )
 }
 
@@ -190,11 +190,11 @@ private fun BoxScope.EndBorder(isDarkTheme: Boolean) {
 private fun SideNavigationRail(
     selectedDestination: Destination,
     destinations: List<Destination>,
-    isDarkTheme: Boolean,
+    isDarkMode: Boolean,
     onDestinationClick: (Destination) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val containerColor by containerColor(isDarkTheme)
+    val containerColor by containerColor(isDarkMode)
     val onSurface = MaterialTheme.colorScheme.onSurface
 
     Box(
@@ -230,14 +230,14 @@ private fun SideNavigationRail(
                 )
             }
         }
-        EndBorder(isDarkTheme)
+        EndBorder(isDarkMode)
     }
 }
 
 @Composable
 private fun SideNavigationDrawer(
     destinations: List<Destination>,
-    isDarkTheme: Boolean,
+    isDarkMode: Boolean,
     selectedDestination: Destination,
     onDestinationClick: (Destination) -> Unit,
     userName: String,
@@ -245,7 +245,7 @@ private fun SideNavigationDrawer(
     onLogoutClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val containerColor by containerColor(isDarkTheme)
+    val containerColor by containerColor(isDarkMode)
 
     Box(
         modifier = modifier
@@ -282,7 +282,7 @@ private fun SideNavigationDrawer(
                         text = "ACCESS CONTROL",
                         style = MaterialTheme.typography.labelSmall.copy(
                             letterSpacing = 1.sp,
-                            color = if (isDarkTheme) Slate400 else Slate500
+                            color = if (isDarkMode) Slate400 else Slate500
                         )
                     )
                 }
@@ -301,7 +301,7 @@ private fun SideNavigationDrawer(
                     NavigationDrawerItem(
                         destination = destination,
                         selected = selected,
-                        isDarkTheme = isDarkTheme,
+                        isDarkMode = isDarkMode,
                         onClick = { onDestinationClick(destination) }
                     )
                 }
@@ -335,14 +335,14 @@ private fun SideNavigationDrawer(
                             text = userName,
                             style = MaterialTheme.typography.bodyMedium.copy(
                                 fontWeight = FontWeight.Bold,
-                                color = if (isDarkTheme) White else Blue900
+                                color = if (isDarkMode) White else Blue900
                             ),
                             maxLines = 1
                         )
                         Text(
                             text = userEmail,
                             style = MaterialTheme.typography.labelSmall.copy(
-                                color = if (isDarkTheme) Slate400 else Slate500
+                                color = if (isDarkMode) Slate400 else Slate500
                             ),
                             maxLines = 1
                         )
@@ -351,7 +351,7 @@ private fun SideNavigationDrawer(
                     ComposeIcon(
                         painter = painterResource(PortalTikIcons.logout),
                         contentDescription = "Logout",
-                        tint = if (isDarkTheme) Slate400 else Slate500,
+                        tint = if (isDarkMode) Slate400 else Slate500,
                         modifier = Modifier
                             .size(20.dp)
                             .clickable { onLogoutClick() }
@@ -359,7 +359,7 @@ private fun SideNavigationDrawer(
                 }
             }
         }
-        EndBorder(isDarkTheme)
+        EndBorder(isDarkMode)
     }
 }
 
@@ -367,15 +367,15 @@ private fun SideNavigationDrawer(
 private fun NavigationDrawerItem(
     destination: Destination,
     selected: Boolean,
-    isDarkTheme: Boolean,
+    isDarkMode: Boolean,
     onClick: () -> Unit
 ) {
-    val selectedIconColor = if (isDarkTheme) Blue100 else Blue900
-    val unselectedIconColor = if (isDarkTheme) Slate400 else Slate500
+    val selectedIconColor = if (isDarkMode) Blue100 else Blue900
+    val unselectedIconColor = if (isDarkMode) Slate400 else Slate500
     
     val backgroundColor by animateColorAsState(
         targetValue = if (selected) {
-            if (isDarkTheme) Blue900.copy(alpha = 0.2f) else Blue100
+            if (isDarkMode) Blue900.copy(alpha = 0.2f) else Blue100
         } else Color.Transparent
     )
     
@@ -438,13 +438,13 @@ private fun NavigationDrawerItem(
 @Composable
 private fun BottomNavigationBar(
     destinations: List<Destination>,
-    isDarkTheme: Boolean,
+    isDarkMode: Boolean,
     selectedDestination: Destination,
     onDestinationClick: (Destination) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val containerColor by animateColorAsState(
-        targetValue = if (isDarkTheme) Slate900_95 else White95
+        targetValue = if (isDarkMode) Slate900_95 else White95
     )
 
     NavigationBar(
@@ -453,8 +453,8 @@ private fun BottomNavigationBar(
     ) {
         destinations.forEach { destination ->
             val selected = destination == selectedDestination
-            val selectedIconColor = if (isDarkTheme) Blue100 else Blue900
-            val unselectedIconColor = if (isDarkTheme) Slate400 else Slate500
+            val selectedIconColor = if (isDarkMode) Blue100 else Blue900
+            val unselectedIconColor = if (isDarkMode) Slate400 else Slate500
 
             NavigationBarItem(
                 selected = selected,
@@ -521,7 +521,7 @@ private fun NavigationScaffoldPreviewContent() {
     PortalTikTheme(darkMode = false) {
         NavigationScaffold(
             destinations = destinations,
-            isDarkTheme = false,
+            isDarkMode = false,
             selectedDestination = selectedDestination,
             onDestinationClick = { selectedDestination = it },
             username = "Aulia Rahman",

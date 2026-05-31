@@ -35,9 +35,7 @@ import kite1412.portaltik.CctvPlayer
 import kite1412.portaltik.designsystem.component.Badge
 import kite1412.portaltik.designsystem.component.GlassBox
 import kite1412.portaltik.designsystem.component.Icon
-import kite1412.portaltik.designsystem.theme.Blue200
 import kite1412.portaltik.designsystem.theme.Blue500
-import kite1412.portaltik.designsystem.theme.Blue900
 import kite1412.portaltik.designsystem.theme.Emerald500
 import kite1412.portaltik.designsystem.theme.PortalTikTheme
 import kite1412.portaltik.designsystem.theme.Purple400
@@ -46,10 +44,10 @@ import kite1412.portaltik.designsystem.theme.Yellow500
 import kite1412.portaltik.designsystem.util.PortalTikIcons
 import kite1412.portaltik.designsystem.util.WindowWidthSize
 import kite1412.portaltik.designsystem.util.rememberWindowWidthSize
+import kite1412.portaltik.ui.component.BorderedHeaderSection
 import kite1412.portaltik.ui.component.DashboardSummaryCard
 import kite1412.portaltik.ui.component.GateControlButton
 import kite1412.portaltik.ui.component.ParkingQuotaCard
-import kite1412.portaltik.ui.component.ThemeToggle
 import kite1412.portaltik.ui.compositionlocal.LocalDarkMode
 import kite1412.portaltik.ui.preview.DevicePreviews
 import kite1412.portaltik.ui.util.LoadState
@@ -65,7 +63,8 @@ fun DesktopDashboardScreen(
 ) {
     DesktopDashboardScreen(
         contentPadding = contentPadding,
-        onThemeToggle = viewModel::updateDarkMode
+        onThemeToggle = viewModel::updateDarkMode,
+        modifier = modifier
     )
 }
 
@@ -78,101 +77,68 @@ private fun DesktopDashboardScreen(
     val windowWidthSize = rememberWindowWidthSize()
     val isLargeWindow = windowWidthSize == WindowWidthSize.LARGE
 
-    LazyColumn(
+    Column(
         modifier = modifier
-            .fillMaxSize(),
-        contentPadding = consumeSideNavBarWidth(contentPadding),
-        verticalArrangement = Arrangement.spacedBy(24.dp)
+            .fillMaxSize()
+            .consumeSideNavBarWidth()
     ) {
-        item {
-            DashboardHeader(
-                onThemeToggle = onThemeToggle
-            )
-        }
-        item {
-            SummaryCardsRow()
-        }
-        item {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(IntrinsicSize.Max),
-                horizontalArrangement = Arrangement.spacedBy(24.dp)
-            ) {
-                if (isLargeWindow) Column(
-                    modifier = Modifier.weight(1f),
-                    verticalArrangement = Arrangement.spacedBy(24.dp)
+        BorderedHeaderSection(
+            title = "Dashboard",
+            badgeText = "ADMIN",
+            onThemeToggle = onThemeToggle
+        )
+        LazyColumn(
+            modifier = Modifier.fillMaxSize(),
+            contentPadding = contentPadding,
+            verticalArrangement = Arrangement.spacedBy(24.dp)
+        ) {
+            item {
+                SummaryCardsRow()
+            }
+            item {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(IntrinsicSize.Max),
+                    horizontalArrangement = Arrangement.spacedBy(24.dp)
                 ) {
-                    GateControlCard(
-                        modifier = Modifier.weight(1f)
+                    if (isLargeWindow) Column(
+                        modifier = Modifier.weight(1f),
+                        verticalArrangement = Arrangement.spacedBy(24.dp)
+                    ) {
+                        GateControlCard(
+                            modifier = Modifier.weight(1f)
+                        )
+                        ParkingOccupancyCardSection(
+                            modifier = Modifier.weight(1f)
+                        )
+                    }
+                    if (!isLargeWindow) GateControlCard(
+                        modifier = Modifier
+                            .weight(1f)
+                            .fillMaxHeight()
                     )
-                    ParkingOccupancyCardSection(
-                        modifier = Modifier.weight(1f)
+                    if (!isLargeWindow) ParkingOccupancyCardSection(
+                        modifier = Modifier
+                            .weight(1f)
+                            .fillMaxHeight()
+                    )
+                    if (isLargeWindow) LiveCameraSection(
+                        modifier = Modifier
+                            .weight(2f)
+                            .fillMaxHeight()
                     )
                 }
-                if (!isLargeWindow) GateControlCard(
-                    modifier = Modifier
-                        .weight(1f)
-                        .fillMaxHeight()
-                )
-                if (!isLargeWindow) ParkingOccupancyCardSection(
-                    modifier = Modifier
-                        .weight(1f)
-                        .fillMaxHeight()
-                )
-                if (isLargeWindow) LiveCameraSection(
-                    modifier = Modifier
-                        .weight(2f)
-                        .fillMaxHeight()
-                )
             }
-        }
-        if (!isLargeWindow) item {
-            LiveCameraSection()
-        }
-        item {
-            AccessTrendSection()
-        }
-        item {
-            RecentAccessActivitySection()
-        }
-    }
-}
-
-@Composable
-private fun DashboardHeader(
-    onThemeToggle: (darkMode: Boolean) -> Unit
-) {
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Text(
-            text = "Dashboard",
-            style = MaterialTheme.typography.headlineMedium.copy(
-                fontWeight = FontWeight.Bold
-            ),
-            color = MaterialTheme.colorScheme.onSurface
-        )
-
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(16.dp)
-        ) {
-            val isDarkMode = LocalDarkMode.current
-            ThemeToggle(
-                onToggle = { onThemeToggle(!isDarkMode) },
-                isDarkMode = isDarkMode,
-                iconSize = 16.dp,
-                clip = RoundedCornerShape(12.dp)
-            )
-
-            Badge(
-                text = "Admin",
-                containerColor = if (isDarkMode) Blue900.copy(alpha = 0.4f) else Blue200.copy(alpha = 0.4f),
-                contentColor = if (isDarkMode) Blue200 else Blue900
-            )
+            if (!isLargeWindow) item {
+                LiveCameraSection()
+            }
+            item {
+                AccessTrendSection()
+            }
+            item {
+                RecentAccessActivitySection()
+            }
         }
     }
 }
