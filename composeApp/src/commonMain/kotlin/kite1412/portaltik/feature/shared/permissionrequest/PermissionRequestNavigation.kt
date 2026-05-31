@@ -7,12 +7,12 @@ import kite1412.portaltik.feature.shared.SharedGraph
 
 fun NavGraphBuilder.permissionRequestScreen(
     contentPadding: PaddingValues,
-    onAllPermissionsGranted: () -> Unit
+    onPermissionRequestsCompleted: () -> Unit
 ) {
     composable(SharedGraph.PermissionRequest.name) {
         PermissionRequestScreen(
             contentPadding = contentPadding,
-            onAllPermissionsGranted = onAllPermissionsGranted
+            onPermissionRequestsCompleted = onPermissionRequestsCompleted
         )
     }
 }

@@ -1,17 +1,12 @@
 package kite1412.portaltik.datastore
 
 import androidx.datastore.preferences.core.booleanPreferencesKey
-import androidx.datastore.preferences.core.stringPreferencesKey
 
 object BooleanPreferencesKey {
     val isDarkMode = booleanPreferencesKey("is_dark_theme")
-}
-
-object StringPreferencesKey {
-    val token = stringPreferencesKey("token")
+    val isFirstLaunch = booleanPreferencesKey("is_first_launch")
 }
 
 object JsonPreferencesKey {
-    const val USER = "user"
     const val AUTH_SESSION = "auth_session"
 }

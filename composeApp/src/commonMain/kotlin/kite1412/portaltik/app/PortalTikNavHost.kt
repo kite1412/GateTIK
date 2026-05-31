@@ -7,12 +7,15 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
+import kite1412.portaltik.PlatformType
 import kite1412.portaltik.feature.monitoring.MonitoringGraph
 import kite1412.portaltik.feature.monitoring.monitoringGraph
 import kite1412.portaltik.feature.shared.SharedGraph
+import kite1412.portaltik.feature.shared.permissionrequest.permissionRequestScreen
 import kite1412.portaltik.feature.shared.sharedGraph
 import kite1412.portaltik.feature.student.StudentGraph
 import kite1412.portaltik.feature.student.studentGraph
+import kite1412.portaltik.getPlatform
 import kite1412.portaltik.model.User
 import kite1412.portaltik.model.UserRole
 import kite1412.portaltik.ui.navigation.RootDestination
@@ -21,13 +24,16 @@ import kite1412.portaltik.ui.navigation.RootDestinationsProvider
 @Composable
 fun PortalTikNavHost(
     signedInUser: User?,
+    isFirstLaunch: Boolean,
     scaffoldPadding: PaddingValues,
     rootDestinationsProvider: RootDestinationsProvider?,
     navigateToRootDestination: (RootDestination) -> Unit,
+    onPermissionRequestsComplete: () -> Unit,
     modifier: Modifier = Modifier,
     navController: NavHostController = rememberNavController()
 ) {
     val startDestination = if (signedInUser == null) SharedGraph.route
+        else if (isFirstLaunch && getPlatform().type == PlatformType.MOBILE) SharedGraph.PermissionRequest.name
         else when(signedInUser.role) {
             UserRole.STUDENT -> StudentGraph.route
             else -> MonitoringGraph.route
@@ -40,15 +46,16 @@ fun PortalTikNavHost(
     ) {
         sharedGraph(
             scaffoldPadding = scaffoldPadding,
-            rootDestinationsProvider = rootDestinationsProvider,
-            onAllPermissionsGranted = {
-                // TODO: Handle permission granted
-            }
+            rootDestinationsProvider = rootDestinationsProvider
         )
         monitoringGraph(
             scaffoldPadding = scaffoldPadding,
             navigateToRootDestination = navigateToRootDestination
         )
         studentGraph(scaffoldPadding = scaffoldPadding)
+        permissionRequestScreen(
+            contentPadding = normalContentPadding(scaffoldPadding),
+            onPermissionRequestsCompleted = onPermissionRequestsComplete
+        )
     }
 }

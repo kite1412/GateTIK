@@ -24,6 +24,10 @@ class PortalTikDataStore(
     fun observeDarkMode(): Flow<Boolean?> =
         dataStore.observePreference(BooleanPreferencesKey.isDarkMode)
 
+    fun observeFirstLaunch(): Flow<Boolean> =
+        dataStore.observePreference(BooleanPreferencesKey.isFirstLaunch)
+            .map { it ?: true }
+
     suspend fun getAuthSession(): DataStoreAuthSession? =
         dataStore.getJsonPreference(JsonPreferencesKey.AUTH_SESSION)
 
@@ -43,6 +47,11 @@ class PortalTikDataStore(
             value = darkMode
         )
     }
+
+    suspend fun setFirstLaunch(value: Boolean) = dataStore.setPreference(
+        key = BooleanPreferencesKey.isFirstLaunch,
+        value = value
+    )
 
     private suspend fun <T> DataStore<Preferences>.getPreference(
         key: Preferences.Key<T>

@@ -37,6 +37,7 @@ import org.koin.compose.viewmodel.koinViewModel
 fun PortalTikApp() {
     val viewModel = koinViewModel<PortalTikViewModel>()
     val isDarkMode by viewModel.isDarkMode.collectAsStateWithLifecycle()
+    val isFirstLaunch by viewModel.isFirstLaunch.collectAsStateWithLifecycle()
     val sessionStatus by viewModel.sessionStatus.collectAsStateWithLifecycle()
     val scaffoldComponentsController = viewModel.scaffoldComponentsController
     val navController = rememberNavController()
@@ -89,16 +90,18 @@ fun PortalTikApp() {
                         .radialBackground()
                 ) {
                     AnimatedVisibility(
-                        visible = sessionStatus !is SessionStatus.Loading,
+                        visible = sessionStatus !is SessionStatus.Loading && isFirstLaunch != null,
                         enter = fadeIn() + slideInHorizontally()
                     ) {
                         PortalTikNavHost(
                             signedInUser = user,
+                            isFirstLaunch = isFirstLaunch!!,
                             scaffoldPadding = p,
                             rootDestinationsProvider = rootDestinationsProvider,
                             navigateToRootDestination = { rootDestination ->
                                 appState.navigateToRootDestination(rootDestination.route)
                             },
+                            onPermissionRequestsComplete = viewModel::completeFirstLaunch,
                             navController = navController
                         )
                     }

@@ -45,33 +45,28 @@ import kite1412.portaltik.designsystem.theme.Blue900
 import kite1412.portaltik.designsystem.theme.PortalTikTheme
 import kite1412.portaltik.designsystem.theme.White
 import kite1412.portaltik.designsystem.util.PortalTikIcons
+import kite1412.portaltik.rememberLocationPermissionRequester
+import kite1412.portaltik.rememberNotificationPermissionRequester
 import kite1412.portaltik.ui.preview.DevicePreviews
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.painterResource
-import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
 fun PermissionRequestScreen(
     contentPadding: PaddingValues,
-    onAllPermissionsGranted: () -> Unit,
-    modifier: Modifier = Modifier,
-    viewModel: PermissionRequestViewModel = koinViewModel()
-) {
-    PermissionRequestScreen(
-        contentPadding = contentPadding,
-        onAllPermissionsGranted = onAllPermissionsGranted,
-        modifier = modifier
-    )
-}
-
-@Composable
-private fun PermissionRequestScreen(
-    contentPadding: PaddingValues,
-    onAllPermissionsGranted: () -> Unit,
+    onPermissionRequestsCompleted: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val pagerState = rememberPagerState(pageCount = { 2 })
     val scope = rememberCoroutineScope()
+    val locationPermissionRequester = rememberLocationPermissionRequester {
+        scope.launch {
+            pagerState.animateScrollToPage(1)
+        }
+    }
+    val notificationPermissionRequester = rememberNotificationPermissionRequester {
+        onPermissionRequestsCompleted()
+    }
 
     Column(
         modifier = modifier
@@ -103,13 +98,8 @@ private fun PermissionRequestScreen(
 
         Button(
             onClick = {
-                scope.launch {
-                    if (pagerState.currentPage < 1) {
-                        pagerState.animateScrollToPage(pagerState.currentPage + 1)
-                    } else {
-                        onAllPermissionsGranted()
-                    }
-                }
+                if (pagerState.currentPage == 0) locationPermissionRequester()
+                else notificationPermissionRequester()
             },
             modifier = Modifier
                 .fillMaxWidth()
@@ -278,7 +268,7 @@ private fun PermissionRequestScreenPreview() {
         Scaffold { p ->
             PermissionRequestScreen(
                 contentPadding = p,
-                onAllPermissionsGranted = {},
+                onPermissionRequestsCompleted = {},
                 modifier = Modifier.radialBackground()
             )
         }

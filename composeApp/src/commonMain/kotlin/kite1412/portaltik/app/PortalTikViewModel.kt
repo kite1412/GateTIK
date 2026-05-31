@@ -14,7 +14,7 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
 class PortalTikViewModel(
-    dataStore: PortalTikDataStore,
+    private val dataStore: PortalTikDataStore,
     private val authentication: Authentication
 ) : ViewModel() {
     private val scaffoldComponentStates = mutableStateMapOf<ScaffoldComponent, ScaffoldComponentState>()
@@ -32,7 +32,20 @@ class PortalTikViewModel(
             started = SharingStarted.WhileSubscribed(5000),
             initialValue = null
         )
+    val isFirstLaunch = dataStore
+        .observeFirstLaunch()
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = null
+        )
     val scaffoldComponentsController = AppScaffoldComponentsController(scaffoldComponentStates)
+
+    fun completeFirstLaunch() {
+        viewModelScope.launch {
+            dataStore.setFirstLaunch(false)
+        }
+    }
 
     fun onSignOutClick() {
         viewModelScope.launch {

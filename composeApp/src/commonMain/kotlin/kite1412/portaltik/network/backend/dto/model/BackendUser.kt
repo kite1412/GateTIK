@@ -19,6 +19,8 @@ data class BackendUser(
     val status: BackendUserStatus,
     @SerialName("profile_photo")
     val profilePhoto: String? = null,
+    @SerialName("ktm_path")
+    val ktmPath: String? = null,
     @SerialName("last_login_at")
     val lastLoginAt: Instant? = null,
     @SerialName("created_at")
