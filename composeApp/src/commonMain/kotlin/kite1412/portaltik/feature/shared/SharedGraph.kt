@@ -4,17 +4,20 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.navigation
 import kite1412.portaltik.app.largeContentPadding
+import kite1412.portaltik.app.normalContentPadding
 import kite1412.portaltik.app.smallContentPadding
 import kite1412.portaltik.feature.Graph
 import kite1412.portaltik.feature.Route
 import kite1412.portaltik.feature.shared.authentication.authenticationScreen
+import kite1412.portaltik.feature.shared.permissionrequest.permissionRequestScreen
 import kite1412.portaltik.feature.shared.profile.profileScreen
 import kite1412.portaltik.ui.navigation.RootDestination
 import kite1412.portaltik.ui.navigation.RootDestinationsProvider
 
 fun NavGraphBuilder.sharedGraph(
     scaffoldPadding: PaddingValues,
-    rootDestinationsProvider: RootDestinationsProvider?
+    rootDestinationsProvider: RootDestinationsProvider?,
+    onAllPermissionsGranted: () -> Unit
 ) {
     navigation(
         startDestination = SharedGraph.AuthenticationRoute.name,
@@ -27,6 +30,10 @@ fun NavGraphBuilder.sharedGraph(
         ) {
             profileScreen(contentPadding = smallContentPadding(scaffoldPadding))
         }
+        permissionRequestScreen(
+            contentPadding = normalContentPadding(scaffoldPadding),
+            onAllPermissionsGranted = onAllPermissionsGranted
+        )
     }
 }
 
@@ -36,6 +43,8 @@ object SharedGraph : Graph {
     object AuthenticationRoute : Route("auth")
 
     object ProfileRoute : Route("profile")
+
+    object PermissionRequest : Route("permission_request")
 }
 
 /**

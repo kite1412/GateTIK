@@ -40,7 +40,10 @@ fun PortalTikNavHost(
     ) {
         sharedGraph(
             scaffoldPadding = scaffoldPadding,
-            rootDestinationsProvider = rootDestinationsProvider
+            rootDestinationsProvider = rootDestinationsProvider,
+            onAllPermissionsGranted = {
+                // TODO: Handle permission granted
+            }
         )
         monitoringGraph(
             scaffoldPadding = scaffoldPadding,
