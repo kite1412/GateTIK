@@ -33,6 +33,7 @@ import portaltik.composeapp.generated.resources.sun
 import portaltik.composeapp.generated.resources.unila
 import portaltik.composeapp.generated.resources.video_recorder
 import portaltik.composeapp.generated.resources.wifi
+import portaltik.composeapp.generated.resources.x
 import portaltik.composeapp.generated.resources.zoom_in
 
 object PortalTikIcons {
@@ -69,4 +70,5 @@ object PortalTikIcons {
     val scrollText = Res.drawable.scroll_text
     val phoneCall = Res.drawable.phone_call
     val cpu = Res.drawable.cpu
+    val x = Res.drawable.x
 }

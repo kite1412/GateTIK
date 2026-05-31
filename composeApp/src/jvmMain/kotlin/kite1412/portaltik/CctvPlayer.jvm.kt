@@ -48,7 +48,7 @@ actual fun CctvPlayer(
     }
 }
 
-private fun isVlcInstalled(): Boolean = when (getSupportedOS()) {
+fun isVlcInstalled(): Boolean = when (getSupportedOS()) {
     SupportedOS.WINDOWS -> checkWindows()
     SupportedOS.MACOS -> checkMac()
     SupportedOS.LINUX -> checkLinux()
