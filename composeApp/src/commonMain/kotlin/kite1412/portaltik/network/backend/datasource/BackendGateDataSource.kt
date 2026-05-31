@@ -13,7 +13,7 @@ import kite1412.portaltik.network.backend.dto.response.BackendResponse
 import kite1412.portaltik.network.domain.datasource.GateRemoteDataSource
 
 class BackendGateDataSource : GateRemoteDataSource {
-    private val accessMethod = getPlatform().name.lowercase()
+    private val accessMethod = getPlatform().type.name.lowercase()
 
     override suspend fun getMainGate(): Gate? = BackendClient
         .get<BackendResponse<BackendGate>>("gate/main")

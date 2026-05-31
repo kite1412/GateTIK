@@ -16,11 +16,8 @@ import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -32,11 +29,9 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.ripple
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -72,7 +67,6 @@ import kite1412.portaltik.designsystem.component.GradientTextButton
 import kite1412.portaltik.designsystem.component.Icon
 import kite1412.portaltik.designsystem.component.OutlinedTextField
 import kite1412.portaltik.designsystem.extension.radialBackground
-import kite1412.portaltik.designsystem.theme.Blue200_60
 import kite1412.portaltik.designsystem.theme.Blue300
 import kite1412.portaltik.designsystem.theme.Blue500
 import kite1412.portaltik.designsystem.theme.BlueSlateGradient
@@ -81,14 +75,13 @@ import kite1412.portaltik.designsystem.theme.PortalTikTheme
 import kite1412.portaltik.designsystem.theme.RoyalBlue800_50
 import kite1412.portaltik.designsystem.theme.RoyalBlue800_60
 import kite1412.portaltik.designsystem.theme.White
-import kite1412.portaltik.designsystem.theme.White10
-import kite1412.portaltik.designsystem.theme.White15
 import kite1412.portaltik.designsystem.theme.White30
 import kite1412.portaltik.designsystem.theme.White50
 import kite1412.portaltik.designsystem.theme.White60
 import kite1412.portaltik.designsystem.util.PortalTikIcons
 import kite1412.portaltik.rememberFilePicker
 import kite1412.portaltik.ui.component.SmallCircularProgressIndicator
+import kite1412.portaltik.ui.component.ThemeToggle
 import kite1412.portaltik.ui.compositionlocal.LocalDarkMode
 import kite1412.portaltik.ui.compositionlocal.LocalSnackbarHostStateWrapper
 import kite1412.portaltik.ui.preview.DevicePreviews
@@ -178,9 +171,6 @@ private fun AuthenticationScreen(
     val gradientColor1 by animateColorAsState(if (isDarkMode) BlueSlateGradient[0] else LighterBlueLightBlueGradient[0])
     val gradientColor2 by animateColorAsState(if (isDarkMode) BlueSlateGradient[1] else LighterBlueLightBlueGradient[1])
     val backgroundBrush = Brush.verticalGradient(listOf(gradientColor1, gradientColor2))
-    val toggleBorderColor by animateColorAsState(if (isDarkMode) White15 else Blue200_60)
-    val toggleBackgroundColor by animateColorAsState(if (isDarkMode) White10 else White)
-    val toggleIconColor by animateColorAsState(if (isDarkMode) White else Blue500)
 
     Column(
         modifier = modifier
@@ -218,32 +208,7 @@ private fun AuthenticationScreen(
                     fontSize = 32.sp
                 )
             }
-            Box(
-                modifier = Modifier
-                    .size(44.dp)
-                    .border(
-                        width = 1.dp,
-                        color = toggleBorderColor,
-                        shape = CircleShape
-                    )
-                    .background(
-                        color = toggleBackgroundColor,
-                        shape = CircleShape
-                    )
-                    .clickable(
-                        interactionSource = remember { MutableInteractionSource() },
-                        indication = ripple(bounded = false),
-                        onClick = onToggleDarkMode
-                    ),
-                contentAlignment = Alignment.Center
-            ) {
-                Icon(
-                    painter = painterResource(if (isDarkMode) PortalTikIcons.sun else PortalTikIcons.moon),
-                    contentDescription = "Toggle Theme",
-                    tint = toggleIconColor,
-                    modifier = Modifier.size(24.dp)
-                )
-            }
+            ThemeToggle(onToggle = onToggleDarkMode)
         }
         GlassBox(
             modifier = Modifier

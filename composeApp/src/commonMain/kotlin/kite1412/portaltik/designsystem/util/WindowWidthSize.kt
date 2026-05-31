@@ -12,7 +12,7 @@ fun rememberWindowWidthSize(): WindowWidthSize {
     // https://developer.android.com/develop/ui/compose/layouts/adaptive/use-window-size-classes
     return when {
         width < 600.dp -> WindowWidthSize.COMPACT
-        width >= 600.dp && width < 840.dp -> WindowWidthSize.MEDIUM
+        width >= 600.dp && width < 1200.dp -> WindowWidthSize.MEDIUM
         else -> WindowWidthSize.LARGE
     }
 }

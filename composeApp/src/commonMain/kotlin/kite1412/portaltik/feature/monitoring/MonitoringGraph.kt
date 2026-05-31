@@ -43,12 +43,44 @@ object MonitoringGraph : Graph {
     override val route: String = "monitoring_graph"
 
     object Desktop : RootDestinationsProvider {
-        override val rootDestinations: List<RootDestination> = listOf(Dashboard)
+        override val rootDestinations: List<RootDestination> = listOf(
+            Dashboard, Cctv, Parking, UserManagement, AccessLogs, VisitorIntercom
+        )
 
         object Dashboard : RootDestination, Route("desktop_monitoring_dashboard") {
             override val route: String = name
             override val icon: DrawableResource = PortalTikIcons.dashboard
             override val label: String = "Dashboard"
+        }
+
+        object Cctv : RootDestination, Route("desktop_monitoring_cctv") {
+            override val route: String = name
+            override val icon: DrawableResource = PortalTikIcons.videoRecorder
+            override val label: String = "CCTV"
+        }
+
+        object Parking : RootDestination, Route("desktop_monitoring_parking") {
+            override val route: String = name
+            override val icon: DrawableResource = PortalTikIcons.car
+            override val label: String = "Parkir"
+        }
+
+        object UserManagement : RootDestination, Route("desktop_monitoring_user_management") {
+            override val route: String = name
+            override val icon: DrawableResource = PortalTikIcons.people
+            override val label: String = "Manajemen Pengguna"
+        }
+
+        object AccessLogs : RootDestination, Route("desktop_monitoring_access_logs") {
+            override val route: String = name
+            override val icon: DrawableResource = PortalTikIcons.scrollText
+            override val label: String = "Access Log"
+        }
+
+        object VisitorIntercom : RootDestination, Route("desktop_monitoring_visitor_intercom") {
+            override val route: String = name
+            override val icon: DrawableResource = PortalTikIcons.phoneCall
+            override val label: String = "Interkom Pengunjung"
         }
     }
 

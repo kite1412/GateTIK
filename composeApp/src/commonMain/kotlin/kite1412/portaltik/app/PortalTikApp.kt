@@ -7,6 +7,7 @@ import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
@@ -60,58 +61,57 @@ fun PortalTikApp() {
         LocalSnackbarHostStateWrapper provides snackbarHostStateWrapper
     ) {
         PortalTikTheme {
-            NavigationScaffold(
-                destinations = rootDestinationsProvider
-                    ?.rootDestinations
-                    ?.map(RootDestination::toNavBarDestination)
-                    ?: emptyList(),
-                isDarkTheme = LocalDarkMode.current,
-                selectedDestination = appState.currentRootDestination?.toNavBarDestination() ?: Destination.Empty,
-                username = user?.fullName ?: "",
-                userEmail = user?.email ?: "",
-                onDestinationClick = { des ->
-                    appState.navigateToRootDestination(des.route)
-                },
-                onSignOutClick = viewModel::onSignOutClick,
-                showNavigationBar = appState.currentRootDestination != null &&
-                    viewModel.scaffoldComponentsController
-                        .getState(ScaffoldComponent.NAV_BAR)
-                        .isVisible,
-                onNavigationBarSizeChange = { size ->
-                    scaffoldComponentsController.updateComponentSize(
-                        component = ScaffoldComponent.NAV_BAR,
-                        size = size
-                    )
-                }
-            ) { p ->
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .radialBackground()
+            Scaffold { p ->
+                NavigationScaffold(
+                    destinations = rootDestinationsProvider
+                        ?.rootDestinations
+                        ?.map(RootDestination::toNavBarDestination)
+                        ?: emptyList(),
+                    isDarkTheme = LocalDarkMode.current,
+                    selectedDestination = appState.currentRootDestination?.toNavBarDestination() ?: Destination.Empty,
+                    username = user?.fullName ?: "",
+                    userEmail = user?.email ?: "",
+                    onDestinationClick = { des ->
+                        appState.navigateToRootDestination(des.route)
+                    },
+                    onSignOutClick = viewModel::onSignOutClick,
+                    showNavigationBar = appState.currentRootDestination != null &&
+                            viewModel.scaffoldComponentsController
+                                .getState(ScaffoldComponent.NAV_BAR)
+                                .isVisible,
+                    onNavigationBarSizeChange = { size ->
+                        scaffoldComponentsController.updateComponentSize(
+                            component = ScaffoldComponent.NAV_BAR,
+                            size = size
+                        )
+                    },
+                    modifier = Modifier.fillMaxSize().radialBackground()
                 ) {
-                    AnimatedVisibility(
-                        visible = sessionStatus !is SessionStatus.Loading && isFirstLaunch != null,
-                        enter = fadeIn() + slideInHorizontally()
-                    ) {
-                        PortalTikNavHost(
-                            signedInUser = user,
-                            isFirstLaunch = isFirstLaunch!!,
-                            scaffoldPadding = p,
-                            rootDestinationsProvider = rootDestinationsProvider,
-                            navigateToRootDestination = { rootDestination ->
-                                appState.navigateToRootDestination(rootDestination.route)
-                            },
-                            onPermissionRequestsComplete = viewModel::completeFirstLaunch,
-                            navController = navController
+                    Box {
+                        AnimatedVisibility(
+                            visible = sessionStatus !is SessionStatus.Loading && isFirstLaunch != null,
+                            enter = fadeIn() + slideInHorizontally()
+                        ) {
+                            PortalTikNavHost(
+                                signedInUser = user,
+                                isFirstLaunch = isFirstLaunch!!,
+                                scaffoldPadding = p,
+                                rootDestinationsProvider = rootDestinationsProvider,
+                                navigateToRootDestination = { rootDestination ->
+                                    appState.navigateToRootDestination(rootDestination.route)
+                                },
+                                onPermissionRequestsComplete = viewModel::completeFirstLaunch,
+                                navController = navController
+                            )
+                        }
+                        SnackbarHost(
+                            hostState = snackbarHostStateWrapper.snackbarHostState,
+                            modifier = Modifier
+                                .align(Alignment.TopCenter)
+                                .padding(p),
+                            snackbar = { data -> PortalTikSnackbar(data) }
                         )
                     }
-                    SnackbarHost(
-                        hostState = snackbarHostStateWrapper.snackbarHostState,
-                        modifier = Modifier
-                            .align(Alignment.TopCenter)
-                            .padding(p),
-                        snackbar = { data -> PortalTikSnackbar(data) }
-                    )
                 }
             }
         }

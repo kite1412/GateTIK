@@ -5,6 +5,7 @@ import portaltik.composeapp.generated.resources.bell
 import portaltik.composeapp.generated.resources.camera
 import portaltik.composeapp.generated.resources.car
 import portaltik.composeapp.generated.resources.chevron_right
+import portaltik.composeapp.generated.resources.cpu
 import portaltik.composeapp.generated.resources.dashboard
 import portaltik.composeapp.generated.resources.door_close
 import portaltik.composeapp.generated.resources.door_open
@@ -20,9 +21,12 @@ import portaltik.composeapp.generated.resources.logout
 import portaltik.composeapp.generated.resources.moon
 import portaltik.composeapp.generated.resources.numbers
 import portaltik.composeapp.generated.resources.parking_off
+import portaltik.composeapp.generated.resources.people
 import portaltik.composeapp.generated.resources.person
 import portaltik.composeapp.generated.resources.phone
+import portaltik.composeapp.generated.resources.phone_call
 import portaltik.composeapp.generated.resources.radio
+import portaltik.composeapp.generated.resources.scroll_text
 import portaltik.composeapp.generated.resources.shield
 import portaltik.composeapp.generated.resources.sound_up
 import portaltik.composeapp.generated.resources.sun
@@ -61,4 +65,8 @@ object PortalTikIcons {
     val doorClose = Res.drawable.door_close
     val lockOpen = Res.drawable.lock_open
     val numbers = Res.drawable.numbers
+    val people = Res.drawable.people
+    val scrollText = Res.drawable.scroll_text
+    val phoneCall = Res.drawable.phone_call
+    val cpu = Res.drawable.cpu
 }

@@ -4,6 +4,7 @@ import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
 import kite1412.portaltik.app.PortalTikApp
 import kite1412.portaltik.di.initKoin
+import java.awt.Dimension
 
 fun main() {
     val koin = initKoin()
@@ -14,8 +15,10 @@ fun main() {
                 koin.close()
                 exitApplication()
             },
-            title = "Parking Gate Control"
+            title = "Portal TIK"
         ) {
+            window.minimumSize = Dimension(800, 600)
+
             PortalTikApp()
         }
     }

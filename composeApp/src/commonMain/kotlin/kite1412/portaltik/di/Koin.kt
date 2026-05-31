@@ -79,7 +79,9 @@ private val viewModelModule = module {
         )
     }
     viewModel {
-        DesktopDashboardViewModel()
+        DesktopDashboardViewModel(
+            dataStore = get()
+        )
     }
 }
 

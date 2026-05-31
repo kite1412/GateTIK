@@ -59,6 +59,7 @@ val Slate950_100 = Color(0xFF0F1419)
 
 // Gray
 val Gray200 = Color(0xFFE4E6EB)
+val Gray400 = Color(0xFF94A3B8)
 val Gray900 = Color(0xFF252A32)
 val Gray950 = Color(0xFF0A0A0A)
 
@@ -75,6 +76,7 @@ val Emerald600 = Color(0xFF009966)
 val Emerald700 = Color(0xFF10B981)
 
 // Red
+val Red100 = Color(0xFFFEE2E2)
 val Red500 = Color(0xFFFB2C36)
 val Red600 = Color(0xFFE7000B)
 val Red600_90 = Color(0xE6E7000B)
@@ -85,6 +87,7 @@ val Sky300_15 = Color(0x2674D4FF)
 val Purple400 = Color(0xFFA684FF)
 val Purple400_20 = Color(0x33A684FF)
 val Yellow300 = Color(0xFFFFD230)
+val Yellow500 = Color(0xFFF59E0B)
 
 // Gradients
 val BlueIndigoGradient = listOf(Blue500Alt, Indigo600)

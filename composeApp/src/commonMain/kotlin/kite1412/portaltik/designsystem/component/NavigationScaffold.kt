@@ -13,6 +13,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -32,12 +33,8 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.NavigationBarItemDefaults
-import androidx.compose.material3.NavigationRail
-import androidx.compose.material3.NavigationRailItem
-import androidx.compose.material3.NavigationRailItemDefaults
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -55,16 +52,19 @@ import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import kite1412.portaltik.designsystem.extension.radialBackground
 import kite1412.portaltik.designsystem.theme.Blue100
 import kite1412.portaltik.designsystem.theme.Blue500
 import kite1412.portaltik.designsystem.theme.Blue900
 import kite1412.portaltik.designsystem.theme.BlueIndigoGradient
+import kite1412.portaltik.designsystem.theme.Gray200
 import kite1412.portaltik.designsystem.theme.PortalTikTheme
 import kite1412.portaltik.designsystem.theme.Slate400
 import kite1412.portaltik.designsystem.theme.Slate500
+import kite1412.portaltik.designsystem.theme.Slate900
 import kite1412.portaltik.designsystem.theme.Slate900_95
 import kite1412.portaltik.designsystem.theme.White
-import kite1412.portaltik.designsystem.theme.White60
+import kite1412.portaltik.designsystem.theme.White30
 import kite1412.portaltik.designsystem.theme.White95
 import kite1412.portaltik.designsystem.util.PortalTikIcons
 import kite1412.portaltik.designsystem.util.WindowWidthSize
@@ -87,17 +87,19 @@ fun NavigationScaffold(
     showNavigationBar: Boolean = true,
     windowWidthSize: WindowWidthSize = rememberWindowWidthSize(),
     onNavigationBarSizeChange: ((DpSize) -> Unit)? = null,
-    content: @Composable (contentPadding: PaddingValues) -> Unit
+    content: @Composable () -> Unit
 ) {
     val density = LocalDensity.current
     val sideNavigationBarEnter = fadeIn() + slideInHorizontally { -it }
     val sideNavigationBarExit = fadeOut() + slideOutHorizontally { -it }
 
-    Row(
+    Box(
         modifier = modifier
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.background)
+            .radialBackground()
     ) {
+        content()
         AnimatedVisibility(
             visible = showNavigationBar && windowWidthSize == WindowWidthSize.MEDIUM,
             modifier = navBarSizeConsumerModifier(density, onNavigationBarSizeChange),
@@ -129,28 +131,20 @@ fun NavigationScaffold(
             )
         }
 
-        Scaffold(
-            modifier = Modifier.weight(1f),
-            bottomBar = if (windowWidthSize == WindowWidthSize.COMPACT) {
-                {
-                    AnimatedVisibility(
-                        visible = showNavigationBar,
-                        modifier = navBarSizeConsumerModifier(density, onNavigationBarSizeChange),
-                        enter = fadeIn() + slideInVertically { it },
-                        exit = fadeOut() + slideOutVertically { it }
-                    ) {
-                        BottomNavigationBar(
-                            destinations = destinations,
-                            isDarkTheme = isDarkTheme,
-                            selectedDestination = selectedDestination,
-                            onDestinationClick = onDestinationClick
-                        )
-                    }
-                }
-            } else {
-                {}
-            }
-        ) { p -> content(p) }
+        AnimatedVisibility(
+            visible = windowWidthSize == WindowWidthSize.COMPACT && showNavigationBar,
+            modifier = navBarSizeConsumerModifier(density, onNavigationBarSizeChange)
+                .align(Alignment.BottomCenter),
+            enter = fadeIn() + slideInVertically { it },
+            exit = fadeOut() + slideOutVertically { it }
+        ) {
+            BottomNavigationBar(
+                destinations = destinations,
+                isDarkTheme = isDarkTheme,
+                selectedDestination = selectedDestination,
+                onDestinationClick = onDestinationClick
+            )
+        }
     }
 }
 
@@ -177,67 +171,66 @@ private fun navBarSizeConsumerModifier(density: Density, consumer: ((DpSize) -> 
     } else Modifier
 
 @Composable
+private fun containerColor(isDarkTheme: Boolean) = animateColorAsState(
+    targetValue = if (isDarkTheme) Slate900.copy(alpha = 0.2f) else White30
+)
+
+@Composable
+private fun BoxScope.EndBorder(isDarkTheme: Boolean) {
+    VerticalDivider(
+        modifier = Modifier
+            .fillMaxHeight()
+            .align(Alignment.TopEnd),
+        thickness = 1.dp,
+        color = if (isDarkTheme) Gray200.copy(alpha = 0.2f) else MaterialTheme.colorScheme.primary
+    )
+}
+
+@Composable
 private fun SideNavigationRail(
+    selectedDestination: Destination,
     destinations: List<Destination>,
     isDarkTheme: Boolean,
-    selectedDestination: Destination,
     onDestinationClick: (Destination) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val containerColor by animateColorAsState(
-        targetValue = if (isDarkTheme) Slate900_95 else White60
-    )
+    val containerColor by containerColor(isDarkTheme)
+    val onSurface = MaterialTheme.colorScheme.onSurface
 
-    NavigationRail(
-        modifier = modifier.fillMaxHeight(),
-        containerColor = containerColor,
-        header = {
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(8.dp),
-                modifier = Modifier.padding(vertical = 24.dp)
-            ) {
-                Icon(
-                    painter = painterResource(PortalTikIcons.unila),
-                    contentDescription = null,
-                    modifier = Modifier.size(40.dp)
+    Box(
+        modifier = modifier
+            .background(containerColor)
+            .fillMaxHeight()
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxHeight()
+                .padding(
+                    horizontal = 24.dp,
+                    vertical = 32.dp
+                ),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            destinations.forEach { destination ->
+                val selected = selectedDestination == destination
+                val iconColor by animateColorAsState(
+                    targetValue = if (selected) onSurface else onSurface.copy(alpha = 0.4f)
+                )
+
+                if (destination.icon != null) Icon(
+                    painter = painterResource(destination.icon),
+                    contentDescription = destination.label,
+                    modifier = Modifier
+                        .size(24.dp)
+                        .clickable(
+                            indication = null,
+                            interactionSource = null
+                        ) { onDestinationClick(destination) },
+                    tint = iconColor
                 )
             }
         }
-    ) {
-        destinations.forEach { destination ->
-            val selected = destination == selectedDestination
-            val selectedIconColor = if (isDarkTheme) Blue100 else Blue900
-            val unselectedIconColor = if (isDarkTheme) Slate400 else Slate500
-
-            NavigationRailItem(
-                selected = selected,
-                onClick = { onDestinationClick(destination) },
-                icon = {
-                    if (destination.icon != null) ComposeIcon(
-                        painter = painterResource(destination.icon),
-                        contentDescription = destination.label,
-                        modifier = Modifier.size(20.dp)
-                    )
-                },
-                label = {
-                    Text(
-                        text = destination.label,
-                        style = MaterialTheme.typography.bodySmall.copy(
-                            fontSize = 10.sp,
-                            fontWeight = FontWeight.Bold
-                        )
-                    )
-                },
-                colors = NavigationRailItemDefaults.colors(
-                    selectedIconColor = selectedIconColor,
-                    unselectedIconColor = unselectedIconColor,
-                    selectedTextColor = selectedIconColor,
-                    unselectedTextColor = unselectedIconColor,
-                    indicatorColor = MaterialTheme.colorScheme.primary
-                )
-            )
-        }
+        EndBorder(isDarkTheme)
     }
 }
 
@@ -252,25 +245,25 @@ private fun SideNavigationDrawer(
     onLogoutClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val containerColor by animateColorAsState(
-        targetValue = if (isDarkTheme) Slate900_95 else White60
-    )
+    val containerColor by containerColor(isDarkTheme)
 
-    Surface(
+    Box(
         modifier = modifier
             .width(280.dp)
-            .fillMaxHeight(),
-        color = containerColor,
-        shape = RoundedCornerShape(topEnd = 16.dp, bottomEnd = 16.dp)
+            .fillMaxHeight()
+            .background(containerColor)
     ) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(24.dp)
+                .padding(
+                    vertical = 24.dp,
+                    horizontal = 16.dp
+                )
         ) {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(16.dp)
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 Icon(
                     painter = painterResource(PortalTikIcons.unila),
@@ -280,7 +273,7 @@ private fun SideNavigationDrawer(
                 Column {
                     Text(
                         text = "Portal TIK",
-                        style = MaterialTheme.typography.titleMedium.copy(
+                        style = MaterialTheme.typography.titleSmall.copy(
                             fontWeight = FontWeight.Bold,
                             color = MaterialTheme.colorScheme.onSurface
                         )
@@ -366,6 +359,7 @@ private fun SideNavigationDrawer(
                 }
             }
         }
+        EndBorder(isDarkTheme)
     }
 }
 
@@ -414,23 +408,30 @@ private fun NavigationDrawerItem(
             Spacer(modifier = Modifier.width(12.dp))
         } else {
             val spacerWidth by animateDpAsState(targetValue = if (selected) 12.dp else 0.dp)
+
             Spacer(modifier = Modifier.width(spacerWidth))
         }
 
-        if (destination.icon != null) ComposeIcon(
-            painter = painterResource(destination.icon),
-            contentDescription = null,
-            tint = contentColor,
-            modifier = Modifier.size(20.dp)
-        )
-        Spacer(modifier = Modifier.width(12.dp))
-        Text(
-            text = destination.label,
-            style = MaterialTheme.typography.bodyMedium.copy(
-                fontWeight = if (selected) FontWeight.Bold else FontWeight.Medium,
-                color = contentColor
+        if (destination.icon != null) Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            val bodyMedium = MaterialTheme.typography.bodyMedium
+
+            Icon(
+                painter = painterResource(destination.icon),
+                contentDescription = null,
+                tint = contentColor,
+                modifier = Modifier.size(bodyMedium.fontSize.value.dp)
             )
-        )
+            Text(
+                text = destination.label,
+                style = bodyMedium.copy(
+                    fontWeight = if (selected) FontWeight.Bold else FontWeight.Medium,
+                    color = contentColor
+                )
+            )
+        }
     }
 }
 
