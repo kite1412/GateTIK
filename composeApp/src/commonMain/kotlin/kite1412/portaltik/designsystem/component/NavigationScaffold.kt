@@ -29,6 +29,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
@@ -43,6 +44,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.onGloballyPositioned
@@ -83,6 +85,7 @@ fun NavigationScaffold(
     userEmail: String,
     onDestinationClick: (Destination) -> Unit,
     onSignOutClick: () -> Unit,
+    onDismissNavBar: () -> Unit,
     modifier: Modifier = Modifier,
     showNavigationBar: Boolean = true,
     windowWidthSize: WindowWidthSize = rememberWindowWidthSize(),
@@ -127,7 +130,8 @@ fun NavigationScaffold(
                 onDestinationClick = onDestinationClick,
                 userName = username,
                 userEmail = userEmail,
-                onLogoutClick = onSignOutClick
+                onLogoutClick = onSignOutClick,
+                onDismissRequest = onDismissNavBar
             )
         }
 
@@ -243,6 +247,7 @@ private fun SideNavigationDrawer(
     userName: String,
     userEmail: String,
     onLogoutClick: () -> Unit,
+    onDismissRequest: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val containerColor by containerColor(isDarkMode)
@@ -262,28 +267,50 @@ private fun SideNavigationDrawer(
                 )
         ) {
             Row(
+                modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                Icon(
-                    painter = painterResource(PortalTikIcons.unila),
-                    contentDescription = null,
-                    modifier = Modifier.size(48.dp)
-                )
-                Column {
-                    Text(
-                        text = "Portal TIK",
-                        style = MaterialTheme.typography.titleSmall.copy(
-                            fontWeight = FontWeight.Bold,
-                            color = MaterialTheme.colorScheme.onSurface
-                        )
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    Icon(
+                        painter = painterResource(PortalTikIcons.unila),
+                        contentDescription = null,
+                        modifier = Modifier.size(48.dp)
                     )
-                    Text(
-                        text = "ACCESS CONTROL",
-                        style = MaterialTheme.typography.labelSmall.copy(
-                            letterSpacing = 1.sp,
-                            color = if (isDarkMode) Slate400 else Slate500
+                    Column {
+                        Text(
+                            text = "Portal TIK",
+                            style = MaterialTheme.typography.titleSmall.copy(
+                                fontWeight = FontWeight.Bold,
+                                color = MaterialTheme.colorScheme.onSurface
+                            )
                         )
+                        Text(
+                            text = "ACCESS CONTROL",
+                            style = MaterialTheme.typography.labelSmall.copy(
+                                letterSpacing = 1.sp,
+                                color = if (isDarkMode) Slate400 else Slate500
+                            )
+                        )
+                    }
+                }
+                GlassBox(
+                    modifier = Modifier
+                        .clip(CircleShape)
+                        .clickable(onClick = onDismissRequest),
+                    contentPadding = PaddingValues(8.dp),
+                    shape = CircleShape
+                ) {
+                    Icon(
+                        painter = painterResource(PortalTikIcons.chevronRight),
+                        contentDescription = "tutup",
+                        modifier = Modifier
+                            .size(16.dp)
+                            .rotate(180f),
+                        tint = LocalContentColor.current
                     )
                 }
             }
@@ -526,7 +553,8 @@ private fun NavigationScaffoldPreviewContent() {
             onDestinationClick = { selectedDestination = it },
             username = "Aulia Rahman",
             userEmail = "admin@campus.edu",
-            onSignOutClick = {}
+            onSignOutClick = {},
+            onDismissNavBar = {}
         ) {
             Box(
                 modifier = Modifier.fillMaxSize(),

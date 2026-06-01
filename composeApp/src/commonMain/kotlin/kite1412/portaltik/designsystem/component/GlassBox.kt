@@ -13,6 +13,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.unit.dp
 import kite1412.portaltik.designsystem.theme.Gray200
 import kite1412.portaltik.designsystem.theme.Slate900
@@ -24,11 +25,11 @@ fun GlassBox(
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(24.dp),
     isDarkMode: Boolean = LocalDarkMode.current,
+    shape: Shape = RoundedCornerShape(24.dp),
     content: @Composable BoxScope.() -> Unit
 ) {
     val borderColor by animateColorAsState(if (isDarkMode) Gray200.copy(alpha = 0.2f) else MaterialTheme.colorScheme.primary)
     val backgroundColor by animateColorAsState(if (isDarkMode) Slate900.copy(alpha = 0.2f) else White30)
-    val shape = RoundedCornerShape(24.dp)
 
     Box(
         modifier = modifier

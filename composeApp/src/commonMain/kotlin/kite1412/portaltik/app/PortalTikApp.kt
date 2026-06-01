@@ -85,6 +85,9 @@ fun PortalTikApp() {
                             size = size
                         )
                     },
+                    onDismissNavBar = {
+                        scaffoldComponentsController.hideComponent(ScaffoldComponent.NAV_BAR)
+                    },
                     modifier = Modifier.fillMaxSize().radialBackground()
                 ) {
                     Box {

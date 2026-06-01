@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -38,7 +39,8 @@ fun BorderedHeaderSection(
     badgeText: String,
     onThemeToggle: (darkMode: Boolean) -> Unit,
     modifier: Modifier = Modifier,
-    isDarkMode: Boolean = LocalDarkMode.current
+    isDarkMode: Boolean = LocalDarkMode.current,
+    leading: (@Composable RowScope.() -> Unit)? = null
 ) {
     val background by animateColorAsState(
         targetValue = if (isDarkMode) Slate900.copy(alpha = 0.2f) else White30
@@ -57,13 +59,19 @@ fun BorderedHeaderSection(
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Text(
-                text = title,
-                style = MaterialTheme.typography.titleMedium.copy(
-                    fontWeight = FontWeight.Bold
-                ),
-                color = MaterialTheme.colorScheme.onSurface
-            )
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
+                leading?.invoke(this)
+                Text(
+                    text = title,
+                    style = MaterialTheme.typography.titleMedium.copy(
+                        fontWeight = FontWeight.Bold
+                    ),
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+            }
 
             Row(
                 verticalAlignment = Alignment.CenterVertically,
