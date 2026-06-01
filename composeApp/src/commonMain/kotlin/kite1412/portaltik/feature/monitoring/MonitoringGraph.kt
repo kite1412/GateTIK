@@ -11,6 +11,7 @@ import kite1412.portaltik.feature.Graph
 import kite1412.portaltik.feature.Route
 import kite1412.portaltik.feature.monitoring.desktop.cctv.desktopCctvScreen
 import kite1412.portaltik.feature.monitoring.desktop.dashboard.desktopDashboardScreen
+import kite1412.portaltik.feature.monitoring.desktop.parking.desktopParkingScreen
 import kite1412.portaltik.feature.monitoring.mobile.cctv.mobileCctvScreen
 import kite1412.portaltik.feature.monitoring.mobile.home.mobileHomeScreen
 import kite1412.portaltik.feature.monitoring.mobile.parking.mobileParkingScreen
@@ -57,13 +58,13 @@ object MonitoringGraph : Graph {
         object Cctv : RootDestination, Route("desktop_monitoring_cctv") {
             override val route: String = name
             override val icon: DrawableResource = PortalTikIcons.videoRecorder
-            override val label: String = "CCTV"
+            override val label: String = "CCTV Monitoring"
         }
 
         object Parking : RootDestination, Route("desktop_monitoring_parking") {
             override val route: String = name
             override val icon: DrawableResource = PortalTikIcons.car
-            override val label: String = "Parkir"
+            override val label: String = "Manajemen Parkir"
         }
 
         object UserManagement : RootDestination, Route("desktop_monitoring_user_management") {
@@ -119,6 +120,7 @@ object MonitoringGraph : Graph {
 private fun NavGraphBuilder.desktopMonitoringGraph(scaffoldPadding: PaddingValues) {
     desktopDashboardScreen(contentPadding = normalContentPadding(scaffoldPadding))
     desktopCctvScreen(contentPadding = normalContentPadding(scaffoldPadding))
+    desktopParkingScreen(contentPadding = normalContentPadding(scaffoldPadding))
 }
 
 private fun NavGraphBuilder.mobileMonitoringGraph(

@@ -14,6 +14,7 @@ import portaltik.composeapp.generated.resources.eye_close
 import portaltik.composeapp.generated.resources.eye_open
 import portaltik.composeapp.generated.resources.house
 import portaltik.composeapp.generated.resources.id_card
+import portaltik.composeapp.generated.resources.locate_fixed
 import portaltik.composeapp.generated.resources.location_mark
 import portaltik.composeapp.generated.resources.lock
 import portaltik.composeapp.generated.resources.lock_open
@@ -27,6 +28,7 @@ import portaltik.composeapp.generated.resources.phone
 import portaltik.composeapp.generated.resources.phone_call
 import portaltik.composeapp.generated.resources.radio
 import portaltik.composeapp.generated.resources.scroll_text
+import portaltik.composeapp.generated.resources.settings
 import portaltik.composeapp.generated.resources.shield
 import portaltik.composeapp.generated.resources.sound_up
 import portaltik.composeapp.generated.resources.sun
@@ -71,4 +73,6 @@ object PortalTikIcons {
     val phoneCall = Res.drawable.phone_call
     val cpu = Res.drawable.cpu
     val x = Res.drawable.x
+    val locateFixed = Res.drawable.locate_fixed
+    val settings = Res.drawable.settings
 }

@@ -7,6 +7,7 @@ import kite1412.portaltik.datastore.dataStoreModule
 import kite1412.portaltik.domain.domainModule
 import kite1412.portaltik.feature.monitoring.desktop.cctv.DesktopCctvViewModel
 import kite1412.portaltik.feature.monitoring.desktop.dashboard.DesktopDashboardViewModel
+import kite1412.portaltik.feature.monitoring.desktop.parking.DesktopParkingViewModel
 import kite1412.portaltik.feature.monitoring.mobile.cctv.MobileCctvViewModel
 import kite1412.portaltik.feature.monitoring.mobile.home.MobileHomeViewModel
 import kite1412.portaltik.feature.monitoring.mobile.parking.MobileParkingViewModel
@@ -81,6 +82,13 @@ private val desktopMonitoringViewModel = module {
         DesktopCctvViewModel(
             authentication = get(),
             dataStore = get()
+        )
+    }
+    viewModel {
+        DesktopParkingViewModel(
+            authentication = get(),
+            dataStore = get(),
+            getMainParkingQuotaUseCase = get()
         )
     }
 }

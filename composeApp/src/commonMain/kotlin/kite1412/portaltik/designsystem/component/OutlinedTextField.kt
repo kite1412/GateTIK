@@ -84,7 +84,7 @@ fun OutlinedTextField(
             modifier = Modifier
                 .fillMaxWidth()
                 .border(
-                    width = 2.dp,
+                    width = 1.dp,
                     color = borderColor,
                     shape = shape
                 )
