@@ -65,7 +65,14 @@ class GateAccessViewModel(
     fun openGate() {
         viewModelScope.launch {
             getMainGateUseCase.observeAsFlow().first()?.let { gate ->
-                openGateUseCase(gate.id)
+                val state = locationState.first()
+
+                if (state is LocationState.Available) {
+                    openGateUseCase.enter(
+                        id = gate.id,
+                        location = state.currentLocation
+                    )
+                }
             }
         }
     }

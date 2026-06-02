@@ -11,6 +11,10 @@ actual object Logger {
         logger.error(throwable) { logMessage(tag, message) }
     }
 
+    actual fun w(tag: String, message: String) {
+        logger.warn { logMessage(tag, message) }
+    }
+
     actual fun d(tag: String, message: String) {
         logger.debug { logMessage(tag, message) }
     }

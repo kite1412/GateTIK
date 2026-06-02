@@ -1,10 +1,12 @@
 package kite1412.portaltik.android.receiver
 
+import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import kite1412.portaltik.Location
+import kite1412.portaltik.Logger
 import kite1412.portaltik.common.AppCoroutineScope
 import kite1412.portaltik.domain.Authentication
 import kite1412.portaltik.domain.SessionStatus
@@ -18,6 +20,8 @@ import org.koin.core.component.KoinComponent
 import org.koin.core.component.get
 
 class OpenGateReceiver : BroadcastReceiver(), KoinComponent {
+    private val logTag = "OpenGateReceiver"
+
     override fun onReceive(context: Context?, intent: Intent?) {
         if (context == null || intent == null) return
 
@@ -33,7 +37,13 @@ class OpenGateReceiver : BroadcastReceiver(), KoinComponent {
                 val user = sessionStatus.user
 
                 gateRepository.getMainGate()
-                    .onError { pendingResult.finish() }
+                    .onError {
+                        Logger.w(
+                            tag = logTag,
+                            message = "Failed to open gate from notification: ${it.message}"
+                        )
+                        pendingResult.finish()
+                    }
                     .onSuccess {
                         it?.let { gate ->
                             if (user.role == UserRole.STUDENT) {
@@ -53,7 +63,13 @@ class OpenGateReceiver : BroadcastReceiver(), KoinComponent {
                                     )
                                 )
                             } else gateRepository.openGate(gate.id)
+                            Logger.d(
+                                tag = logTag,
+                                message = "Success opening gate from notification"
+                            )
                         }
+                        (context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager)
+                            .cancel(1)
                         pendingResult.finish()
                     }
             } else pendingResult.finish()
@@ -71,7 +87,7 @@ class OpenGateReceiver : BroadcastReceiver(), KoinComponent {
         ): PendingIntent = PendingIntent.getBroadcast(
             /*context =*/context,
             /*requestCode =*/1,
-            /*intent =*/Intent().apply {
+            /*intent =*/Intent(context, OpenGateReceiver::class.java).apply {
                 this.action = ACTION
                 putExtra(LATITUDE, location.latitude)
                 putExtra(LONGITUDE, location.longitude)

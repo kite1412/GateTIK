@@ -43,6 +43,10 @@ class GeofenceReceiver : BroadcastReceiver() {
                     geofenceTransition == Geofence.GEOFENCE_TRANSITION_ENTER ||
                     geofenceTransition == Geofence.GEOFENCE_TRANSITION_EXIT
                 ) {
+                    Logger.d(
+                        tag = logTag,
+                        message = "Geofence event received: ${if (geofenceTransition == 1) "ENTER" else "EXIT"}"
+                    )
                     val notificationId = 1
                     val notificationManager = NotificationManagerCompat.from(context)
 

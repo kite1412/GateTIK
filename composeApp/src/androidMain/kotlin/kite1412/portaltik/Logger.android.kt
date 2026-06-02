@@ -7,6 +7,10 @@ actual object Logger {
         Log.e(tag, message, throwable)
     }
 
+    actual fun w(tag: String, message: String) {
+        Log.w(tag, message)
+    }
+
     actual fun d(tag: String, message: String) {
         Log.d(tag, message)
     }
