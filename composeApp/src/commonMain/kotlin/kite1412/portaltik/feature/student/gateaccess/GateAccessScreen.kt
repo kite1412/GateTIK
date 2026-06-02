@@ -25,6 +25,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -69,10 +70,12 @@ import kite1412.portaltik.ui.component.HeaderSection
 import kite1412.portaltik.ui.component.ParkingQuotaCard
 import kite1412.portaltik.ui.compositionlocal.LocalDarkMode
 import kite1412.portaltik.ui.compositionlocal.LocalScaffoldComponentsController
+import kite1412.portaltik.ui.compositionlocal.LocalSnackbarHostStateWrapper
 import kite1412.portaltik.ui.preview.DevicePreviews
 import kite1412.portaltik.ui.util.LoadState
 import kite1412.portaltik.ui.util.MockScaffoldComponentController
 import kite1412.portaltik.ui.util.ScaffoldComponent
+import kite1412.portaltik.ui.util.UiEvent
 import org.jetbrains.compose.resources.painterResource
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -85,14 +88,21 @@ fun GateAccessScreen(
     val user by viewModel.user.collectAsStateWithLifecycle()
     val parkingQuota by viewModel.parkingQuota.collectAsStateWithLifecycle()
     val locationState by viewModel.locationState.collectAsStateWithLifecycle()
+    val snackbarHostStateWrapper = LocalSnackbarHostStateWrapper.current
 
     user?.let { user ->
+        LaunchedEffect(Unit) {
+            viewModel.uiEvent.collect { event ->
+                if (event is UiEvent.ShowSnackbar) snackbarHostStateWrapper.showSnackbar(event.message)
+            }
+        }
         GateAccessScreen(
             user = user,
             parkingQuota = parkingQuota,
             locationState = locationState,
             isLocationPermissionGranted = viewModel.isLocationPermissionGranted,
             isGateLocked = false,
+            isActionDelayed = viewModel.delayAction,
             isDarkMode = LocalDarkMode.current,
             contentPadding = contentPadding,
             onGateOpen = viewModel::openGate,
@@ -109,6 +119,7 @@ private fun GateAccessScreen(
     locationState: LocationState,
     isLocationPermissionGranted: Boolean,
     isGateLocked: Boolean,
+    isActionDelayed: Boolean,
     isDarkMode: Boolean,
     contentPadding: PaddingValues,
     onGateOpen: () -> Unit,
@@ -157,7 +168,8 @@ private fun GateAccessScreen(
                             parkingQuota is LoadState.Success &&
                             parkingQuota.data != null
                         ) parkingQuota.data.usedSlots < parkingQuota.data.totalSlots else false) &&
-                            !isGateLocked,
+                            !isGateLocked &&
+                            !isActionDelayed,
                         isDarkMode = isDarkMode,
                         onGateOpen = onGateOpen
                     )
@@ -389,6 +401,7 @@ private fun GateAccessScreenPreview() {
                     locationState = LocationState.Unavailable,
                     isLocationPermissionGranted = false,
                     isGateLocked = false,
+                    isActionDelayed = false,
                     parkingQuota = LoadState.Success(mockParkingQuota),
                     isDarkMode = darkMode,
                     contentPadding = p,

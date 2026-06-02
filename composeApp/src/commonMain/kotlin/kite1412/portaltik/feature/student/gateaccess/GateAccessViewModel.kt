@@ -15,10 +15,16 @@ import kite1412.portaltik.domain.usecase.GetMainGateUseCase
 import kite1412.portaltik.domain.usecase.GetMainParkingQuotaUseCase
 import kite1412.portaltik.domain.usecase.OpenGateUseCase
 import kite1412.portaltik.model.User
+import kite1412.portaltik.ui.util.UiEvent
 import kite1412.portaltik.ui.util.stateIn
+import kite1412.portaltik.util.onError
+import kite1412.portaltik.util.onSuccess
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
@@ -33,6 +39,9 @@ class GateAccessViewModel(
     private val getMainGateUseCase: GetMainGateUseCase,
     private val openGateUseCase: OpenGateUseCase
 ) : ViewModel() {
+    private val _uiEvent = MutableSharedFlow<UiEvent>()
+    val uiEvent = _uiEvent.asSharedFlow()
+
     @OptIn(ExperimentalCoroutinesApi::class)
     val user: StateFlow<User?> = authentication.sessionStatus
         .mapLatest { state ->
@@ -49,6 +58,9 @@ class GateAccessViewModel(
         LocationPermissionController.isPermissionGranted()
     )
         private set
+    var delayAction by mutableStateOf(false)
+        private set
+
     @OptIn(ExperimentalCoroutinesApi::class)
     val locationState = snapshotFlow { isLocationPermissionGranted }
         .flatMapLatest { granted ->
@@ -72,6 +84,21 @@ class GateAccessViewModel(
                         id = gate.id,
                         location = state.currentLocation
                     )
+                        .onSuccess { success ->
+                            _uiEvent.emit(
+                                UiEvent.ShowSnackbar(if (success) "Berhasil membuka gate" else "Gagal membuka gate, pastikan berada di sekitar gate")
+                            )
+                            if (success) {
+                                delayAction = true
+                                delay(5000)
+                                delayAction = false
+                            }
+                        }
+                        .onError {
+                            _uiEvent.emit(
+                                UiEvent.ShowSnackbar("Gagal membuka gate, pastikan berada di sekitar gate")
+                            )
+                        }
                 }
             }
         }
