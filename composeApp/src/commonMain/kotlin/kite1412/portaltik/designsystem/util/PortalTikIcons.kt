@@ -4,6 +4,8 @@ import portaltik.composeapp.generated.resources.Res
 import portaltik.composeapp.generated.resources.bell
 import portaltik.composeapp.generated.resources.camera
 import portaltik.composeapp.generated.resources.car
+import portaltik.composeapp.generated.resources.chevron_first
+import portaltik.composeapp.generated.resources.chevron_last
 import portaltik.composeapp.generated.resources.chevron_right
 import portaltik.composeapp.generated.resources.cpu
 import portaltik.composeapp.generated.resources.dashboard
@@ -12,6 +14,7 @@ import portaltik.composeapp.generated.resources.door_open
 import portaltik.composeapp.generated.resources.email
 import portaltik.composeapp.generated.resources.eye_close
 import portaltik.composeapp.generated.resources.eye_open
+import portaltik.composeapp.generated.resources.funnel
 import portaltik.composeapp.generated.resources.house
 import portaltik.composeapp.generated.resources.id_card
 import portaltik.composeapp.generated.resources.locate_fixed
@@ -28,11 +31,16 @@ import portaltik.composeapp.generated.resources.phone
 import portaltik.composeapp.generated.resources.phone_call
 import portaltik.composeapp.generated.resources.radio
 import portaltik.composeapp.generated.resources.scroll_text
+import portaltik.composeapp.generated.resources.search
 import portaltik.composeapp.generated.resources.settings
 import portaltik.composeapp.generated.resources.shield
 import portaltik.composeapp.generated.resources.sound_up
 import portaltik.composeapp.generated.resources.sun
+import portaltik.composeapp.generated.resources.trash
 import portaltik.composeapp.generated.resources.unila
+import portaltik.composeapp.generated.resources.user_check
+import portaltik.composeapp.generated.resources.user_pen
+import portaltik.composeapp.generated.resources.user_plus
 import portaltik.composeapp.generated.resources.video_recorder
 import portaltik.composeapp.generated.resources.wifi
 import portaltik.composeapp.generated.resources.x
@@ -75,4 +83,12 @@ object PortalTikIcons {
     val x = Res.drawable.x
     val locateFixed = Res.drawable.locate_fixed
     val settings = Res.drawable.settings
+    val funnel = Res.drawable.funnel
+    val userPen = Res.drawable.user_pen
+    val userCheck = Res.drawable.user_check
+    val userPlus = Res.drawable.user_plus
+    val trash = Res.drawable.trash
+    val search = Res.drawable.search
+    val chevronFirst = Res.drawable.chevron_first
+    val chevronLast = Res.drawable.chevron_last
 }

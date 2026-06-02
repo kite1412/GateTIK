@@ -18,6 +18,10 @@ class GeofenceReceiver : BroadcastReceiver() {
     private val logTag = "GeofenceReceiver"
 
     override fun onReceive(context: Context?, intent: Intent?) {
+        Logger.d(
+            tag = logTag,
+            message = "Geofencing event received"
+        )
         if (intent != null && context != null) if (
             ActivityCompat.checkSelfPermission(
                 /*context =*/context,

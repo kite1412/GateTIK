@@ -9,4 +9,5 @@ import androidx.compose.ui.tooling.preview.Preview
 @Preview(name = "tablet", device = Devices.TABLET, showBackground = true)
 @Preview(name = "desktop", device = Devices.DESKTOP, showBackground = true)
 @PreviewPhoneDark
+@PreviewDesktopDark
 annotation class DevicePreviews

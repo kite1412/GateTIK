@@ -12,6 +12,7 @@ import kite1412.portaltik.feature.Route
 import kite1412.portaltik.feature.monitoring.desktop.cctv.desktopCctvScreen
 import kite1412.portaltik.feature.monitoring.desktop.dashboard.desktopDashboardScreen
 import kite1412.portaltik.feature.monitoring.desktop.parking.desktopParkingScreen
+import kite1412.portaltik.feature.monitoring.desktop.usermanagement.desktopUserManagementScreen
 import kite1412.portaltik.feature.monitoring.mobile.cctv.mobileCctvScreen
 import kite1412.portaltik.feature.monitoring.mobile.home.mobileHomeScreen
 import kite1412.portaltik.feature.monitoring.mobile.parking.mobileParkingScreen
@@ -121,6 +122,7 @@ private fun NavGraphBuilder.desktopMonitoringGraph(scaffoldPadding: PaddingValue
     desktopDashboardScreen(contentPadding = normalContentPadding(scaffoldPadding))
     desktopCctvScreen(contentPadding = normalContentPadding(scaffoldPadding))
     desktopParkingScreen(contentPadding = normalContentPadding(scaffoldPadding))
+    desktopUserManagementScreen(contentPadding = normalContentPadding(scaffoldPadding))
 }
 
 private fun NavGraphBuilder.mobileMonitoringGraph(
