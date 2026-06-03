@@ -1,12 +1,9 @@
 package kite1412.portaltik.feature.monitoring.mobile.cctv
 
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.animateColor
-import androidx.compose.animation.core.RepeatMode
-import androidx.compose.animation.core.infiniteRepeatable
-import androidx.compose.animation.core.rememberInfiniteTransition
-import androidx.compose.animation.core.tween
-import androidx.compose.foundation.background
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -18,23 +15,28 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.retain.retain
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import kite1412.portaltik.CctvPlayer
 import kite1412.portaltik.designsystem.component.Badge
+import kite1412.portaltik.designsystem.component.GlassBox
 import kite1412.portaltik.designsystem.component.Icon
 import kite1412.portaltik.designsystem.component.SectionHeader
-import kite1412.portaltik.designsystem.theme.Black
-import kite1412.portaltik.designsystem.theme.Emerald700
-import kite1412.portaltik.designsystem.theme.Gray900
 import kite1412.portaltik.designsystem.theme.PortalTikTheme
 import kite1412.portaltik.designsystem.theme.Red600
 import kite1412.portaltik.designsystem.theme.White
@@ -46,6 +48,7 @@ import kite1412.portaltik.ui.compositionlocal.LocalScaffoldComponentsController
 import kite1412.portaltik.ui.preview.DevicePreviews
 import kite1412.portaltik.ui.util.LoadState
 import kite1412.portaltik.ui.util.ScaffoldComponent
+import kotlinx.coroutines.delay
 import org.jetbrains.compose.resources.painterResource
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -71,34 +74,66 @@ private fun MobileCctvScreen(
     modifier: Modifier = Modifier
 ) {
     val scaffoldComponentsController = LocalScaffoldComponentsController.current
+    var showInFullScreen by retain { mutableStateOf(false) }
 
-    LazyColumn(
-        modifier = modifier
-            .fillMaxSize()
-            .padding(contentPadding),
-        contentPadding = PaddingValues(
-            bottom = scaffoldComponentsController.getState(ScaffoldComponent.NAV_BAR).size.height
-        ),
-        verticalArrangement = Arrangement.spacedBy(24.dp)
+    Box(
+        modifier = modifier.fillMaxSize()
     ) {
-        item {
-            SectionHeader(
-                title = "CCTV",
-                subtitle = if (cctv is LoadState.Success && cctv.data != null) "${cctv.data.cameraName}"
+        LazyColumn(
+            modifier = Modifier.padding(contentPadding),
+            contentPadding = PaddingValues(
+                bottom = scaffoldComponentsController.getState(ScaffoldComponent.NAV_BAR).size.height
+            ),
+            verticalArrangement = Arrangement.spacedBy(24.dp)
+        ) {
+            item {
+                SectionHeader(
+                    title = "CCTV",
+                    subtitle = if (cctv is LoadState.Success && cctv.data != null) cctv.data.cameraName
                     else ""
-            )
+                )
+            }
+            item {
+                CctvPlayer(
+                    cctv = cctv,
+                    onFullScreenClick = { showInFullScreen = !showInFullScreen }
+                )
+            }
+            item {
+                InfoCard(
+                    icon = painterResource(PortalTikIcons.phone),
+                    title = "Kamera Interkom",
+                    description = "Sistem interkom pengunjung memiliki kamera internal untuk identifikasi visual saat panggilan."
+                )
+            }
         }
-        item {
-            CctvPlayer(
-                cctv = cctv
+        if (showInFullScreen) Dialog(
+            onDismissRequest = { showInFullScreen = false },
+            properties = DialogProperties(
+                dismissOnBackPress = true,
+                dismissOnClickOutside = true,
+                usePlatformDefaultWidth = false
             )
-        }
-        item {
-            InfoCard(
-                icon = painterResource(PortalTikIcons.phone),
-                title = "Kamera Interkom",
-                description = "Sistem interkom pengunjung memiliki kamera internal untuk identifikasi visual saat panggilan."
-            )
+        ) {
+            Column(
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                IconButton(
+                    onClick = { showInFullScreen = false },
+                    modifier = Modifier
+                        .padding(start = 16.dp)
+                ) {
+                    Icon(
+                        painter = painterResource(PortalTikIcons.x),
+                        contentDescription = null
+                    )
+                }
+                CctvPlayer(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .aspectRatio(16f / 9f)
+                ) {}
+            }
         }
     }
 }
@@ -106,24 +141,52 @@ private fun MobileCctvScreen(
 @Composable
 private fun CctvPlayer(
     cctv: LoadState<Cctv?>,
+    onFullScreenClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    Column(
-        modifier = modifier
-            .fillMaxWidth()
-            .clip(RoundedCornerShape(24.dp))
-            .background(Black)
+    GlassBox(
+        modifier = modifier.fillMaxWidth(),
+        contentPadding = PaddingValues(0.dp)
     ) {
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .aspectRatio(16f / 9f)
-                .background(
-                    Brush.radialGradient(
-                        colors = listOf(Gray900, Color.Black)
-                    )
+        Column {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .aspectRatio(16f / 9f)
+            ) {
+                var showMessage by rememberSaveable { mutableStateOf(true) }
+
+                LaunchedEffect(Unit) {
+                    if (showMessage) {
+                        delay(3000)
+                        showMessage = false
+                    }
+                }
+                CctvPlayer(
+                    modifier = Modifier.fillMaxSize()
+                ) {}
+                Badge(
+                    text = "LIVE",
+                    containerColor = Red600,
+                    contentColor = White,
+                    modifier = Modifier
+                        .align(Alignment.TopEnd)
+                        .padding(16.dp)
                 )
-        ) {
+                this@Column.AnimatedVisibility(
+                    visible = showMessage,
+                    modifier = Modifier.align(Alignment.Center),
+                    exit = fadeOut(),
+                    enter = fadeIn()
+                ) {
+                    Text(
+                        text = "Pastikan terhubung dengan Wi-Fi TIK",
+                        style = MaterialTheme.typography.labelSmall,
+                        color = White
+                    )
+                }
+            }
+
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -131,74 +194,31 @@ private fun CctvPlayer(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                val infiniteTransition = rememberInfiniteTransition()
-                val iconColor by infiniteTransition.animateColor(
-                    initialValue = Emerald700,
-                    targetValue = Emerald700.copy(alpha = 0.4f),
-                    animationSpec = infiniteRepeatable(
-                        animation = tween(durationMillis = 1000),
-                        repeatMode = RepeatMode.Reverse
-                    )
-                )
+                val isCctvSuccess = cctv is LoadState.Success && cctv.data != null
 
-                Row(
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    val isCctvSuccess = cctv is LoadState.Success && cctv.data != null
-
-                    Badge(
-                        text = "LIVE",
-                        containerColor = Red600,
-                        contentColor = White
-                    )
-
-                    AnimatedVisibility(isCctvSuccess) {
-                        val cctv = if (isCctvSuccess) cctv.data else null
-                        cctv?.let {
-                            Badge(
-                                text = it.cameraName,
-                                containerColor = White20,
-                                contentColor = White
-                            )
-                        }
+                AnimatedVisibility(isCctvSuccess) {
+                    val cctv = if (isCctvSuccess) cctv.data else null
+                    cctv?.let {
+                        Badge(
+                            text = it.cameraName,
+                            containerColor = White20,
+                            contentColor = White
+                        )
                     }
                 }
-
                 Icon(
-                    painter = painterResource(PortalTikIcons.radio),
+                    painter = painterResource(PortalTikIcons.zoomIn),
                     contentDescription = null,
-                    modifier = Modifier.size(20.dp),
-                    tint = iconColor
+                    modifier = Modifier
+                        .size(24.dp)
+                        .clickable(
+                            interactionSource = null,
+                            indication = null,
+                            onClick = onFullScreenClick
+                        ),
+                    tint = White
                 )
             }
-        }
-
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
-            horizontalArrangement = Arrangement.SpaceAround,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Icon(
-                painter = painterResource(PortalTikIcons.soundUp),
-                contentDescription = null,
-                modifier = Modifier.size(24.dp),
-                tint = White
-            )
-            Icon(
-                painter = painterResource(PortalTikIcons.camera),
-                contentDescription = null,
-                modifier = Modifier.size(24.dp),
-                tint = White
-            )
-            Icon(
-                painter = painterResource(PortalTikIcons.zoomIn),
-                contentDescription = null,
-                modifier = Modifier.size(24.dp),
-                tint = White
-            )
         }
     }
 }
