@@ -1,29 +1,19 @@
 package kite1412.gatetik.data.repository
 
-import kite1412.gatetik.Logger
+import kite1412.gatetik.data.util.tryOrThrowUnknown
 import kite1412.gatetik.domain.repository.AccessLogRepository
 import kite1412.gatetik.domain.repository.AccessLogResult
 import kite1412.gatetik.model.AccessLog
 import kite1412.gatetik.network.domain.datasource.AccessLogRemoteDataSource
-import kite1412.gatetik.util.Error
-import kite1412.gatetik.util.Success
-import kite1412.gatetik.util.Unknown
 
 class AccessLogRepositoryImpl(
     private val remoteDataSource: AccessLogRemoteDataSource
 ) : AccessLogRepository {
     private val logTag = "AccessLogRepositoryImpl"
 
-    override suspend fun getLatestOpenLog(): AccessLogResult<AccessLog?> = try {
-        val res = remoteDataSource.getLatestOpenLog()
-
-        Success(res)
-    } catch (e: Exception) {
-        Logger.e(
-            tag = logTag,
-            message = "Failed to get latest open log",
-            throwable = e
-        )
-        Error(Unknown())
-    }
+    override suspend fun getLatestOpenLog(): AccessLogResult<AccessLog?> = tryOrThrowUnknown(
+        logTag = logTag,
+        errorMessage = "Failed to get latest open log",
+        action = remoteDataSource::getLatestOpenLog
+    )
 }
