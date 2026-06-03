@@ -20,8 +20,7 @@ import kite1412.gatetik.designsystem.theme.Indigo400_30
 import kite1412.gatetik.ui.compositionlocal.LocalDarkMode
 
 @Composable
-fun Modifier.radialBackground(): Modifier {
-    val isDarkMode = LocalDarkMode.current
+fun Modifier.radialBackground(isDarkMode: Boolean = LocalDarkMode.current): Modifier {
     val color1 by animateColorAsState(if (isDarkMode) Blue500Alt_30 else Blue400_40)
     val color2 by animateColorAsState(if (isDarkMode) Indigo400_30 else Blue500Alt_30)
 

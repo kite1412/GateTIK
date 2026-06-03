@@ -56,11 +56,11 @@ import kite1412.gatetik.model.UserRole
 import kite1412.gatetik.ui.compositionlocal.LocalScaffoldComponentsController
 import kite1412.gatetik.ui.preview.DevicePreviews
 import kite1412.gatetik.ui.util.MockScaffoldComponentController
-import kotlinx.datetime.Instant
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 import org.jetbrains.compose.resources.painterResource
 import org.koin.compose.viewmodel.koinViewModel
+import kotlin.time.Instant
 
 @Composable
 fun DesktopAccessLogsScreen(
@@ -142,15 +142,11 @@ private fun DesktopAccessLogsScreen(
                 Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
                     GlassBox(
                         contentPadding = PaddingValues(0.dp),
-                        shape = RoundedCornerShape(8.dp)
+                        shape = RoundedCornerShape(12.dp)
                     ) {
                         Row(
                             modifier = Modifier
-                                .clickable(
-                                    indication = null,
-                                    interactionSource = null,
-                                    onClick = onExportCsv
-                                )
+                                .clickable(onClick = onExportCsv)
                                 .padding(
                                     vertical = 8.dp,
                                     horizontal = 16.dp
@@ -467,7 +463,7 @@ private fun AccessLogsTableSection(
                     Text(
                         text = log.createdAt.toLocalDateTime(TimeZone.currentSystemDefault()).run {
                             val monthName = month.name.lowercase().replaceFirstChar { it.uppercase() }
-                            "$monthName $dayOfMonth, $year jam $hour:$minute:$second"
+                            "$monthName $day, $year jam $hour:$minute:$second"
                         },
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant

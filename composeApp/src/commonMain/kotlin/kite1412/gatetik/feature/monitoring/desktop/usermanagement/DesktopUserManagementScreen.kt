@@ -216,8 +216,12 @@ private fun DesktopUserManagementContent(
                                         color = MaterialTheme.colorScheme.onSurfaceVariant
                                     )
                                 },
-                                TableColumn("AKSI", 1.5f) {
-                                    Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+                                TableColumn("AKSI", 2f) {
+                                    FlowRow(
+                                        horizontalArrangement = Arrangement.spacedBy(4.dp),
+                                        verticalArrangement = Arrangement.spacedBy(4.dp),
+                                        itemVerticalAlignment = Alignment.CenterVertically
+                                    ) {
                                         ActionIconButton(
                                             icon = GateTikIcons.eyeOpen,
                                             onClick = { },

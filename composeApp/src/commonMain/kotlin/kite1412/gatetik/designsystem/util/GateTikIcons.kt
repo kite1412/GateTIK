@@ -42,6 +42,7 @@ import gatetik.composeapp.generated.resources.unila
 import gatetik.composeapp.generated.resources.user_check
 import gatetik.composeapp.generated.resources.user_pen
 import gatetik.composeapp.generated.resources.user_plus
+import gatetik.composeapp.generated.resources.user_x
 import gatetik.composeapp.generated.resources.video_recorder
 import gatetik.composeapp.generated.resources.wifi
 import gatetik.composeapp.generated.resources.x
@@ -93,4 +94,5 @@ object GateTikIcons {
     val chevronFirst = Res.drawable.chevron_first
     val chevronLast = Res.drawable.chevron_last
     val download = Res.drawable.download
+    val userX = Res.drawable.user_x
 }

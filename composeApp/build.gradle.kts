@@ -105,4 +105,5 @@ buildConfig {
     buildConfigField("BACKEND_URL")
     buildConfigField("CCTV_URL")
     buildConfigField("VERSION")
+    buildConfigField("ANDROID_INSTALLATION_URL")
 }
