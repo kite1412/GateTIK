@@ -104,4 +104,5 @@ buildConfig {
 
     buildConfigField("BACKEND_URL")
     buildConfigField("CCTV_URL")
+    buildConfigField("VERSION")
 }

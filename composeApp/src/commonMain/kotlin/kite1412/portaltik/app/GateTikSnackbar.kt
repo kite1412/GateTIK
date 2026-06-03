@@ -9,7 +9,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun PortalTikSnackbar(
+fun GateTikSnackbar(
     snackbarData: SnackbarData,
     modifier: Modifier = Modifier
 ) {

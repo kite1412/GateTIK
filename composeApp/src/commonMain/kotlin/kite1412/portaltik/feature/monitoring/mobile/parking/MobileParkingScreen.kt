@@ -38,7 +38,7 @@ import kite1412.portaltik.designsystem.theme.Emerald700
 import kite1412.portaltik.designsystem.theme.PortalTikTheme
 import kite1412.portaltik.designsystem.theme.Slate900
 import kite1412.portaltik.designsystem.theme.White
-import kite1412.portaltik.designsystem.util.PortalTikIcons
+import kite1412.portaltik.designsystem.util.GateTikIcons
 import kite1412.portaltik.model.ParkingQuota
 import kite1412.portaltik.ui.component.InfoCard
 import kite1412.portaltik.ui.component.StatCard
@@ -130,13 +130,13 @@ private fun MobileParkingScreen(
                 item {
                     Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
                         InfoCard(
-                            icon = painterResource(PortalTikIcons.car),
+                            icon = painterResource(GateTikIcons.car),
                             title = "Sistem Kuota Mahasiswa",
                             description = "Slot parkir terbatas untuk mahasiswa. Akses akan diblokir jika sudah penuh."
                         )
 
                         InfoCard(
-                            icon = painterResource(PortalTikIcons.locationMark),
+                            icon = painterResource(GateTikIcons.locationMark),
                             title = "Akses Staf & Admin",
                             description = "Akses parkir tidak terbatas, tidak tunduk pada batasan kapasitas.",
                             iconBackground = Emerald700.copy(alpha = 0.2f),
@@ -161,7 +161,7 @@ private fun MobileParkingScreen(
                     val color = MaterialTheme.colorScheme.outline
 
                     Icon(
-                        painter = painterResource(PortalTikIcons.parkingOff),
+                        painter = painterResource(GateTikIcons.parkingOff),
                         contentDescription = "gagal memuat informasi parkir",
                         modifier = Modifier.size(120.dp),
                         tint = color

@@ -6,7 +6,7 @@ import androidx.navigation.navigation
 import kite1412.portaltik.PlatformType
 import kite1412.portaltik.app.normalContentPadding
 import kite1412.portaltik.app.smallContentPadding
-import kite1412.portaltik.designsystem.util.PortalTikIcons
+import kite1412.portaltik.designsystem.util.GateTikIcons
 import kite1412.portaltik.feature.Graph
 import kite1412.portaltik.feature.Route
 import kite1412.portaltik.feature.monitoring.desktop.cctv.desktopCctvScreen
@@ -52,37 +52,37 @@ object MonitoringGraph : Graph {
 
         object Dashboard : RootDestination, Route("desktop_monitoring_dashboard") {
             override val route: String = name
-            override val icon: DrawableResource = PortalTikIcons.dashboard
+            override val icon: DrawableResource = GateTikIcons.dashboard
             override val label: String = "Dashboard"
         }
 
         object Cctv : RootDestination, Route("desktop_monitoring_cctv") {
             override val route: String = name
-            override val icon: DrawableResource = PortalTikIcons.videoRecorder
+            override val icon: DrawableResource = GateTikIcons.videoRecorder
             override val label: String = "CCTV Monitoring"
         }
 
         object Parking : RootDestination, Route("desktop_monitoring_parking") {
             override val route: String = name
-            override val icon: DrawableResource = PortalTikIcons.car
+            override val icon: DrawableResource = GateTikIcons.car
             override val label: String = "Manajemen Parkir"
         }
 
         object UserManagement : RootDestination, Route("desktop_monitoring_user_management") {
             override val route: String = name
-            override val icon: DrawableResource = PortalTikIcons.people
+            override val icon: DrawableResource = GateTikIcons.people
             override val label: String = "Manajemen Pengguna"
         }
 
         object AccessLogs : RootDestination, Route("desktop_monitoring_access_logs") {
             override val route: String = name
-            override val icon: DrawableResource = PortalTikIcons.scrollText
+            override val icon: DrawableResource = GateTikIcons.scrollText
             override val label: String = "Access Log"
         }
 
         object VisitorIntercom : RootDestination, Route("desktop_monitoring_visitor_intercom") {
             override val route: String = name
-            override val icon: DrawableResource = PortalTikIcons.phoneCall
+            override val icon: DrawableResource = GateTikIcons.phoneCall
             override val label: String = "Interkom Pengunjung"
         }
     }
@@ -94,25 +94,25 @@ object MonitoringGraph : Graph {
 
         object Home : RootDestination, Route("mobile_monitoring_home") {
             override val route: String = name
-            override val icon: DrawableResource = PortalTikIcons.house
+            override val icon: DrawableResource = GateTikIcons.house
             override val label: String = "Home"
         }
 
         object Parking : RootDestination, Route("mobile_monitoring_parking") {
             override val route: String = name
-            override val icon: DrawableResource = PortalTikIcons.car
+            override val icon: DrawableResource = GateTikIcons.car
             override val label: String = "Parkir"
         }
 
         object Cctv : RootDestination, Route("mobile_monitoring_cctv") {
             override val route: String = name
-            override val icon: DrawableResource = PortalTikIcons.videoRecorder
+            override val icon: DrawableResource = GateTikIcons.videoRecorder
             override val label: String = "CCTV"
         }
 
         object Profile : RootDestination {
             override val route: String = SharedGraph.ProfileRoute.name
-            override val icon: DrawableResource = PortalTikIcons.person
+            override val icon: DrawableResource = GateTikIcons.person
             override val label: String = "Profil"
         }
     }

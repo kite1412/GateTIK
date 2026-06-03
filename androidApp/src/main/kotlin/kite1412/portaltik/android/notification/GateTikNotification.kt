@@ -17,13 +17,13 @@ import kite1412.portaltik.android.receiver.OpenGateReceiver
 
 private const val MAIN_ACTIVITY_NAME = "kite1412.portaltik.android.MainActivity"
 
-sealed class PortalTikNotification(
+sealed class GateTikNotification(
     val channelId: String,
     val channelName: String,
     val channelDescription: String,
     val importance: Int
 ) {
-    object GateAccess : PortalTikNotification(
+    object GateAccess : GateTikNotification(
         channelId = "gate_access",
         channelName = "Gate Access",
         channelDescription = "Notifikasi buka gate",

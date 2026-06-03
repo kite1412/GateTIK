@@ -46,7 +46,7 @@ import portaltik.composeapp.generated.resources.wifi
 import portaltik.composeapp.generated.resources.x
 import portaltik.composeapp.generated.resources.zoom_in
 
-object PortalTikIcons {
+object GateTikIcons {
     val email = Res.drawable.email
     val lock = Res.drawable.lock
     val unila = Res.drawable.unila

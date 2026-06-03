@@ -33,7 +33,7 @@ import kite1412.portaltik.designsystem.theme.Gray900
 import kite1412.portaltik.designsystem.theme.PortalTikTheme
 import kite1412.portaltik.designsystem.theme.White
 import kite1412.portaltik.designsystem.theme.White60
-import kite1412.portaltik.designsystem.util.PortalTikIcons
+import kite1412.portaltik.designsystem.util.GateTikIcons
 import org.jetbrains.compose.resources.painterResource
 
 @Composable
@@ -78,7 +78,7 @@ fun GateControlButton(
 
             Icon(
                 painter = painterResource(
-                    if (isOpen) PortalTikIcons.doorOpen else PortalTikIcons.doorClose
+                    if (isOpen) GateTikIcons.doorOpen else GateTikIcons.doorClose
                 ),
                 contentDescription = null,
                 modifier = Modifier.size(20.dp),

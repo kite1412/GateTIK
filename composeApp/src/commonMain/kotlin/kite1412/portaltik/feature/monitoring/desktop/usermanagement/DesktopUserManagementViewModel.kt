@@ -3,7 +3,7 @@ package kite1412.portaltik.feature.monitoring.desktop.usermanagement
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import kite1412.portaltik.datastore.PortalTikDataStore
+import kite1412.portaltik.datastore.GateTikDataStore
 import kite1412.portaltik.domain.Authentication
 import kite1412.portaltik.feature.monitoring.desktop.DesktopBaseViewModel
 import kite1412.portaltik.model.User
@@ -14,7 +14,7 @@ import kotlinx.coroutines.flow.asStateFlow
 
 class DesktopUserManagementViewModel(
     authentication: Authentication,
-    dataStore: PortalTikDataStore
+    dataStore: GateTikDataStore
 ) : DesktopBaseViewModel(authentication, dataStore) {
 
     var searchText by mutableStateOf("")

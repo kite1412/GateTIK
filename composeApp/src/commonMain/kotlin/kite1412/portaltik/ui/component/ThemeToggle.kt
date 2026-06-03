@@ -24,7 +24,7 @@ import kite1412.portaltik.designsystem.theme.Blue500
 import kite1412.portaltik.designsystem.theme.White
 import kite1412.portaltik.designsystem.theme.White10
 import kite1412.portaltik.designsystem.theme.White15
-import kite1412.portaltik.designsystem.util.PortalTikIcons
+import kite1412.portaltik.designsystem.util.GateTikIcons
 import kite1412.portaltik.ui.compositionlocal.LocalDarkMode
 import org.jetbrains.compose.resources.painterResource
 
@@ -61,7 +61,7 @@ fun ThemeToggle(
         contentAlignment = Alignment.Center
     ) {
         Icon(
-            painter = painterResource(if (isDarkMode) PortalTikIcons.sun else PortalTikIcons.moon),
+            painter = painterResource(if (isDarkMode) GateTikIcons.sun else GateTikIcons.moon),
             contentDescription = "Toggle Theme",
             tint = toggleIconColor,
             modifier = Modifier.size(iconSize)

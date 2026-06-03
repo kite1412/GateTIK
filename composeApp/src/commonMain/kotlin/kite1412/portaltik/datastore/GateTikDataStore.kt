@@ -11,7 +11,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.json.Json
 
-class PortalTikDataStore(
+class GateTikDataStore(
     private val dataStore: DataStore<Preferences>
 ) {
     private val json = Json {

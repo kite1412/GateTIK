@@ -15,15 +15,15 @@ import kite1412.portaltik.ui.navigation.RootDestination
 import kite1412.portaltik.ui.navigation.RootDestinationsProvider
 
 @Composable
-fun rememberPortalTikAppState(navController: NavController, userRole: UserRole?) =
+fun rememberGateTikAppState(navController: NavController, userRole: UserRole?) =
     remember(navController, userRole) {
-        PortalTikAppState(
+        GateTikAppState(
             navController = navController,
             userRole = userRole
         )
     }
 
-class PortalTikAppState(
+class GateTikAppState(
     private val navController: NavController,
     private val userRole: UserRole?
 ) {

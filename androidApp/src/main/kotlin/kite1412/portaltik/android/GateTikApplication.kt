@@ -25,7 +25,7 @@ import kotlinx.coroutines.flow.mapLatest
 import org.koin.android.ext.android.get
 import org.koin.android.ext.koin.androidContext
 
-class PortalTikApplication : Application() {
+class GateTikApplication : Application() {
     private val logTag = "PortalTikApplication"
     private val appScope by lazy { get<AppCoroutineScope>() }
     private val authentication by lazy { get<Authentication>() }
@@ -49,7 +49,7 @@ class PortalTikApplication : Application() {
         geofencingClient = LocationServices.getGeofencingClient(this)
 
         initKoin {
-            androidContext(this@PortalTikApplication)
+            androidContext(this@GateTikApplication)
         }
 
         if (

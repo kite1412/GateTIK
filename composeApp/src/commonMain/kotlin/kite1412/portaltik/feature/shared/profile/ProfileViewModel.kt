@@ -2,7 +2,7 @@ package kite1412.portaltik.feature.shared.profile
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import kite1412.portaltik.datastore.PortalTikDataStore
+import kite1412.portaltik.datastore.GateTikDataStore
 import kite1412.portaltik.domain.Authentication
 import kite1412.portaltik.domain.SessionStatus
 import kite1412.portaltik.model.User
@@ -15,7 +15,7 @@ import kotlinx.coroutines.launch
 
 class ProfileViewModel(
     private val authentication: Authentication,
-    private val dataStore: PortalTikDataStore
+    private val dataStore: GateTikDataStore
 ) : ViewModel() {
     val user: Flow<LoadState<User>> = flow {
         emit(LoadState.Loading("Memuat informasi akun"))

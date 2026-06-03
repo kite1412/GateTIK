@@ -20,7 +20,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import kite1412.portaltik.designsystem.theme.Blue500
 import kite1412.portaltik.designsystem.theme.White
-import kite1412.portaltik.designsystem.util.PortalTikIcons
+import kite1412.portaltik.designsystem.util.GateTikIcons
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.painterResource
 
@@ -72,12 +72,12 @@ fun Pagination(
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             PaginationIconButton(
-                icon = PortalTikIcons.chevronFirst,
+                icon = GateTikIcons.chevronFirst,
                 contentDescription = "pertama",
                 onClick = {}
             )
             PaginationIconButton(
-                icon = PortalTikIcons.chevronRight,
+                icon = GateTikIcons.chevronRight,
                 contentDescription = "sebelumnya",
                 onClick = {},
                 modifier = Modifier.rotate(180f)
@@ -100,12 +100,12 @@ fun Pagination(
             }
 
             PaginationIconButton(
-                icon = PortalTikIcons.chevronRight,
+                icon = GateTikIcons.chevronRight,
                 contentDescription = "selanjutnya",
                 onClick = {}
             )
             PaginationIconButton(
-                icon = PortalTikIcons.chevronLast,
+                icon = GateTikIcons.chevronLast,
                 contentDescription = "akhir",
                 onClick = {}
             )

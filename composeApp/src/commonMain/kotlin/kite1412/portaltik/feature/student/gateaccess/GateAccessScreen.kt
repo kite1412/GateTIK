@@ -56,7 +56,7 @@ import kite1412.portaltik.designsystem.theme.Red500
 import kite1412.portaltik.designsystem.theme.White
 import kite1412.portaltik.designsystem.theme.White30
 import kite1412.portaltik.designsystem.theme.White60
-import kite1412.portaltik.designsystem.util.PortalTikIcons
+import kite1412.portaltik.designsystem.util.GateTikIcons
 import kite1412.portaltik.designsystem.util.WindowWidthSize
 import kite1412.portaltik.designsystem.util.rememberWindowWidthSize
 import kite1412.portaltik.model.ParkingQuota
@@ -217,7 +217,7 @@ private fun LocationWarning(
     ) {
         PulsingIcon(
             basePulseColor = Red500.copy(alpha = 0.3f),
-            painter = painterResource(PortalTikIcons.locationMark)
+            painter = painterResource(GateTikIcons.locationMark)
         )
         Text(
             text = buildAnnotatedString {
@@ -272,8 +272,8 @@ private fun GateStatusCard(
             PulsingIcon(
                 basePulseColor = baseColor,
                 painter = painterResource(
-                    if (isLocked) PortalTikIcons.lock
-                    else PortalTikIcons.lockOpen
+                    if (isLocked) GateTikIcons.lock
+                    else GateTikIcons.lockOpen
                 )
             )
             if (isLocked) Text(

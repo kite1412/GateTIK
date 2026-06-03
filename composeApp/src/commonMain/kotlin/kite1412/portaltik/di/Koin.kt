@@ -1,6 +1,6 @@
 package kite1412.portaltik.di
 
-import kite1412.portaltik.app.PortalTikViewModel
+import kite1412.portaltik.app.GateTikViewModel
 import kite1412.portaltik.common.commonModule
 import kite1412.portaltik.data.dataModule
 import kite1412.portaltik.datastore.dataStoreModule
@@ -104,7 +104,7 @@ private val viewModelModule = module {
     includes(sharedViewModelModule, mobileMonitoringViewModelModule, desktopMonitoringViewModel)
 
     viewModel {
-        PortalTikViewModel(
+        GateTikViewModel(
             dataStore = get(),
             authentication = get()
         )

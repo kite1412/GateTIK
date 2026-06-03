@@ -12,7 +12,7 @@ import com.google.android.gms.location.GeofenceStatusCodes
 import com.google.android.gms.location.GeofencingEvent
 import kite1412.portaltik.Location
 import kite1412.portaltik.Logger
-import kite1412.portaltik.android.notification.PortalTikNotification
+import kite1412.portaltik.android.notification.GateTikNotification
 
 class GeofenceReceiver : BroadcastReceiver() {
     private val logTag = "GeofenceReceiver"
@@ -60,7 +60,7 @@ class GeofenceReceiver : BroadcastReceiver() {
                         triggeringGeofences.firstOrNull()?.let { geofence ->
                             notificationManager.notify(
                                 /*id =*/notificationId,
-                                /*notification =*/PortalTikNotification.GateAccess.createNotification(
+                                /*notification =*/GateTikNotification.GateAccess.createNotification(
                                     context = context,
                                     location = Location(
                                         latitude = geofence.latitude,

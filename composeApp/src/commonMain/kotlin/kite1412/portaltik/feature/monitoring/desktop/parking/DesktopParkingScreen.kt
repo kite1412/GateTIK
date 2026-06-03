@@ -62,7 +62,7 @@ import kite1412.portaltik.designsystem.theme.PortalTikTheme
 import kite1412.portaltik.designsystem.theme.Sky300
 import kite1412.portaltik.designsystem.theme.White
 import kite1412.portaltik.designsystem.theme.White15
-import kite1412.portaltik.designsystem.util.PortalTikIcons
+import kite1412.portaltik.designsystem.util.GateTikIcons
 import kite1412.portaltik.designsystem.util.WindowWidthSize
 import kite1412.portaltik.designsystem.util.rememberWindowWidthSize
 import kite1412.portaltik.feature.monitoring.desktop.component.DesktopLayout
@@ -336,7 +336,7 @@ private fun Settings(
         modifier = modifier
     ) {
         Card(
-            icon = PortalTikIcons.settings,
+            icon = GateTikIcons.settings,
             label = "Pembatasan Otomatis",
             description = "Batasi akses mahasiswa ketika parkir sudah penuh"
         ) {
@@ -346,7 +346,7 @@ private fun Settings(
             )
         }
         Card(
-            icon = PortalTikIcons.locateFixed,
+            icon = GateTikIcons.locateFixed,
             label = "Jangkauan Radius Akses",
             description = "Atur radius maksimum (dalam meter) untuk mahasiswa dapat mengakses gate"
         ) {
@@ -456,7 +456,7 @@ private fun Notes(modifier: Modifier = Modifier) {
         modifier = modifier
     ) {
         Card(
-            icon = PortalTikIcons.car,
+            icon = GateTikIcons.car,
             label = "Sistem Kuota Parkir Mahasiswa",
             description = "Slot parkir untuk mahasiswa dibatasi sesuai kuota kapasitas yang tersedia. Akses mahasiswa akan diblokir secara otomatis ketika kapasitas penuh.",
             trailing = {},
@@ -464,7 +464,7 @@ private fun Notes(modifier: Modifier = Modifier) {
             verticalAlignment = Alignment.Top
         )
         Card(
-            icon = PortalTikIcons.people,
+            icon = GateTikIcons.people,
             label = "Akses Staff & Admin",
             description = "Staf dan admin memiliki akses parkir tanpa batas serta tidak dikenakan pembatasan berdasarkan kapasitas parkir.",
             trailing = {},

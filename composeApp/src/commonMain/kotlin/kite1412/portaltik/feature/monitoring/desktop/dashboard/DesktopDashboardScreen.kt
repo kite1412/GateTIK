@@ -40,7 +40,7 @@ import kite1412.portaltik.designsystem.theme.PortalTikTheme
 import kite1412.portaltik.designsystem.theme.Purple400
 import kite1412.portaltik.designsystem.theme.Red500
 import kite1412.portaltik.designsystem.theme.Yellow500
-import kite1412.portaltik.designsystem.util.PortalTikIcons
+import kite1412.portaltik.designsystem.util.GateTikIcons
 import kite1412.portaltik.designsystem.util.WindowWidthSize
 import kite1412.portaltik.designsystem.util.rememberWindowWidthSize
 import kite1412.portaltik.feature.monitoring.desktop.component.DashboardSummaryCard
@@ -160,7 +160,7 @@ private fun SummaryCardsRow(
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         DashboardSummaryCard(
-            icon = painterResource(PortalTikIcons.people),
+            icon = painterResource(GateTikIcons.people),
             iconContainerColor = Blue500.copy(alpha = 0.1f),
             iconTint = Blue500,
             value = "1",
@@ -168,7 +168,7 @@ private fun SummaryCardsRow(
             topRightText = "Total 2"
         )
         DashboardSummaryCard(
-            icon = painterResource(PortalTikIcons.doorOpen),
+            icon = painterResource(GateTikIcons.doorOpen),
             iconContainerColor = Emerald500.copy(alpha = 0.1f),
             iconTint = Emerald500,
             value = "0",
@@ -176,7 +176,7 @@ private fun SummaryCardsRow(
             topRightText = "0% sukses"
         )
         DashboardSummaryCard(
-            icon = painterResource(PortalTikIcons.car),
+            icon = painterResource(GateTikIcons.car),
             iconContainerColor = Yellow500.copy(alpha = 0.1f),
             iconTint = Yellow500,
             value = "0/50",
@@ -184,7 +184,7 @@ private fun SummaryCardsRow(
             topRightText = "0%"
         )
         DashboardSummaryCard(
-            icon = painterResource(PortalTikIcons.cpu),
+            icon = painterResource(GateTikIcons.cpu),
             iconContainerColor = Purple400.copy(alpha = 0.1f),
             iconTint = Purple400,
             value = "Offline",
@@ -192,7 +192,7 @@ private fun SummaryCardsRow(
             topRightText = "ESP8266 Gerbang 1"
         )
         DashboardSummaryCard(
-            icon = painterResource(PortalTikIcons.phoneCall),
+            icon = painterResource(GateTikIcons.phoneCall),
             iconContainerColor = Red500.copy(alpha = 0.1f),
             iconTint = Red500,
             value = "Aktif",
@@ -228,7 +228,7 @@ private fun GateControlCard(
                     Spacer(modifier = Modifier.height(8.dp))
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Icon(
-                            painter = painterResource(PortalTikIcons.wifi),
+                            painter = painterResource(GateTikIcons.wifi),
                             contentDescription = null,
                             modifier = Modifier.size(14.dp),
                             tint = Emerald500

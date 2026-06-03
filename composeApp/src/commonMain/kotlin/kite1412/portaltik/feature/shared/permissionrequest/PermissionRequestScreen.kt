@@ -44,7 +44,7 @@ import kite1412.portaltik.designsystem.extension.radialBackground
 import kite1412.portaltik.designsystem.theme.Blue900
 import kite1412.portaltik.designsystem.theme.PortalTikTheme
 import kite1412.portaltik.designsystem.theme.White
-import kite1412.portaltik.designsystem.util.PortalTikIcons
+import kite1412.portaltik.designsystem.util.GateTikIcons
 import kite1412.portaltik.rememberLocationPermissionRequester
 import kite1412.portaltik.rememberNotificationPermissionRequester
 import kite1412.portaltik.ui.preview.DevicePreviews
@@ -153,7 +153,7 @@ private fun LocationPermission(modifier: Modifier = Modifier) {
                     )
             )
             Icon(
-                painter = painterResource(PortalTikIcons.locationMark),
+                painter = painterResource(GateTikIcons.locationMark),
                 contentDescription = null,
                 modifier = Modifier.size(80.dp),
                 tint = MaterialTheme.colorScheme.onPrimary
@@ -200,7 +200,7 @@ private fun NotificationPermission(modifier: Modifier = Modifier) {
             contentAlignment = Alignment.Center
         ) {
             Icon(
-                painter = painterResource(PortalTikIcons.bell),
+                painter = painterResource(GateTikIcons.bell),
                 contentDescription = null,
                 modifier = Modifier
                     .size(80.dp)

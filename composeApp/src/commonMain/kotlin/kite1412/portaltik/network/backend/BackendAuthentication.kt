@@ -9,7 +9,7 @@ import io.ktor.http.HttpHeaders
 import kite1412.portaltik.File
 import kite1412.portaltik.Logger
 import kite1412.portaltik.common.AppCoroutineScope
-import kite1412.portaltik.datastore.PortalTikDataStore
+import kite1412.portaltik.datastore.GateTikDataStore
 import kite1412.portaltik.datastore.extension.toDataStoreUser
 import kite1412.portaltik.datastore.model.DataStoreAuthSession
 import kite1412.portaltik.domain.AuthResult
@@ -31,7 +31,7 @@ import kotlinx.coroutines.flow.stateIn
 
 class BackendAuthentication(
     appScope: AppCoroutineScope,
-    private val dataStore: PortalTikDataStore
+    private val dataStore: GateTikDataStore
 ) : Authentication {
     @OptIn(ExperimentalCoroutinesApi::class)
     override val sessionStatus: Flow<SessionStatus> = dataStore.observeAuthSession()

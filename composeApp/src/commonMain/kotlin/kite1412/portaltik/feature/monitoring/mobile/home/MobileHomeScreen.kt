@@ -56,7 +56,7 @@ import kite1412.portaltik.designsystem.theme.White
 import kite1412.portaltik.designsystem.theme.White20
 import kite1412.portaltik.designsystem.theme.White60
 import kite1412.portaltik.designsystem.theme.White80
-import kite1412.portaltik.designsystem.util.PortalTikIcons
+import kite1412.portaltik.designsystem.util.GateTikIcons
 import kite1412.portaltik.model.AccessLog
 import kite1412.portaltik.model.Cctv
 import kite1412.portaltik.model.Gate
@@ -163,7 +163,7 @@ private fun MobileHomeScreen(
                         contentAlignment = Alignment.Center
                     ) {
                         Icon(
-                            painter = painterResource(PortalTikIcons.bell),
+                            painter = painterResource(GateTikIcons.bell),
                             contentDescription = "Notifikasi",
                             modifier = Modifier.size(20.dp),
                             tint = MaterialTheme.colorScheme.onSurface
@@ -232,7 +232,7 @@ private fun GateAccessButton(
         ) {
             Icon(
                 painter = painterResource(
-                    if (isLocked) PortalTikIcons.lockOpen else PortalTikIcons.lock
+                    if (isLocked) GateTikIcons.lockOpen else GateTikIcons.lock
                 ),
                 contentDescription = text,
                 tint = color
@@ -301,7 +301,7 @@ private fun GateControlCard(
                     val contentColor = if (isDeviceOnline) Emerald500 else color
 
                     Icon(
-                        painter = painterResource(PortalTikIcons.wifi),
+                        painter = painterResource(GateTikIcons.wifi),
                         contentDescription = null,
                         tint = contentColor
                     )
@@ -371,7 +371,7 @@ private fun GateControlCard(
 
             Icon(
                 painter = painterResource(
-                    if (isLocked) PortalTikIcons.lock else PortalTikIcons.lockOpen
+                    if (isLocked) GateTikIcons.lock else GateTikIcons.lockOpen
                 ),
                 contentDescription = null,
                 modifier = Modifier.size(32.dp),
@@ -470,7 +470,7 @@ private fun CctvCard(
                             horizontalArrangement = Arrangement.spacedBy(4.dp)
                         ) {
                             Icon(
-                                painter = painterResource(PortalTikIcons.videoRecorder),
+                                painter = painterResource(GateTikIcons.videoRecorder),
                                 contentDescription = null,
                                 modifier = Modifier.size(16.dp),
                                 tint = White
@@ -502,13 +502,13 @@ private fun QuickActionsRow(
         horizontalArrangement = Arrangement.spacedBy(16.dp)
     ) {
         ActionCard(
-            icon = painterResource(PortalTikIcons.car),
+            icon = painterResource(GateTikIcons.car),
             label = "Parkir",
             onClick = onParkingClick,
             modifier = Modifier.weight(1f)
         )
         ActionCard(
-            icon = painterResource(PortalTikIcons.videoRecorder),
+            icon = painterResource(GateTikIcons.videoRecorder),
             label = "Cctv",
             onClick = onCctvClick,
             modifier = Modifier.weight(1f)

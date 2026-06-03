@@ -7,7 +7,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kite1412.portaltik.File
 import kite1412.portaltik.PickResult
-import kite1412.portaltik.datastore.PortalTikDataStore
+import kite1412.portaltik.datastore.GateTikDataStore
 import kite1412.portaltik.domain.AuthResult
 import kite1412.portaltik.domain.Authentication
 import kite1412.portaltik.model.User
@@ -20,7 +20,7 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
 
 class AuthenticationViewModel(
-    private val dataStore: PortalTikDataStore,
+    private val dataStore: GateTikDataStore,
     private val authentication: Authentication
 ) : ViewModel() {
     private val _uiEvent = MutableSharedFlow<UiEvent>()

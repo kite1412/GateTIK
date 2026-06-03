@@ -68,7 +68,7 @@ import kite1412.portaltik.designsystem.theme.Slate900_95
 import kite1412.portaltik.designsystem.theme.White
 import kite1412.portaltik.designsystem.theme.White30
 import kite1412.portaltik.designsystem.theme.White95
-import kite1412.portaltik.designsystem.util.PortalTikIcons
+import kite1412.portaltik.designsystem.util.GateTikIcons
 import kite1412.portaltik.designsystem.util.WindowWidthSize
 import kite1412.portaltik.designsystem.util.rememberWindowWidthSize
 import kite1412.portaltik.ui.preview.DevicePreviews
@@ -276,7 +276,7 @@ private fun SideNavigationDrawer(
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     Icon(
-                        painter = painterResource(PortalTikIcons.unila),
+                        painter = painterResource(GateTikIcons.unila),
                         contentDescription = null,
                         modifier = Modifier.size(48.dp)
                     )
@@ -305,7 +305,7 @@ private fun SideNavigationDrawer(
                     shape = CircleShape
                 ) {
                     Icon(
-                        painter = painterResource(PortalTikIcons.chevronRight),
+                        painter = painterResource(GateTikIcons.chevronRight),
                         contentDescription = "tutup",
                         modifier = Modifier
                             .size(16.dp)
@@ -376,7 +376,7 @@ private fun SideNavigationDrawer(
                     }
                     Spacer(modifier = Modifier.width(8.dp))
                     ComposeIcon(
-                        painter = painterResource(PortalTikIcons.logout),
+                        painter = painterResource(GateTikIcons.logout),
                         contentDescription = "Logout",
                         tint = if (isDarkMode) Slate400 else Slate500,
                         modifier = Modifier
@@ -520,27 +520,27 @@ private fun NavigationScaffoldPreviewContent() {
         Destination(
             route = "eye open",
             label = "Eye Open",
-            icon = PortalTikIcons.eyeOpen
+            icon = GateTikIcons.eyeOpen
         ),
         Destination(
             route = "eye close",
             label = "Eye Close",
-            icon = PortalTikIcons.eyeClose
+            icon = GateTikIcons.eyeClose
         ),
         Destination(
             route = "lock",
             label = "Lock",
-            icon = PortalTikIcons.lock
+            icon = GateTikIcons.lock
         ),
         Destination(
             route = "sun",
             label = "Sun",
-            icon = PortalTikIcons.sun
+            icon = GateTikIcons.sun
         ),
         Destination(
             route = "moon",
             label = "Moon",
-            icon = PortalTikIcons.moon
+            icon = GateTikIcons.moon
         )
     )
     var selectedDestination by remember { mutableStateOf(destinations.first()) }

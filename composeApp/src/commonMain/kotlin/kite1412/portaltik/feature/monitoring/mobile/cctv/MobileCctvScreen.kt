@@ -41,7 +41,7 @@ import kite1412.portaltik.designsystem.theme.PortalTikTheme
 import kite1412.portaltik.designsystem.theme.Red600
 import kite1412.portaltik.designsystem.theme.White
 import kite1412.portaltik.designsystem.theme.White20
-import kite1412.portaltik.designsystem.util.PortalTikIcons
+import kite1412.portaltik.designsystem.util.GateTikIcons
 import kite1412.portaltik.model.Cctv
 import kite1412.portaltik.ui.component.InfoCard
 import kite1412.portaltik.ui.compositionlocal.LocalScaffoldComponentsController
@@ -101,9 +101,9 @@ private fun MobileCctvScreen(
             }
             item {
                 InfoCard(
-                    icon = painterResource(PortalTikIcons.phone),
-                    title = "Kamera Interkom",
-                    description = "Sistem interkom pengunjung memiliki kamera internal untuk identifikasi visual saat panggilan."
+                    icon = painterResource(GateTikIcons.phone),
+                    title = "CCTV Monitoring",
+                    description = "Sistem monitoring untuk memantau aktivitas di area gate."
                 )
             }
         }
@@ -124,7 +124,7 @@ private fun MobileCctvScreen(
                         .padding(start = 16.dp)
                 ) {
                     Icon(
-                        painter = painterResource(PortalTikIcons.x),
+                        painter = painterResource(GateTikIcons.x),
                         contentDescription = null
                     )
                 }
@@ -207,7 +207,7 @@ private fun CctvPlayer(
                     }
                 }
                 Icon(
-                    painter = painterResource(PortalTikIcons.zoomIn),
+                    painter = painterResource(GateTikIcons.zoomIn),
                     contentDescription = null,
                     modifier = Modifier
                         .size(24.dp)

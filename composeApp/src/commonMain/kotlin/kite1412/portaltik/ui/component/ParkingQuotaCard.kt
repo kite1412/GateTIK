@@ -31,7 +31,7 @@ import kite1412.portaltik.designsystem.theme.Slate400
 import kite1412.portaltik.designsystem.theme.Slate500
 import kite1412.portaltik.designsystem.theme.White
 import kite1412.portaltik.designsystem.theme.White55
-import kite1412.portaltik.designsystem.util.PortalTikIcons
+import kite1412.portaltik.designsystem.util.GateTikIcons
 import kite1412.portaltik.model.ParkingQuota
 import kite1412.portaltik.ui.compositionlocal.LocalDarkMode
 import kite1412.portaltik.ui.util.LoadState
@@ -42,7 +42,7 @@ import org.jetbrains.compose.resources.painterResource
 fun ParkingQuotaCard(
     parkingQuota: LoadState<ParkingQuota?>,
     modifier: Modifier = Modifier,
-    icon: DrawableResource = PortalTikIcons.car,
+    icon: DrawableResource = GateTikIcons.car,
     isDarkMode: Boolean = LocalDarkMode.current
 ) {
     val background = if (isDarkMode) MaterialTheme.colorScheme.surface.copy(alpha = 0.7f) else White55

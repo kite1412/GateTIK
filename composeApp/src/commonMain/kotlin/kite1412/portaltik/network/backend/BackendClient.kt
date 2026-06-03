@@ -13,7 +13,7 @@ import io.ktor.client.statement.HttpResponse
 import io.ktor.client.statement.request
 import io.ktor.http.fullPath
 import kite1412.portaltik.Logger
-import kite1412.portaltik.datastore.PortalTikDataStore
+import kite1412.portaltik.datastore.GateTikDataStore
 import kite1412.portaltik.network.backend.util.getPath
 import kite1412.portaltik.network.domain.ktorHttpClient
 import org.koin.core.component.KoinComponent
@@ -21,7 +21,7 @@ import org.koin.core.component.inject
 
 object BackendClient : KoinComponent {
     const val LOG_TAG = "BackendClient"
-    val dataStore: PortalTikDataStore by inject()
+    val dataStore: GateTikDataStore by inject()
     val httpClient = ktorHttpClient
 
     suspend inline fun rawGet(

@@ -22,7 +22,7 @@ import kite1412.portaltik.ui.navigation.RootDestination
 import kite1412.portaltik.ui.navigation.RootDestinationsProvider
 
 @Composable
-fun PortalTikNavHost(
+fun GateTikNavHost(
     signedInUser: User?,
     isFirstLaunch: Boolean,
     scaffoldPadding: PaddingValues,

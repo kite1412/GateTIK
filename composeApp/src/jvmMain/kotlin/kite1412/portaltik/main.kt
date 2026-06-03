@@ -33,10 +33,10 @@ import androidx.compose.ui.text.withLink
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
-import kite1412.portaltik.app.PortalTikApp
+import kite1412.portaltik.app.GateTikApp
 import kite1412.portaltik.designsystem.extension.linkStyle
 import kite1412.portaltik.designsystem.theme.Yellow500
-import kite1412.portaltik.designsystem.util.PortalTikIcons
+import kite1412.portaltik.designsystem.util.GateTikIcons
 import kite1412.portaltik.di.initKoin
 import kite1412.portaltik.domain.Authentication
 import kite1412.portaltik.domain.SessionStatus
@@ -85,7 +85,7 @@ fun main() {
                                     onDismissClick = { showVlcWarning = false }
                                 )
                             }
-                            PortalTikApp()
+                            GateTikApp()
                         }
                     }
                 }
@@ -138,7 +138,7 @@ private fun VlcNotInstalledWarning(
             style = labelSmall
         )
         Icon(
-            painter = painterResource(PortalTikIcons.x),
+            painter = painterResource(GateTikIcons.x),
             contentDescription = "dismiss",
             modifier = Modifier
                 .padding(4.dp)

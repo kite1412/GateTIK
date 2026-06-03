@@ -28,6 +28,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import kite1412.portaltik.BuildConfig
 import kite1412.portaltik.designsystem.component.Badge
 import kite1412.portaltik.designsystem.component.Icon
 import kite1412.portaltik.designsystem.component.PrimaryButton
@@ -37,7 +38,7 @@ import kite1412.portaltik.designsystem.theme.PortalTikTheme
 import kite1412.portaltik.designsystem.theme.Red600
 import kite1412.portaltik.designsystem.theme.RoyalBlueIndigoGradient
 import kite1412.portaltik.designsystem.theme.White
-import kite1412.portaltik.designsystem.util.PortalTikIcons
+import kite1412.portaltik.designsystem.util.GateTikIcons
 import kite1412.portaltik.model.User
 import kite1412.portaltik.ui.component.SettingsDivider
 import kite1412.portaltik.ui.component.SettingsGroup
@@ -112,12 +113,12 @@ private fun ProfileScreen(
                 item {
                     SettingsGroup(title = "AKUN") {
                         SettingsItem(
-                            icon = painterResource(PortalTikIcons.idCard),
+                            icon = painterResource(GateTikIcons.idCard),
                             title = "NPM / NIP",
                             subtitle = user.instituteNumber,
                             trailing = {
                                 Icon(
-                                    painter = painterResource(PortalTikIcons.chevronRight),
+                                    painter = painterResource(GateTikIcons.chevronRight),
                                     contentDescription = null,
                                     modifier = Modifier.size(16.dp),
                                     tint = MaterialTheme.colorScheme.onSurfaceVariant
@@ -126,12 +127,12 @@ private fun ProfileScreen(
                         )
                         SettingsDivider()
                         SettingsItem(
-                            icon = painterResource(PortalTikIcons.email),
+                            icon = painterResource(GateTikIcons.email),
                             title = "EMAIL",
                             subtitle = user.email,
                             trailing = {
                                 Icon(
-                                    painter = painterResource(PortalTikIcons.chevronRight),
+                                    painter = painterResource(GateTikIcons.chevronRight),
                                     contentDescription = null,
                                     modifier = Modifier.size(16.dp),
                                     tint = MaterialTheme.colorScheme.onSurfaceVariant
@@ -140,12 +141,12 @@ private fun ProfileScreen(
                         )
                         SettingsDivider()
                         SettingsItem(
-                            icon = painterResource(PortalTikIcons.shield),
+                            icon = painterResource(GateTikIcons.shield),
                             title = "ROLE",
                             subtitle = user.role.toIdString(),
                             trailing = {
                                 Icon(
-                                    painter = painterResource(PortalTikIcons.chevronRight),
+                                    painter = painterResource(GateTikIcons.chevronRight),
                                     contentDescription = null,
                                     modifier = Modifier.size(16.dp),
                                     tint = MaterialTheme.colorScheme.onSurfaceVariant
@@ -158,7 +159,7 @@ private fun ProfileScreen(
                 item {
                     SettingsGroup(title = "PENGATURAN") {
                         SettingsItem(
-                            icon = painterResource(if (isDarkMode) PortalTikIcons.moon else PortalTikIcons.sun),
+                            icon = painterResource(if (isDarkMode) GateTikIcons.moon else GateTikIcons.sun),
                             subtitle = "Mode gelap",
                             trailing = {
                                 Switch(
@@ -179,7 +180,7 @@ private fun ProfileScreen(
                         containerColor = Red600,
                         leading = {
                             Icon(
-                                painter = painterResource(PortalTikIcons.logout),
+                                painter = painterResource(GateTikIcons.logout),
                                 contentDescription = null,
                                 tint = White,
                                 modifier = Modifier.size(20.dp)
@@ -194,7 +195,7 @@ private fun ProfileScreen(
                         contentAlignment = Alignment.Center
                     ) {
                         Text(
-                            text = "Portal TIK - v1.0.0",
+                            text = "Gate TIK - v${BuildConfig.VERSION}",
                             style = MaterialTheme.typography.labelSmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
                         )

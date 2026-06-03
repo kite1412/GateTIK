@@ -41,7 +41,7 @@ import kite1412.portaltik.designsystem.theme.Emerald700
 import kite1412.portaltik.designsystem.theme.PortalTikTheme
 import kite1412.portaltik.designsystem.theme.Red500
 import kite1412.portaltik.designsystem.theme.Yellow500
-import kite1412.portaltik.designsystem.util.PortalTikIcons
+import kite1412.portaltik.designsystem.util.GateTikIcons
 import kite1412.portaltik.feature.monitoring.desktop.component.DesktopLayout
 import kite1412.portaltik.feature.monitoring.desktop.util.desktopBaseModifier
 import kite1412.portaltik.model.User
@@ -125,7 +125,7 @@ private fun DesktopUserManagementContent(
                 )
 
                 Icon(
-                    painter = painterResource(PortalTikIcons.funnel),
+                    painter = painterResource(GateTikIcons.funnel),
                     contentDescription = null,
                     modifier = Modifier.size(24.dp),
                     tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
@@ -219,22 +219,22 @@ private fun DesktopUserManagementContent(
                                 TableColumn("AKSI", 1.5f) {
                                     Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
                                         ActionIconButton(
-                                            icon = PortalTikIcons.eyeOpen,
+                                            icon = GateTikIcons.eyeOpen,
                                             onClick = { },
                                             tint = Blue500
                                         )
                                         ActionIconButton(
-                                            icon = PortalTikIcons.userCheck,
+                                            icon = GateTikIcons.userCheck,
                                             onClick = { },
                                             tint = Emerald500
                                         )
                                         ActionIconButton(
-                                            icon = PortalTikIcons.userPen,
+                                            icon = GateTikIcons.userPen,
                                             onClick = { },
                                             tint = Yellow500
                                         )
                                         ActionIconButton(
-                                            icon = PortalTikIcons.trash,
+                                            icon = GateTikIcons.trash,
                                             onClick = { },
                                             tint = Red500
                                         )

@@ -2,7 +2,7 @@ package kite1412.portaltik.feature.monitoring.desktop
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import kite1412.portaltik.datastore.PortalTikDataStore
+import kite1412.portaltik.datastore.GateTikDataStore
 import kite1412.portaltik.domain.Authentication
 import kite1412.portaltik.domain.SessionStatus
 import kotlinx.coroutines.flow.SharingStarted
@@ -12,7 +12,7 @@ import kotlinx.coroutines.launch
 
 abstract class DesktopBaseViewModel(
     authentication: Authentication,
-    private val dataStore: PortalTikDataStore
+    private val dataStore: GateTikDataStore
 ) : ViewModel() {
     val signedInUser = authentication
         .sessionStatus

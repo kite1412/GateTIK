@@ -29,7 +29,7 @@ import kite1412.portaltik.designsystem.component.GlassBox
 import kite1412.portaltik.designsystem.component.Icon
 import kite1412.portaltik.designsystem.theme.Blue500
 import kite1412.portaltik.designsystem.theme.Red500
-import kite1412.portaltik.designsystem.util.PortalTikIcons
+import kite1412.portaltik.designsystem.util.GateTikIcons
 import org.jetbrains.compose.resources.painterResource
 
 @Composable
@@ -73,7 +73,7 @@ fun LiveCameraSection(
                 ) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Icon(
-                            painter = painterResource(PortalTikIcons.videoRecorder),
+                            painter = painterResource(GateTikIcons.videoRecorder),
                             contentDescription = null,
                             modifier = Modifier.size(14.dp),
                             tint = Color.White

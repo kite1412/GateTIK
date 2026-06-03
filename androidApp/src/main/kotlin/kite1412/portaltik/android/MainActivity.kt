@@ -6,7 +6,7 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
-import kite1412.portaltik.app.PortalTikApp
+import kite1412.portaltik.app.GateTikApp
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -14,13 +14,13 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         setContent {
-            PortalTikApp()
+            GateTikApp()
         }
     }
 }
 
 @Preview
 @Composable
-fun PortalTikAppPreview() {
-    PortalTikApp()
+fun GateTikAppPreview() {
+    GateTikApp()
 }

@@ -39,7 +39,7 @@ import kite1412.portaltik.designsystem.theme.RoyalBlue800_50
 import kite1412.portaltik.designsystem.theme.White
 import kite1412.portaltik.designsystem.theme.White15
 import kite1412.portaltik.designsystem.theme.White50
-import kite1412.portaltik.designsystem.util.PortalTikIcons
+import kite1412.portaltik.designsystem.util.GateTikIcons
 import kite1412.portaltik.ui.compositionlocal.LocalDarkMode
 import org.jetbrains.compose.resources.painterResource
 
@@ -142,7 +142,7 @@ private fun OutlineTextFieldPreview() {
                       label = buildAnnotatedString { append("EMAIL") },
                       leading = {
                           Icon(
-                              painter = painterResource(PortalTikIcons.email),
+                              painter = painterResource(GateTikIcons.email),
                               contentDescription = "EMAIL",
                               tint = RoyalBlue800_50
                           )
@@ -155,7 +155,7 @@ private fun OutlineTextFieldPreview() {
                       placeholder = "Password",
                       leading = {
                           Icon(
-                              painter = painterResource(PortalTikIcons.lock),
+                              painter = painterResource(GateTikIcons.lock),
                               contentDescription = "lock",
                               tint = RoyalBlue800_50
                           )

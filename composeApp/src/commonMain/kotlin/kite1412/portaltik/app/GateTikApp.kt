@@ -35,8 +35,8 @@ import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
 @Preview
-fun PortalTikApp() {
-    val viewModel = koinViewModel<PortalTikViewModel>()
+fun GateTikApp() {
+    val viewModel = koinViewModel<GateTikViewModel>()
     val isDarkMode by viewModel.isDarkMode.collectAsStateWithLifecycle()
     val isFirstLaunch by viewModel.isFirstLaunch.collectAsStateWithLifecycle()
     val sessionStatus by viewModel.sessionStatus.collectAsStateWithLifecycle()
@@ -44,7 +44,7 @@ fun PortalTikApp() {
     val navController = rememberNavController()
     val user = if (sessionStatus is SessionStatus.SignedIn)
         (sessionStatus as SessionStatus.SignedIn).user else null
-    val appState = rememberPortalTikAppState(
+    val appState = rememberGateTikAppState(
         navController = navController,
         userRole = user?.role
     )
@@ -95,7 +95,7 @@ fun PortalTikApp() {
                             visible = sessionStatus !is SessionStatus.Loading && isFirstLaunch != null,
                             enter = fadeIn() + slideInHorizontally()
                         ) {
-                            PortalTikNavHost(
+                            GateTikNavHost(
                                 signedInUser = user,
                                 isFirstLaunch = isFirstLaunch!!,
                                 scaffoldPadding = p,
@@ -112,7 +112,7 @@ fun PortalTikApp() {
                             modifier = Modifier
                                 .align(Alignment.TopCenter)
                                 .padding(p),
-                            snackbar = { data -> PortalTikSnackbar(data) }
+                            snackbar = { data -> GateTikSnackbar(data) }
                         )
                     }
                 }

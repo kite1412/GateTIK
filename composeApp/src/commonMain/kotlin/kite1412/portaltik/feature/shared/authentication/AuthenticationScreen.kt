@@ -78,7 +78,7 @@ import kite1412.portaltik.designsystem.theme.White
 import kite1412.portaltik.designsystem.theme.White30
 import kite1412.portaltik.designsystem.theme.White50
 import kite1412.portaltik.designsystem.theme.White60
-import kite1412.portaltik.designsystem.util.PortalTikIcons
+import kite1412.portaltik.designsystem.util.GateTikIcons
 import kite1412.portaltik.rememberFilePicker
 import kite1412.portaltik.ui.component.SmallCircularProgressIndicator
 import kite1412.portaltik.ui.component.ThemeToggle
@@ -237,7 +237,7 @@ private fun AuthenticationScreen(
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
                         Icon(
-                            painter = painterResource(PortalTikIcons.unila),
+                            painter = painterResource(GateTikIcons.unila),
                             contentDescription = "App Icon",
                             modifier = Modifier.size(64.dp)
                         )
@@ -353,7 +353,7 @@ private fun AuthenticationScreen(
                     contentPadding = PaddingValues(8.dp)
                 ) {
                     Icon(
-                        painter = painterResource(PortalTikIcons.chevronRight),
+                        painter = painterResource(GateTikIcons.chevronRight),
                         contentDescription = null,
                         modifier = Modifier.rotate(90f)
                     )
@@ -396,7 +396,7 @@ private fun Form(
                 onValueChange = onFullNameChange,
                 label = buildAnnotatedString { append("NAMA LENGKAP") },
                 placeholder = "Masukkan nama lengkap",
-                icon = PortalTikIcons.person,
+                icon = GateTikIcons.person,
                 iconColor = iconColor
             )
         }
@@ -406,7 +406,7 @@ private fun Form(
             modifier = Modifier.fillMaxWidth(),
             label = buildAnnotatedString { append("EMAIL KAMPUS") },
             placeholder = "@students.unila.ac.id",
-            icon = PortalTikIcons.email,
+            icon = GateTikIcons.email,
             iconColor = iconColor,
             keyboardType = KeyboardType.Email
         )
@@ -416,7 +416,7 @@ private fun Form(
                 onValueChange = onNpmNipChange,
                 label = buildAnnotatedString { append("NPM/NIP") },
                 placeholder = "NPM/NIP",
-                icon = PortalTikIcons.numbers,
+                icon = GateTikIcons.numbers,
                 iconColor = iconColor
             )
         }
@@ -426,7 +426,7 @@ private fun Form(
             modifier = Modifier.fillMaxWidth(),
             label = buildAnnotatedString { append("PASSWORD") },
             placeholder = "Password",
-            icon = PortalTikIcons.lock,
+            icon = GateTikIcons.lock,
             iconColor = iconColor,
             visualTransformation = if (showPassword) VisualTransformation.None
                 else PasswordVisualTransformation(),
@@ -445,7 +445,7 @@ private fun Form(
                 onValueChange = onConfirmPasswordChange,
                 label = buildAnnotatedString { append("KONFIRMASI PASSWORD") },
                 placeholder = "Ulangi password",
-                icon = PortalTikIcons.lock,
+                icon = GateTikIcons.lock,
                 iconColor = iconColor,
                 visualTransformation = if (showConfirmPassword) VisualTransformation.None
                     else PasswordVisualTransformation(),
@@ -518,7 +518,7 @@ private fun IdCardPicker(
                 val color = MaterialTheme.colorScheme.onBackground
 
                 Icon(
-                    painter = painterResource(PortalTikIcons.idCard),
+                    painter = painterResource(GateTikIcons.idCard),
                     contentDescription = null,
                     modifier = Modifier.size((labelMedium.fontSize.value * 2).dp),
                     tint = color
@@ -544,7 +544,7 @@ private fun PasswordVisibilityStateIcon(
 ) {
     Icon(
         painter = painterResource(
-            resource = if (showPassword) PortalTikIcons.eyeClose else PortalTikIcons.eyeOpen
+            resource = if (showPassword) GateTikIcons.eyeClose else GateTikIcons.eyeOpen
         ),
         contentDescription = if (showPassword) "sembunyikan password" else "tampilkan password",
         modifier = modifier.clickable(

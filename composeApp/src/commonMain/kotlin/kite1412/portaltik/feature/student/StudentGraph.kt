@@ -4,7 +4,7 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.navigation
 import kite1412.portaltik.app.smallContentPadding
-import kite1412.portaltik.designsystem.util.PortalTikIcons
+import kite1412.portaltik.designsystem.util.GateTikIcons
 import kite1412.portaltik.feature.Graph
 import kite1412.portaltik.feature.Route
 import kite1412.portaltik.feature.shared.SharedGraph
@@ -30,13 +30,13 @@ object StudentGraph : RootDestinationsProvider, Graph {
 
     object GateAccess : RootDestination, Route("gate_access") {
         override val route: String = name
-        override val icon: DrawableResource = PortalTikIcons.doorOpen
+        override val icon: DrawableResource = GateTikIcons.doorOpen
         override val label: String = "Gate"
     }
 
     object Profile : RootDestination {
         override val route: String = SharedGraph.ProfileRoute.name
-        override val icon: DrawableResource = PortalTikIcons.person
+        override val icon: DrawableResource = GateTikIcons.person
         override val label: String = "Profil"
     }
 }

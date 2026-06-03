@@ -4,6 +4,6 @@ import org.koin.dsl.module
 
 val dataStoreModule = module {
     single {
-        PortalTikDataStore(dataStore = get())
+        GateTikDataStore(dataStore = get())
     }
 }

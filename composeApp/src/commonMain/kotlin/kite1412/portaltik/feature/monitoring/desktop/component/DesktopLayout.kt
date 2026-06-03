@@ -14,7 +14,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import kite1412.portaltik.designsystem.component.GlassBox
 import kite1412.portaltik.designsystem.component.Icon
-import kite1412.portaltik.designsystem.util.PortalTikIcons
+import kite1412.portaltik.designsystem.util.GateTikIcons
 import kite1412.portaltik.model.UserRole
 import kite1412.portaltik.ui.component.BorderedHeaderSection
 import kite1412.portaltik.ui.compositionlocal.LocalScaffoldComponentsController
@@ -51,7 +51,7 @@ fun DesktopLayout(
                         shape = CircleShape
                     ) {
                         Icon(
-                            painter = painterResource(PortalTikIcons.chevronRight),
+                            painter = painterResource(GateTikIcons.chevronRight),
                             contentDescription = "tutup",
                             modifier = Modifier.size(16.dp),
                             tint = LocalContentColor.current

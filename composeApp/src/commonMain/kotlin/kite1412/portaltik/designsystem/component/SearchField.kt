@@ -12,7 +12,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import kite1412.portaltik.designsystem.theme.Gray200
 import kite1412.portaltik.designsystem.theme.Gray900
-import kite1412.portaltik.designsystem.util.PortalTikIcons
+import kite1412.portaltik.designsystem.util.GateTikIcons
 import kite1412.portaltik.ui.compositionlocal.LocalDarkMode
 import org.jetbrains.compose.resources.painterResource
 
@@ -37,7 +37,7 @@ fun SearchField(
             horizontalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             Icon(
-                painter = painterResource(PortalTikIcons.search),
+                painter = painterResource(GateTikIcons.search),
                 contentDescription = null,
                 modifier = Modifier.size(20.dp),
                 tint = if (isDarkMode) Gray200.copy(alpha = 0.5f) else Gray900.copy(alpha = 0.5f)
