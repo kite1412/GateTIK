@@ -9,6 +9,7 @@ import kite1412.gatetik.app.smallContentPadding
 import kite1412.gatetik.designsystem.util.GateTikIcons
 import kite1412.gatetik.feature.Graph
 import kite1412.gatetik.feature.Route
+import kite1412.gatetik.feature.monitoring.desktop.accesslogs.desktopAccessLogsScreen
 import kite1412.gatetik.feature.monitoring.desktop.cctv.desktopCctvScreen
 import kite1412.gatetik.feature.monitoring.desktop.dashboard.desktopDashboardScreen
 import kite1412.gatetik.feature.monitoring.desktop.parking.desktopParkingScreen
@@ -47,7 +48,7 @@ object MonitoringGraph : Graph {
 
     object Desktop : RootDestinationsProvider {
         override val rootDestinations: List<RootDestination> = listOf(
-            Dashboard, Cctv, Parking, UserManagement, AccessLogs, VisitorIntercom
+            Dashboard, Cctv, Parking, UserManagement, AccessLogs
         )
 
         object Dashboard : RootDestination, Route("desktop_monitoring_dashboard") {
@@ -77,13 +78,7 @@ object MonitoringGraph : Graph {
         object AccessLogs : RootDestination, Route("desktop_monitoring_access_logs") {
             override val route: String = name
             override val icon: DrawableResource = GateTikIcons.scrollText
-            override val label: String = "Access Log"
-        }
-
-        object VisitorIntercom : RootDestination, Route("desktop_monitoring_visitor_intercom") {
-            override val route: String = name
-            override val icon: DrawableResource = GateTikIcons.phoneCall
-            override val label: String = "Interkom Pengunjung"
+            override val label: String = "Log Akses"
         }
     }
 
@@ -123,6 +118,7 @@ private fun NavGraphBuilder.desktopMonitoringGraph(scaffoldPadding: PaddingValue
     desktopCctvScreen(contentPadding = normalContentPadding(scaffoldPadding))
     desktopParkingScreen(contentPadding = normalContentPadding(scaffoldPadding))
     desktopUserManagementScreen(contentPadding = normalContentPadding(scaffoldPadding))
+    desktopAccessLogsScreen(contentPadding = normalContentPadding(scaffoldPadding))
 }
 
 private fun NavGraphBuilder.mobileMonitoringGraph(

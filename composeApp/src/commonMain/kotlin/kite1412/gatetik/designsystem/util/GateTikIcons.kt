@@ -11,6 +11,7 @@ import gatetik.composeapp.generated.resources.cpu
 import gatetik.composeapp.generated.resources.dashboard
 import gatetik.composeapp.generated.resources.door_close
 import gatetik.composeapp.generated.resources.door_open
+import gatetik.composeapp.generated.resources.download
 import gatetik.composeapp.generated.resources.email
 import gatetik.composeapp.generated.resources.eye_close
 import gatetik.composeapp.generated.resources.eye_open
@@ -91,4 +92,5 @@ object GateTikIcons {
     val search = Res.drawable.search
     val chevronFirst = Res.drawable.chevron_first
     val chevronLast = Res.drawable.chevron_last
+    val download = Res.drawable.download
 }
