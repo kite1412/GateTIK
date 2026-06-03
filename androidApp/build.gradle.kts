@@ -18,11 +18,11 @@ kotlin {
 }
 
 android {
-    namespace = "kite1412.portaltik.android"
+    namespace = "kite1412.gatetik.android"
     compileSdk = libs.versions.android.compileSdk.get().toInt()
 
     defaultConfig {
-        applicationId = "kite1412.portaltik"
+        applicationId = "kite1412.gatetik"
         minSdk = libs.versions.android.minSdk.get().toInt()
         targetSdk = libs.versions.android.targetSdk.get().toInt()
         versionCode = 1

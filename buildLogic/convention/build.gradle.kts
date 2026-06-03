@@ -22,7 +22,7 @@ dependencies {
 gradlePlugin {
     plugins {
         register("buildConfig") {
-            id = "portaltik.buildconfig"
+            id = "gatetik.buildconfig"
             implementationClass = "BuildConfigConventionPlugin"
         }
     }

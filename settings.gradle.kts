@@ -1,4 +1,4 @@
-rootProject.name = "PortalTIK"
+rootProject.name = "GateTIK"
 enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
 
 pluginManagement {

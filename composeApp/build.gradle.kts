@@ -6,7 +6,7 @@ plugins {
     alias(libs.plugins.kotlinMultiplatformLibrary)
     alias(libs.plugins.composeMultiplatform)
     alias(libs.plugins.composeCompiler)
-    alias(libs.plugins.portaltik.buildconfig)
+    alias(libs.plugins.gatetik.buildconfig)
     kotlin("plugin.serialization")
 }
 
@@ -16,7 +16,7 @@ kotlin {
     }
 
     androidLibrary {
-        namespace = "kite1412.portaltik"
+        namespace = "kite1412.gatetik"
         minSdk = libs.versions.android.minSdk.get().toInt()
         compileSdk = libs.versions.android.compileSdk.get().toInt()
 
@@ -79,11 +79,11 @@ dependencies {
 
 compose.desktop {
     application {
-        mainClass = "kite1412.portaltik.MainKt"
+        mainClass = "kite1412.gatetik.MainKt"
 
         nativeDistributions {
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
-            packageName = "kite1412.portaltik"
+            packageName = "kite1412.gatetik"
             packageVersion = "1.0.0"
 
             macOS {
@@ -100,7 +100,7 @@ compose.desktop {
 }
 
 buildConfig {
-    packageName = "kite1412.portaltik"
+    packageName = "kite1412.gatetik"
 
     buildConfigField("BACKEND_URL")
     buildConfigField("CCTV_URL")

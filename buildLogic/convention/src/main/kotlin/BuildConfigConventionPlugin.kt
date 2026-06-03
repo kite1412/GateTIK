@@ -1,5 +1,5 @@
-import kite1412.portaltik.BuildConfigExtension
-import kite1412.portaltik.task.GenerateBuildConfigTask
+import kite1412.gatetik.BuildConfigExtension
+import kite1412.gatetik.task.GenerateBuildConfigTask
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.kotlin.dsl.getByType

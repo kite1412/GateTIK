@@ -1,4 +1,4 @@
-# PortalTIK
+# GateTIK
 A multiplatform project for parking gate control and parking monitoring.
 
 ### Tested Platforms
@@ -32,7 +32,7 @@ Support Status:
 1. Clone the repository
 
     ```bash
-    git clone https://github.com/kite1412/PortalTIK.git
+    git clone https://github.com/kite1412/GateTIK.git
     ```
 2. Open the downloaded repository in Android Studio.
 3. Simply click run (▶️) button at the top of the Android Studio to install and launch the app.
@@ -41,7 +41,7 @@ Support Status:
 1. Clone the repository
 
     ```bash
-    git clone https://github.com/kite1412/PortalTIK.git
+    git clone https://github.com/kite1412/GateTIK.git
     ```
 2. Open the downloaded repository in Android Studio.
 3. Navigate to **Build > Generate Signed APP Bundle / APK**.
@@ -62,7 +62,7 @@ Support Status:
 1. Clone the repository
 
     ```bash
-    git clone https://github.com/kite1412/PortalTIK.git
+    git clone https://github.com/kite1412/GateTIK.git
     ```
 2. Open the downloaded repository in Android Studio / IntelliJ IDEA.
 3. Run the following gradle command:
