@@ -8,5 +8,5 @@ import kite1412.gatetik.ui.util.stateIn
 class MobileParkingViewModel(
     getMainParkingQuotaUseCase: GetMainParkingQuotaUseCase
 ) : ViewModel() {
-    val mainParkingQuota = getMainParkingQuotaUseCase().stateIn(viewModelScope)
+    val mainParkingQuota = getMainParkingQuotaUseCase.observeAsLoadStateFlow().stateIn(viewModelScope)
 }

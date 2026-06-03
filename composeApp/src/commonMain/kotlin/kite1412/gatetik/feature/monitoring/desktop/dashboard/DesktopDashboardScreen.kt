@@ -18,10 +18,14 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -34,6 +38,8 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kite1412.gatetik.designsystem.component.Badge
 import kite1412.gatetik.designsystem.component.GlassBox
 import kite1412.gatetik.designsystem.component.Icon
+import kite1412.gatetik.designsystem.component.Table
+import kite1412.gatetik.designsystem.component.TableColumn
 import kite1412.gatetik.designsystem.theme.Blue500
 import kite1412.gatetik.designsystem.theme.Emerald500
 import kite1412.gatetik.designsystem.theme.GateTikTheme
@@ -47,15 +53,25 @@ import kite1412.gatetik.feature.monitoring.desktop.component.DashboardSummaryCar
 import kite1412.gatetik.feature.monitoring.desktop.component.DesktopLayout
 import kite1412.gatetik.feature.monitoring.desktop.component.LiveCameraSection
 import kite1412.gatetik.feature.monitoring.desktop.util.desktopBaseModifier
+import kite1412.gatetik.model.AccessLog
+import kite1412.gatetik.model.AccessStatus
+import kite1412.gatetik.model.Cctv
+import kite1412.gatetik.model.Gate
 import kite1412.gatetik.model.ParkingQuota
 import kite1412.gatetik.model.UserRole
 import kite1412.gatetik.ui.component.GateControlButton
 import kite1412.gatetik.ui.component.ParkingQuotaCard
 import kite1412.gatetik.ui.compositionlocal.LocalDarkMode
+import kite1412.gatetik.ui.compositionlocal.LocalSnackbarHostStateWrapper
 import kite1412.gatetik.ui.preview.DevicePreviews
 import kite1412.gatetik.ui.util.LoadState
+import kite1412.gatetik.ui.util.UiEvent
+import kite1412.gatetik.ui.util.data
+import kite1412.gatetik.ui.util.map
+import kite1412.gatetik.util.timestampString
 import org.jetbrains.compose.resources.painterResource
 import org.koin.compose.viewmodel.koinViewModel
+import kotlin.math.roundToInt
 
 @Composable
 fun DesktopDashboardScreen(
@@ -63,13 +79,32 @@ fun DesktopDashboardScreen(
     modifier: Modifier = Modifier,
     viewModel: DesktopDashboardViewModel = koinViewModel()
 ) {
+    val snackbarHostStateWrapper = LocalSnackbarHostStateWrapper.current
     val user by viewModel.signedInUser.collectAsStateWithLifecycle()
+    val gate by viewModel.gate.collectAsStateWithLifecycle()
+    val parkingQuota by viewModel.parkingQuota.collectAsStateWithLifecycle()
+    val cctv by viewModel.cctv.collectAsStateWithLifecycle()
+    val totalUsers = viewModel.totalUsers
+    val accessLogs = viewModel.accessLogs
 
+    LaunchedEffect(Unit) {
+        viewModel.uiEvent.collect { event ->
+            if (event is UiEvent.ShowSnackbar)
+                snackbarHostStateWrapper.showSnackbar(event.message)
+        }
+    }
     user?.let { user ->
         DesktopDashboardScreen(
             userRole = user.role,
+            gate = gate,
+            parkingQuota = parkingQuota,
+            cctv = cctv,
+            totalUsers = totalUsers,
+            accessLogs = accessLogs,
             contentPadding = contentPadding,
             onThemeToggle = viewModel::updateDarkMode,
+            onOpenGate = viewModel::openGate,
+            onCloseGate = viewModel::closeGate,
             modifier = modifier
         )
     }
@@ -78,8 +113,15 @@ fun DesktopDashboardScreen(
 @Composable
 private fun DesktopDashboardScreen(
     userRole: UserRole,
+    gate: LoadState<Gate?>,
+    parkingQuota: LoadState<ParkingQuota?>,
+    cctv: LoadState<Cctv?>,
+    totalUsers: LoadState<Int>,
+    accessLogs: LoadState<List<AccessLog>>,
     contentPadding: PaddingValues,
     onThemeToggle: (darkMode: Boolean) -> Unit,
+    onOpenGate: () -> Unit,
+    onCloseGate: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val windowWidthSize = rememberWindowWidthSize()
@@ -97,7 +139,12 @@ private fun DesktopDashboardScreen(
             verticalArrangement = Arrangement.spacedBy(24.dp)
         ) {
             item {
-                SummaryCardsRow()
+                SummaryCardsRow(
+                    gate = gate,
+                    parkingQuota = parkingQuota,
+                    totalUsers = totalUsers,
+                    accessLogs = accessLogs
+                )
             }
             item {
                 Row(
@@ -111,24 +158,34 @@ private fun DesktopDashboardScreen(
                         verticalArrangement = Arrangement.spacedBy(24.dp)
                     ) {
                         GateControlCard(
+                            gate = gate,
+                            accessLogs = accessLogs,
+                            onOpenGate = onOpenGate,
+                            onCloseGate = onCloseGate,
                             modifier = Modifier.weight(1f)
                         )
                         ParkingOccupancyCardSection(
+                            parkingQuota = parkingQuota,
                             modifier = Modifier.weight(1f)
                         )
                     }
                     if (!isLargeWindow) GateControlCard(
+                        gate = gate,
+                        accessLogs = accessLogs,
+                        onOpenGate = onOpenGate,
+                        onCloseGate = onCloseGate,
                         modifier = Modifier
                             .weight(1f)
                             .fillMaxHeight()
                     )
                     if (!isLargeWindow) ParkingOccupancyCardSection(
+                        parkingQuota = parkingQuota,
                         modifier = Modifier
                             .weight(1f)
                             .fillMaxHeight()
                     )
                     if (isLargeWindow) LiveCameraSection(
-                        cameraName = "CAM-01 · Gerbang Utama",
+                        cameraName = cctv.data?.cameraName ?: "~",
                         modifier = Modifier
                             .weight(2f)
                             .fillMaxHeight()
@@ -137,14 +194,16 @@ private fun DesktopDashboardScreen(
             }
             if (!isLargeWindow) item {
                 LiveCameraSection(
-                    cameraName = "CAM-01 · Gerbang Utama"
+                    cameraName = cctv.data?.cameraName ?: "~"
                 )
             }
             item {
                 AccessTrendSection()
             }
             item {
-                RecentAccessActivitySection()
+                RecentAccessActivitySection(
+                    accessLogs = accessLogs
+                )
             }
         }
     }
@@ -152,6 +211,10 @@ private fun DesktopDashboardScreen(
 
 @Composable
 private fun SummaryCardsRow(
+    gate: LoadState<Gate?>,
+    parkingQuota: LoadState<ParkingQuota?>,
+    totalUsers: LoadState<Int>,
+    accessLogs: LoadState<List<AccessLog>>,
     modifier: Modifier = Modifier
 ) {
     FlowRow(
@@ -163,39 +226,57 @@ private fun SummaryCardsRow(
             icon = painterResource(GateTikIcons.people),
             iconContainerColor = Blue500.copy(alpha = 0.1f),
             iconTint = Blue500,
-            value = "1",
+            value = totalUsers.map { it.toString() },
             label = "Pengguna Aktif",
-            topRightText = "Total 2"
+            topRightText = "Total ${totalUsers.data ?: "~"}"
         )
         DashboardSummaryCard(
             icon = painterResource(GateTikIcons.doorOpen),
             iconContainerColor = Emerald500.copy(alpha = 0.1f),
             iconTint = Emerald500,
-            value = "0",
-            label = "Pemicu Gerbang",
-            topRightText = "0% sukses"
+            value = accessLogs.map { it.size.toString() },
+            label = "Akses Gate",
+            topRightText = "${
+                accessLogs.data?.let { logs ->
+                    if (logs.isEmpty()) "~" 
+                    else (logs.count { it.status == AccessStatus.SUCCESS } * 100f / logs.size).roundToInt()
+                } ?: "~"
+            }% sukses"
         )
         DashboardSummaryCard(
             icon = painterResource(GateTikIcons.car),
             iconContainerColor = Yellow500.copy(alpha = 0.1f),
             iconTint = Yellow500,
-            value = "0/50",
+            value = parkingQuota.map {
+                if (it == null) "~"
+                else "${it.usedSlots}/${it.totalSlots}"
+            },
             label = "Parkir (Mahasiswa)",
-            topRightText = "0%"
+            topRightText = "${
+                parkingQuota.data?.let { parkingQuota ->  
+                    if (parkingQuota.usedSlots == 0 || parkingQuota.totalSlots == 0) "0"
+                    else "${(parkingQuota.usedSlots * 100f / parkingQuota.totalSlots).roundToInt()}"
+                } ?: "~"
+            }%"
         )
         DashboardSummaryCard(
             icon = painterResource(GateTikIcons.cpu),
             iconContainerColor = Purple400.copy(alpha = 0.1f),
             iconTint = Purple400,
-            value = "Offline",
+            value = gate.map {
+                it?.iotDevice?.status
+                    ?.name
+                    ?.uppercase()
+                    ?.replaceFirstChar { c -> c.uppercase() } ?: "Offline"
+            },
             label = "Perangkat IoT",
-            topRightText = "ESP8266 Gerbang 1"
+            topRightText = gate.data?.iotDevice?.deviceName ?: "~"
         )
         DashboardSummaryCard(
             icon = painterResource(GateTikIcons.phoneCall),
             iconContainerColor = Red500.copy(alpha = 0.1f),
             iconTint = Red500,
-            value = "Aktif",
+            value = LoadState.Success("Aktif"),
             label = "Panggilan Pengunjung",
             topRightText = "Sedang berlangsung"
         )
@@ -204,6 +285,10 @@ private fun SummaryCardsRow(
 
 @Composable
 private fun GateControlCard(
+    gate: LoadState<Gate?>,
+    accessLogs: LoadState<List<AccessLog>>,
+    onOpenGate: () -> Unit,
+    onCloseGate: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     GlassBox(modifier = modifier) {
@@ -216,9 +301,11 @@ private fun GateControlCard(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Column {
+                Column(
+                    modifier = Modifier.weight(1f)
+                ) {
                     Text(
-                        text = "GERBANG UTAMA",
+                        text = gate.data?.gateName ?: "~",
                         style = MaterialTheme.typography.labelSmall.copy(
                             fontWeight = FontWeight.Bold,
                             letterSpacing = 1.sp
@@ -235,7 +322,17 @@ private fun GateControlCard(
                         )
                         Spacer(modifier = Modifier.width(6.dp))
                         Text(
-                            text = "Online • Terakhir dibuka —",
+                            text = "${
+                                gate.data
+                                    ?.iotDevice
+                                    ?.status
+                                    ?.capitalizedName
+                            } • Terakhir dibuka ${
+                                accessLogs.data
+                                    ?.maxOf { it.createdAt }
+                                    ?.timestampString
+                                    ?: "~"
+                            }",
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurface
                         )
@@ -260,7 +357,7 @@ private fun GateControlCard(
                 GateControlButton(
                     isOpen = true,
                     actionEnabled = true,
-                    onClick = {},
+                    onClick = onOpenGate,
                     backgroundBrush = SolidColor(Blue500),
                     color = Color.White,
                     modifier = Modifier.weight(1f)
@@ -268,7 +365,7 @@ private fun GateControlCard(
                 GateControlButton(
                     isOpen = false,
                     actionEnabled = true,
-                    onClick = {},
+                    onClick = onCloseGate,
                     backgroundBrush = SolidColor(Red500),
                     color = Color.White,
                     modifier = Modifier.weight(1f)
@@ -280,6 +377,7 @@ private fun GateControlCard(
 
 @Composable
 private fun ParkingOccupancyCardSection(
+    parkingQuota: LoadState<ParkingQuota?>,
     modifier: Modifier = Modifier
 ) {
     GlassBox(modifier = modifier) {
@@ -305,14 +403,7 @@ private fun ParkingOccupancyCardSection(
             }
 
             ParkingQuotaCard(
-                parkingQuota = LoadState.Success(
-                    ParkingQuota(
-                        id = 1,
-                        totalSlots = 50,
-                        usedSlots = 0,
-                        autoRestrictStudents = false
-                    )
-                ),
+                parkingQuota = parkingQuota,
                 isDarkMode = LocalDarkMode.current
             )
 
@@ -441,7 +532,9 @@ private fun AccessTrendSection() {
 }
 
 @Composable
-private fun RecentAccessActivitySection() {
+private fun RecentAccessActivitySection(
+    accessLogs: LoadState<List<AccessLog>>
+) {
     GlassBox {
         Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
             Row(
@@ -460,6 +553,43 @@ private fun RecentAccessActivitySection() {
                     color = Blue500
                 )
             }
+            LoadState(
+                state = accessLogs,
+                loading = { CircularProgressIndicator() },
+                error = { Text("Gagal memuat log akses") },
+                success = { accessLogs ->
+                    CompositionLocalProvider(
+                        LocalTextStyle provides MaterialTheme.typography.bodySmall
+                    ) {
+                        Table(
+                            columns = listOf(
+                                TableColumn("PENGGUNA") {
+                                    Text(it.userId.toString())
+                                },
+                                TableColumn("ROLE") {
+                                    Text(UserRole.STUDENT.toIdString())
+                                },
+                                TableColumn("AKSI") {
+                                    Text(it.action.name)
+                                },
+                                TableColumn("METODE") {
+                                    Text(it.accessMethod.name)
+                                },
+                                TableColumn("STATUS") {
+                                    Text(it.status.name)
+                                },
+                                TableColumn("CATATAN", 2f) {
+                                    Text(it.notes ?: "")
+                                },
+                                TableColumn("WAKTU", 2f) {
+                                    Text(it.createdAt.timestampString)
+                                }
+                            ),
+                            items = accessLogs
+                        )
+                    }
+                }
+            )
 
             Row(
                 modifier = Modifier.fillMaxWidth(),

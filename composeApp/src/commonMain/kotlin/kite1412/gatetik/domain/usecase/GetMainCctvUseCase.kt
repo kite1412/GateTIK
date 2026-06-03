@@ -9,7 +9,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 
 class GetMainCctvUseCase(private val cctvRepository: CctvRepository) {
-    operator fun invoke(): Flow<LoadState<Cctv?>> = flow {
+    fun observeAsLoadStateFlow(): Flow<LoadState<Cctv?>> = flow {
         emit(LoadState.Loading())
 
         cctvRepository

@@ -9,7 +9,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 
 class GetMainParkingQuotaUseCase(private val parkingQuotaRepository: ParkingQuotaRepository) {
-    operator fun invoke(): Flow<LoadState<ParkingQuota?>> = flow {
+    fun observeAsLoadStateFlow(): Flow<LoadState<ParkingQuota?>> = flow {
         emit(LoadState.Loading("Memuat informasi parkir"))
 
         parkingQuotaRepository

@@ -53,7 +53,7 @@ class GateAccessViewModel(
             started = SharingStarted.Eagerly,
             initialValue = null
         )
-    val parkingQuota = getMainParkingQuotaUseCase().stateIn(viewModelScope)
+    val parkingQuota = getMainParkingQuotaUseCase.observeAsLoadStateFlow().stateIn(viewModelScope)
     var isLocationPermissionGranted by mutableStateOf(
         LocationPermissionController.isPermissionGranted()
     )

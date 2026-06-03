@@ -8,5 +8,5 @@ import kite1412.gatetik.ui.util.stateIn
 class MobileCctvViewModel(
     getMainCctvUseCase: GetMainCctvUseCase
 ) : ViewModel() {
-    val mainCctv = getMainCctvUseCase().stateIn(viewModelScope)
+    val mainCctv = getMainCctvUseCase.observeAsLoadStateFlow().stateIn(viewModelScope)
 }

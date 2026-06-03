@@ -23,13 +23,15 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kite1412.gatetik.designsystem.component.GlassBox
 import kite1412.gatetik.designsystem.component.Icon
+import kite1412.gatetik.ui.component.SmallCircularProgressIndicator
+import kite1412.gatetik.ui.util.LoadState
 
 @Composable
 fun DashboardSummaryCard(
     icon: Painter,
     iconContainerColor: Color,
     iconTint: Color,
-    value: String,
+    value: LoadState<String>,
     label: String,
     modifier: Modifier = Modifier,
     topRightText: String? = null,
@@ -84,13 +86,25 @@ fun DashboardSummaryCard(
             Column(
                 verticalArrangement = Arrangement.spacedBy(4.dp)
             ) {
-                Text(
-                    text = value,
-                    style = MaterialTheme.typography.labelMedium.copy(
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 24.sp
-                    ),
-                    color = MaterialTheme.colorScheme.onSurface
+                LoadState(
+                    state = value,
+                    loading = { SmallCircularProgressIndicator() },
+                    error = {
+                        Text(
+                            text = it,
+                            style = MaterialTheme.typography.bodySmall
+                        )
+                    },
+                    success = {
+                        Text(
+                            text = it,
+                            style = MaterialTheme.typography.labelMedium.copy(
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 24.sp
+                            ),
+                            color = MaterialTheme.colorScheme.onSurface
+                        )
+                    }
                 )
                 Text(
                     text = label,

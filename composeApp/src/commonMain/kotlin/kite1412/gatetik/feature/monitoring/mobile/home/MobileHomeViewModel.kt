@@ -56,8 +56,8 @@ class MobileHomeViewModel(
             }
         }
         .stateIn(viewModelScope)
-    val mainCctv = getMainCctvUseCase().stateIn(viewModelScope)
-    val mainParkingQuota = getMainParkingQuotaUseCase().stateIn(viewModelScope)
+    val mainCctv = getMainCctvUseCase.observeAsLoadStateFlow().stateIn(viewModelScope)
+    val mainParkingQuota = getMainParkingQuotaUseCase.observeAsLoadStateFlow().stateIn(viewModelScope)
     val latestAccessLog = flow {
         emit(accessLogRepository.getLatestOpenLog())
     }

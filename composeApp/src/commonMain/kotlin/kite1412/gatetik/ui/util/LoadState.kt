@@ -33,6 +33,12 @@ sealed interface LoadState<out T> {
     ) : LoadState<Nothing>
 }
 
+val <T> LoadState<T>.data: T?
+    get() = when (this) {
+        is LoadState.Success -> data
+        else -> null
+    }
+
 fun <T> Flow<LoadState<T>>.stateIn(
     scope: CoroutineScope,
     started: SharingStarted = SharingStarted.WhileSubscribed(5000),
@@ -42,6 +48,13 @@ fun <T> Flow<LoadState<T>>.stateIn(
     started = started,
     initialValue = initialValue
 )
+
+@Suppress("UNCHECKED_CAST")
+fun <T, R> LoadState<T>.map(block: (value: T) -> R): LoadState<R> =
+    when (this) {
+        is LoadState.Success<T> -> LoadState.Success(block(this.data))
+        else -> this as LoadState<R>
+    }
 
 @Composable
 fun <T> UiLoadState(

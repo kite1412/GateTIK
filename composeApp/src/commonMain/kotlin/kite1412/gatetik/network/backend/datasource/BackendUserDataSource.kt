@@ -9,13 +9,11 @@ import kite1412.gatetik.network.backend.dto.response.BackendResponse
 import kite1412.gatetik.network.domain.datasource.UserRemoteDataSource
 
 class BackendUserDataSource : UserRemoteDataSource {
-    override suspend fun getAll(role: UserRole?): PaginatedListResult<User>? {
-        val res = BackendClient.get<BackendResponse<List<BackendUser>>>(
+    override suspend fun getAll(role: UserRole?): PaginatedListResult<User>? =
+        BackendClient.get<BackendResponse<List<BackendUser>>>(
             path = "users"
         )
-
-        return res.toModel()
-    }
+            .toModel()
 
     private fun BackendResponse<List<BackendUser>>.toModel(): PaginatedListResult<User>? =
         if (data == null || pagination == null) null

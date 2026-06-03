@@ -12,5 +12,5 @@ class DesktopParkingViewModel(
     dataStore: GateTikDataStore,
     getMainParkingQuotaUseCase: GetMainParkingQuotaUseCase
 ) : DesktopBaseViewModel(authentication, dataStore) {
-    val parkingQuota = getMainParkingQuotaUseCase().stateIn(viewModelScope)
+    val parkingQuota = getMainParkingQuotaUseCase.observeAsLoadStateFlow().stateIn(viewModelScope)
 }

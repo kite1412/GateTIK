@@ -8,6 +8,10 @@ import kotlin.time.Instant
 @Serializable
 data class BackendAccessLog(
     val id: Int,
+    @SerialName("user_id")
+    val userId: Int,
+    @SerialName("gate_id")
+    val gateId: Int,
     @SerialName("access_status")
     val accessStatus: BackendAccessStatus,
     @SerialName("access_method")
@@ -18,13 +22,13 @@ data class BackendAccessLog(
     val createdAt: Instant,
     @SerialName("updated_at")
     val updatedAt: Instant,
-    val user: BackendUserMinimum,
-    val gate: BackendGateMinimum
+    val user: BackendUserMinimum? = null,
+    val gate: BackendGateMinimum? = null
 ) {
     fun toModel() = AccessLog(
         id = id,
-        userId = user.id,
-        gateId = gate.id,
+        userId = userId,
+        gateId = gateId,
         status = accessStatus.toModel(),
         accessMethod = accessMethod.toModel(),
         action = action.toModel(),
