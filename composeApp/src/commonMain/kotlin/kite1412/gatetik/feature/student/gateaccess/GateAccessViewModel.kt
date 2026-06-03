@@ -77,6 +77,7 @@ class GateAccessViewModel(
     fun openGate() {
         viewModelScope.launch {
             getMainGateUseCase.observeAsFlow().first()?.let { gate ->
+                delayAction = true
                 val state = locationState.first()
 
                 if (state is LocationState.Available) {
@@ -88,18 +89,17 @@ class GateAccessViewModel(
                             _uiEvent.emit(
                                 UiEvent.ShowSnackbar(if (success) "Berhasil membuka gate" else "Gagal membuka gate, pastikan berada di sekitar gate")
                             )
-                            if (success) {
-                                delayAction = true
-                                delay(5000)
-                                delayAction = false
-                            }
                         }
                         .onError {
                             _uiEvent.emit(
                                 UiEvent.ShowSnackbar("Gagal membuka gate, pastikan berada di sekitar gate")
                             )
                         }
-                }
+                } else _uiEvent.emit(
+                    UiEvent.ShowSnackbar("Tidak dapat mengakses lokasi, tunggu beberapa saat")
+                )
+                delay(5000)
+                delayAction = false
             }
         }
     }

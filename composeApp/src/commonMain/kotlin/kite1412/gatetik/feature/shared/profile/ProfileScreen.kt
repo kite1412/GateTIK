@@ -115,43 +115,19 @@ private fun ProfileScreen(
                         SettingsItem(
                             icon = painterResource(GateTikIcons.idCard),
                             title = "NPM / NIP",
-                            subtitle = user.instituteNumber,
-                            trailing = {
-                                Icon(
-                                    painter = painterResource(GateTikIcons.chevronRight),
-                                    contentDescription = null,
-                                    modifier = Modifier.size(16.dp),
-                                    tint = MaterialTheme.colorScheme.onSurfaceVariant
-                                )
-                            }
+                            subtitle = user.instituteNumber
                         )
                         SettingsDivider()
                         SettingsItem(
                             icon = painterResource(GateTikIcons.email),
                             title = "EMAIL",
-                            subtitle = user.email,
-                            trailing = {
-                                Icon(
-                                    painter = painterResource(GateTikIcons.chevronRight),
-                                    contentDescription = null,
-                                    modifier = Modifier.size(16.dp),
-                                    tint = MaterialTheme.colorScheme.onSurfaceVariant
-                                )
-                            }
+                            subtitle = user.email
                         )
                         SettingsDivider()
                         SettingsItem(
                             icon = painterResource(GateTikIcons.shield),
                             title = "ROLE",
-                            subtitle = user.role.toIdString(),
-                            trailing = {
-                                Icon(
-                                    painter = painterResource(GateTikIcons.chevronRight),
-                                    contentDescription = null,
-                                    modifier = Modifier.size(16.dp),
-                                    tint = MaterialTheme.colorScheme.onSurfaceVariant
-                                )
-                            }
+                            subtitle = user.role.toIdString()
                         )
                     }
                 }
