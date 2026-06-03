@@ -16,3 +16,19 @@ suspend fun <T> tryOrThrowUnknown(
     Logger.e(logTag, errorMessage, e)
     Error(Unknown(errorMessage))
 }
+
+
+suspend fun <T> tryOrThrowUnknown(
+    logTag: String,
+    errorMessage: String,
+    action: suspend (throwError: () -> Nothing) -> T
+): Result<T, Error> = try {
+    Success(
+        action {
+            throw RuntimeException()
+        }
+    )
+} catch (e: Exception) {
+    Logger.e(logTag, errorMessage, e)
+    Error(Unknown(errorMessage))
+}
