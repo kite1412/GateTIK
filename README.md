@@ -23,6 +23,15 @@ Support Status:
 - ❌ = not supported
 
 ## 📥 Installation
+### 📄Set Up `local.properties`
+Inside `<project root>/local.properties` file, add the following properties:
+```properties
+BACKEND_URL=<Backend base URL>
+CCTV_URL=<CCTV URL>
+ANDROID_INSTALLATION_URL=<Android APK Distribution URL>
+VERSION=<Application Version>
+```
+
 ### 📱 Android
 #### 🔹 Requirements
 - Android Studio.
