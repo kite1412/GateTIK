@@ -10,4 +10,5 @@ class MockParkingQuotaRemoteDataSource : ParkingQuotaRemoteDataSource {
         delay(2000)
         return mockParkingQuota
     }
+    override suspend fun updateMainParkingQuota(parkingQuota: ParkingQuota): ParkingQuota = parkingQuota
 }

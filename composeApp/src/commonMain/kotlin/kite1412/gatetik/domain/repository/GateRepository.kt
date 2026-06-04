@@ -5,11 +5,16 @@ import kite1412.gatetik.domain.model.GateAccessType
 import kite1412.gatetik.model.Gate
 import kite1412.gatetik.util.Error
 import kite1412.gatetik.util.Result
+import kotlinx.coroutines.flow.Flow
 
 typealias GateResult<T> = Result<T, Error>
 
 interface GateRepository {
+    fun observeMainGate(): Flow<GateResult<Gate?>>
+
     suspend fun getMainGate(): GateResult<Gate?>
+
+    suspend fun updateMainGate(gate: Gate): GateResult<Gate>
 
     suspend fun openGate(id: Int): GateResult<Boolean>
 
@@ -20,4 +25,8 @@ interface GateRepository {
     suspend fun exitGate(id: Int, location: Location): GateResult<Boolean>
 
     suspend fun enterOrExitGate(id: Int, location: Location): GateResult<GateAccessType>
+
+    sealed interface GateError : Error {
+        data class BadRequest(override val message: String) : GateError
+    }
 }

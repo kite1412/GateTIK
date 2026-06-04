@@ -3,6 +3,7 @@ package kite1412.gatetik.network.backend.dto.model
 import kite1412.gatetik.model.ParkingQuota
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import kotlin.time.Instant
 
 @Serializable
 data class BackendParkingQuota(
@@ -13,7 +14,9 @@ data class BackendParkingQuota(
     @SerialName("available_slots")
     val availableSlots: Int,
     @SerialName("auto_restrict_student")
-    val autoRestrictStudent: Boolean
+    val autoRestrictStudent: Boolean,
+    @SerialName("updated_at")
+    val updatedAt: Instant? = null
 ) {
     fun toModel() = ParkingQuota(
         id = 1,

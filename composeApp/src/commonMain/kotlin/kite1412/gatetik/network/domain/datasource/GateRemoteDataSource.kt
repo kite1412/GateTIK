@@ -7,6 +7,8 @@ import kite1412.gatetik.model.Gate
 interface GateRemoteDataSource {
     suspend fun getMainGate(): Gate?
 
+    suspend fun updateMainGate(gate: Gate): Gate
+
     suspend fun openGate(id: Int): Boolean
 
     suspend fun closeGate(id: Int): Boolean

@@ -9,4 +9,10 @@ typealias ParkingQuotaResult<T> = Result<T, Error>
 
 interface ParkingQuotaRepository {
     fun observeMainParkingQuota(): Flow<ParkingQuotaResult<ParkingQuota?>>
+
+    suspend fun updateMainParkingQuota(parkingQuota: ParkingQuota): ParkingQuotaResult<ParkingQuota>
+
+    sealed interface ParkingQuotaError : Error {
+        data class BadRequest(override val message: String) : ParkingQuotaError
+    }
 }

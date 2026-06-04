@@ -12,7 +12,7 @@ class MockGateRemoteDataSource : GateRemoteDataSource {
         delay(2000)
         return mockGate
     }
-
+    override suspend fun updateMainGate(gate: Gate): Gate = gate
     override suspend fun openGate(id: Int): Boolean = true
     override suspend fun closeGate(id: Int): Boolean = true
     override suspend fun enterGate(id: Int, location: Location) = true

@@ -7,19 +7,32 @@ import kite1412.gatetik.model.Gate
 import kite1412.gatetik.network.backend.BackendClient
 import kite1412.gatetik.network.backend.dto.model.BackendGate
 import kite1412.gatetik.network.backend.dto.request.BackendGateAccessRequest
+import kite1412.gatetik.network.backend.dto.request.BackendGateUpdateRequest
 import kite1412.gatetik.network.backend.dto.request.BackendLocationGateAccessRequest
 import kite1412.gatetik.network.backend.dto.response.BackendCloseGateResponse
+import kite1412.gatetik.network.backend.dto.response.BackendMainGateResponse
 import kite1412.gatetik.network.backend.dto.response.BackendOpenGateResponse
 import kite1412.gatetik.network.backend.dto.response.BackendResponse
+import kite1412.gatetik.network.backend.extension.toUpdateRequest
+import kite1412.gatetik.network.backend.util.BackendException
 import kite1412.gatetik.network.domain.datasource.GateRemoteDataSource
 
 class BackendGateDataSource : GateRemoteDataSource {
     private val accessMethod = getPlatform().type.name.lowercase()
 
     override suspend fun getMainGate(): Gate? = BackendClient
-        .get<BackendResponse<BackendGate>>("gate/main")
+        .get<BackendResponse<BackendMainGateResponse>>("gate/main")
         .data
         ?.toModel()
+
+    override suspend fun updateMainGate(gate: Gate): Gate {
+        val res = BackendClient.patch<BackendGateUpdateRequest, BackendResponse<BackendGate>>(
+            path = "gate",
+            body = gate.toUpdateRequest()
+        )
+
+        return res.data?.toModel() ?: throw BackendException("Failed to update main gate")
+    }
 
     override suspend fun openGate(id: Int): Boolean {
         val res = BackendClient.post<BackendGateAccessRequest, BackendResponse<BackendOpenGateResponse>>(
@@ -87,7 +100,7 @@ class BackendGateDataSource : GateRemoteDataSource {
         return res.data?.let { data ->
             if (data.action == "entry") GateAccessType.ENTER
             else GateAccessType.EXIT
-        } ?: throw RuntimeException("Failed to access gate")
+        } ?: throw BackendException("Failed to access gate")
     }
 
     private fun gateAccess(id: Int, open: Boolean) = BackendGateAccessRequest(

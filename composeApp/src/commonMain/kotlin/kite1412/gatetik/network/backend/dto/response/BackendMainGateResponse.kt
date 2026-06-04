@@ -1,12 +1,13 @@
-package kite1412.gatetik.network.backend.dto.model
+package kite1412.gatetik.network.backend.dto.response
 
 import kite1412.gatetik.model.Gate
+import kite1412.gatetik.network.backend.dto.model.BackendIotDevice
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlin.time.Instant
 
 @Serializable
-data class BackendGate(
+data class BackendMainGateResponse(
     val id: Int,
     @SerialName("gate_name")
     val gateName: String,
@@ -17,7 +18,9 @@ data class BackendGate(
     @SerialName("created_at")
     val createdAt: Instant,
     @SerialName("updated_at")
-    val updatedAt: Instant
+    val updatedAt: Instant,
+    @SerialName("iot_devices")
+    val iotDevices: List<BackendIotDevice>
 ) {
     fun toModel() = Gate(
         id = id,
@@ -25,6 +28,6 @@ data class BackendGate(
         latitude = latitude,
         longitude = longitude,
         allowedRadiusMeter = allowedRadiusMeter,
-        iotDevice = null
+        iotDevice = iotDevices.first().toModel()
     )
 }
