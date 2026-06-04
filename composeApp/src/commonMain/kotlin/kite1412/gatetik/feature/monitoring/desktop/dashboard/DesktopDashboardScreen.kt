@@ -51,6 +51,7 @@ import kite1412.gatetik.designsystem.theme.Yellow500
 import kite1412.gatetik.designsystem.util.GateTikIcons
 import kite1412.gatetik.designsystem.util.WindowWidthSize
 import kite1412.gatetik.designsystem.util.rememberWindowWidthSize
+import kite1412.gatetik.feature.monitoring.desktop.component.AccessTrend
 import kite1412.gatetik.feature.monitoring.desktop.component.DashboardSummaryCard
 import kite1412.gatetik.feature.monitoring.desktop.component.DesktopLayout
 import kite1412.gatetik.feature.monitoring.desktop.component.LiveCameraSection
@@ -200,7 +201,9 @@ private fun DesktopDashboardScreen(
                 )
             }
             item {
-                AccessTrendSection()
+                AccessTrend(
+                    accessLogs = accessLogs
+                )
             }
             item {
                 RecentAccessActivitySection(
@@ -460,80 +463,6 @@ private fun ParkingOccupancyCardSection(
 }
 
 @Composable
-private fun AccessTrendSection() {
-    GlassBox {
-        Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
-            Column {
-                Text(
-                    text = "TREN AKSES",
-                    style = MaterialTheme.typography.labelSmall.copy(
-                        fontWeight = FontWeight.Bold,
-                        letterSpacing = 1.sp
-                    ),
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-                Text(
-                    text = "24 jam terakhir",
-                    style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold),
-                    color = MaterialTheme.colorScheme.onSurface
-                )
-            }
-
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(200.dp)
-                    .background(Color.Transparent)
-            ) {
-                // Placeholder for chart
-                Column(modifier = Modifier.fillMaxSize(), verticalArrangement = Arrangement.SpaceBetween) {
-                    repeat(5) { i ->
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            Text(
-                                text = "${4 - i}",
-                                style = MaterialTheme.typography.labelSmall,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                modifier = Modifier.width(24.dp)
-                            )
-                            Box(
-                                modifier = Modifier
-                                    .weight(1f)
-                                    .height(1.dp)
-                                    .background(MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.1f))
-                            )
-                        }
-                    }
-                }
-                
-                // Bottom timeline labels
-                Row(
-                    modifier = Modifier.fillMaxWidth().align(Alignment.BottomStart).padding(start = 24.dp),
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-                    listOf("00:00", "04:00", "08:00", "12:00", "16:00", "20:00").forEach { time ->
-                        Text(
-                            text = time,
-                            style = MaterialTheme.typography.labelSmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                    }
-                }
-
-                // Simple line representation
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(2.dp)
-                        .background(Blue500)
-                        .align(Alignment.BottomCenter)
-                        .padding(bottom = 16.dp)
-                )
-            }
-        }
-    }
-}
-
-@Composable
 private fun RecentAccessActivitySection(
     accessLogs: LoadState<List<AccessLog>>
 ) {
@@ -616,23 +545,6 @@ private fun RecentAccessActivitySection(
                     }
                 }
             )
-
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                listOf("PENGGUNA", "PERAN", "AKSI", "METODE", "STATUS", "CATATAN", "WAKTU").forEach { header ->
-                    Text(
-                        text = header,
-                        style = MaterialTheme.typography.labelSmall.copy(
-                            fontWeight = FontWeight.Bold,
-                            letterSpacing = 1.sp
-                        ),
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        modifier = Modifier.weight(1f)
-                    )
-                }
-            }
 
             if (accessLogs.data == null) Box(
                 modifier = Modifier
