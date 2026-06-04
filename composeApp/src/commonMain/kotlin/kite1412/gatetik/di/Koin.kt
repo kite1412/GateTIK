@@ -95,7 +95,10 @@ private val desktopMonitoringViewModel = module {
         DesktopParkingViewModel(
             authentication = get(),
             dataStore = get(),
-            getMainParkingQuotaUseCase = get()
+            getMainParkingQuotaUseCase = get(),
+            getMainGateUseCase = get(),
+            updateMainGateUseCase = get(),
+            updateMainParkingQuotaUseCase = get(),
         )
     }
     viewModel {

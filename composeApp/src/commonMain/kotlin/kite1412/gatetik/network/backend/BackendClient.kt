@@ -85,10 +85,12 @@ object BackendClient : KoinComponent {
     suspend inline fun <reified Request : Any, reified Response> patch(
         path: String,
         body: Request,
+        useToken: Boolean = true,
         block: HttpRequestBuilder.() -> Unit = {}
     ): Response {
         return httpClient
             .patch(getPath(path)) {
+                if (useToken) attachToken()
                 setBody(body)
                 block()
             }

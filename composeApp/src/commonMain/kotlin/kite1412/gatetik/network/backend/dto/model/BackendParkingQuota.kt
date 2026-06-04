@@ -11,8 +11,6 @@ data class BackendParkingQuota(
     val totalSlots: Int,
     @SerialName("used_slots")
     val usedSlots: Int,
-    @SerialName("available_slots")
-    val availableSlots: Int,
     @SerialName("auto_restrict_student")
     val autoRestrictStudent: Boolean,
     @SerialName("updated_at")

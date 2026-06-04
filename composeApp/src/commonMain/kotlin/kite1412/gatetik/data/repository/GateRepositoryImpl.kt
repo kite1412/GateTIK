@@ -50,6 +50,7 @@ class GateRepositoryImpl(
 
         val res = remoteDataSource.updateMainGate(gate)
 
+        mainGate.value = Success(res)
         Success(res)
     } catch (e: Exception) {
         Logger.e(

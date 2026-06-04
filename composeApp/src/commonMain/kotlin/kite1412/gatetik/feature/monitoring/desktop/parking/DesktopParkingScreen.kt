@@ -35,8 +35,9 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.retain.retain
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -57,8 +58,8 @@ import kite1412.gatetik.designsystem.component.OutlinedTextField
 import kite1412.gatetik.designsystem.component.Switch
 import kite1412.gatetik.designsystem.theme.Blue500
 import kite1412.gatetik.designsystem.theme.Emerald600
-import kite1412.gatetik.designsystem.theme.Gray900
 import kite1412.gatetik.designsystem.theme.GateTikTheme
+import kite1412.gatetik.designsystem.theme.Gray900
 import kite1412.gatetik.designsystem.theme.Sky300
 import kite1412.gatetik.designsystem.theme.White
 import kite1412.gatetik.designsystem.theme.White15
@@ -73,9 +74,12 @@ import kite1412.gatetik.network.mock.mockParkingQuota
 import kite1412.gatetik.network.mock.mockUser
 import kite1412.gatetik.ui.compositionlocal.LocalDarkMode
 import kite1412.gatetik.ui.compositionlocal.LocalScaffoldComponentsController
+import kite1412.gatetik.ui.compositionlocal.LocalSnackbarHostStateWrapper
 import kite1412.gatetik.ui.preview.DevicePreviews
 import kite1412.gatetik.ui.util.LoadState
 import kite1412.gatetik.ui.util.MockScaffoldComponentController
+import kite1412.gatetik.ui.util.UiEvent
+import kite1412.gatetik.ui.util.data
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.painterResource
 import org.koin.compose.viewmodel.koinViewModel
@@ -87,17 +91,27 @@ fun DesktopParkingScreen(
     modifier: Modifier = Modifier,
     viewModel: DesktopParkingViewModel = koinViewModel()
 ) {
+    val snackbarHostStateWrapper = LocalSnackbarHostStateWrapper.current
     val user by viewModel.signedInUser.collectAsStateWithLifecycle()
-    val parkingQuota by viewModel.parkingQuota.collectAsStateWithLifecycle()
+    val mainParkingQuota by viewModel.mainParkingQuota.collectAsStateWithLifecycle()
+    val mainGate by viewModel.mainGate.collectAsStateWithLifecycle()
 
+    LaunchedEffect(Unit) {
+        viewModel.uiEvent.collect { event ->
+            if (event is UiEvent.ShowSnackbar)
+                snackbarHostStateWrapper.showSnackbar(event.message)
+        }
+    }
     user?.let { user ->
         DesktopParkingScreen(
             userRole = user.role,
-            parkingQuota = parkingQuota,
+            parkingQuota = mainParkingQuota,
+            allowedRadiusMeter = mainGate.data?.allowedRadiusMeter ?: 0,
             contentPadding = contentPadding,
             onThemeToggle = viewModel::updateDarkMode,
-            onSaveParkingCapacity = {},
-            onAutoRestrictStudentsChange = {},
+            onSaveParkingCapacity = viewModel::updateParkingCapacity,
+            onAutoRestrictStudentsChange = viewModel::updateAutoRestrictStudent,
+            onAllowedRadiusMeterChange = viewModel::updateAllowedRadiusMeter,
             modifier = modifier
         )
     }
@@ -107,12 +121,16 @@ fun DesktopParkingScreen(
 private fun DesktopParkingScreen(
     userRole: UserRole,
     parkingQuota: LoadState<ParkingQuota?>,
+    allowedRadiusMeter: Int,
     contentPadding: PaddingValues,
     onThemeToggle: (Boolean) -> Unit,
     onSaveParkingCapacity: (Int) -> Unit,
     onAutoRestrictStudentsChange: (Boolean) -> Unit,
+    onAllowedRadiusMeterChange: (Int) -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val snackbarHostStateWrapper = LocalSnackbarHostStateWrapper.current
+
     DesktopLayout(
         title = "Manajemen Parkir",
         userRole = userRole,
@@ -138,7 +156,7 @@ private fun DesktopParkingScreen(
                     parkingQuota?.let {
                         val windowWidthSize = rememberWindowWidthSize()
                         var capacity by retain(parkingQuota.totalSlots) {
-                            mutableIntStateOf(parkingQuota.totalSlots)
+                            mutableStateOf(parkingQuota.totalSlots.toString())
                         }
 
                         LazyColumn(
@@ -156,7 +174,15 @@ private fun DesktopParkingScreen(
                                     StudentCapacity(
                                         capacity = capacity,
                                         onCapacityChange = { capacity = it },
-                                        onSaveClick = onSaveParkingCapacity,
+                                        onSaveClick = {
+                                            runCatching { capacity.toInt() }
+                                                .getOrNull()
+                                                ?.let(onSaveParkingCapacity)
+                                                ?: run {
+                                                    snackbarHostStateWrapper.showSnackbar("Gagal memperbarui kapasitas parkir")
+                                                    capacity = parkingQuota.totalSlots.toString()
+                                                }
+                                        },
                                         modifier = Modifier
                                             .weight(1f)
                                             .fillMaxHeight()
@@ -179,7 +205,9 @@ private fun DesktopParkingScreen(
                             item {
                                 Settings(
                                     autoRestrictStudents = parkingQuota.autoRestrictStudents,
-                                    onAutoRestrictStudentChange = onAutoRestrictStudentsChange
+                                    allowedRadiusMeter = allowedRadiusMeter,
+                                    onAutoRestrictStudentChange = onAutoRestrictStudentsChange,
+                                    onAllowedRadiusMeterChange = onAllowedRadiusMeterChange
                                 )
                             }
                             item {
@@ -198,9 +226,9 @@ private fun DesktopParkingScreen(
 
 @Composable
 private fun StudentCapacity(
-    capacity: Int,
-    onCapacityChange: (Int) -> Unit,
-    onSaveClick: (Int) -> Unit,
+    capacity: String,
+    onCapacityChange: (String) -> Unit,
+    onSaveClick: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val contentColor = LocalContentColor.current.copy(alpha = 0.7f)
@@ -214,12 +242,8 @@ private fun StudentCapacity(
             horizontalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             OutlinedTextField(
-                value = capacity.toString(),
-                onValueChange = {
-                    runCatching { it.toInt() }
-                        .getOrNull()
-                        ?.let(onCapacityChange)
-                },
+                value = capacity,
+                onValueChange = onCapacityChange,
                 modifier = Modifier.weight(1f)
             )
             Button(
@@ -328,7 +352,9 @@ private fun RowScope.OccupancyInfo(
 @Composable
 private fun Settings(
     autoRestrictStudents: Boolean,
+    allowedRadiusMeter: Int,
     onAutoRestrictStudentChange: (Boolean) -> Unit,
+    onAllowedRadiusMeterChange: (Int) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Section(
@@ -352,8 +378,8 @@ private fun Settings(
         ) {
             CapacitySelector(
                 steps = listOf(0, 25, 50, 100, 200),
-                onSelectedChange = {},
-                selected = 25,
+                onSelectedChange = onAllowedRadiusMeterChange,
+                selected = allowedRadiusMeter,
                 modifier = Modifier
                     .widthIn(min = 160.dp, max = 190.dp)
                     .fillMaxWidth()
@@ -576,10 +602,12 @@ private fun DesktopParkingScreenPreview() {
                 DesktopParkingScreen(
                     userRole = mockUser.role,
                     parkingQuota = LoadState.Success(mockParkingQuota),
+                    allowedRadiusMeter = 50,
                     contentPadding = p,
                     onThemeToggle = {},
                     onSaveParkingCapacity = {},
-                    onAutoRestrictStudentsChange = {}
+                    onAutoRestrictStudentsChange = {},
+                    onAllowedRadiusMeterChange = {}
                 )
             }
         }
