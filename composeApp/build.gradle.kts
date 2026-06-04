@@ -60,6 +60,7 @@ kotlin {
             implementation(libs.ktor.client.cio)
             implementation(libs.ktor.client.content.negotiation)
             implementation(libs.ktor.serialization.kotlinx.json)
+            implementation(libs.vico.compose)
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)
@@ -69,6 +70,7 @@ kotlin {
             implementation(libs.kotlinx.coroutinesSwing)
             implementation(libs.kotlin.logging.jvm)
             implementation(libs.vlcj)
+            implementation(libs.logback)
         }
     }
 }

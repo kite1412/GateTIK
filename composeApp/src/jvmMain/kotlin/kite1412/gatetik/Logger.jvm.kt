@@ -1,8 +1,6 @@
 package kite1412.gatetik
 
 import io.github.oshai.kotlinlogging.KotlinLogging
-import kite1412.gatetik.util.now
-import kite1412.gatetik.util.toLocalDateTime
 
 private val logger = KotlinLogging.logger {}
 
@@ -23,5 +21,5 @@ actual object Logger {
         logger.info { logMessage(tag, message) }
     }
 
-    private fun logMessage(tag: String, message: String) = "${now().toLocalDateTime()} - [$tag]: $message"
+    private fun logMessage(tag: String, message: String) = "[$tag]: $message"
 }
