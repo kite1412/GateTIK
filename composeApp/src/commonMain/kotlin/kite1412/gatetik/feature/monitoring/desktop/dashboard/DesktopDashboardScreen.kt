@@ -32,6 +32,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -45,6 +46,7 @@ import kite1412.gatetik.designsystem.theme.Emerald500
 import kite1412.gatetik.designsystem.theme.GateTikTheme
 import kite1412.gatetik.designsystem.theme.Purple400
 import kite1412.gatetik.designsystem.theme.Red500
+import kite1412.gatetik.designsystem.theme.Red600
 import kite1412.gatetik.designsystem.theme.Yellow500
 import kite1412.gatetik.designsystem.util.GateTikIcons
 import kite1412.gatetik.designsystem.util.WindowWidthSize
@@ -563,20 +565,44 @@ private fun RecentAccessActivitySection(
                     ) {
                         Table(
                             columns = listOf(
-                                TableColumn("PENGGUNA") {
-                                    Text(it.userId.toString())
+                                TableColumn("PENGGUNA", 2f) {
+                                    Text(
+                                        text = it.userFullName,
+                                        maxLines = 1,
+                                        overflow = TextOverflow.Ellipsis
+                                    )
                                 },
                                 TableColumn("ROLE") {
-                                    Text(UserRole.STUDENT.toIdString())
+                                    Text(it.userRole.toIdString())
                                 },
                                 TableColumn("AKSI") {
-                                    Text(it.action.name)
+                                    Text(it.action.capitalizedName)
                                 },
                                 TableColumn("METODE") {
-                                    Text(it.accessMethod.name)
+                                    Text(it.accessMethod.capitalizedName)
                                 },
                                 TableColumn("STATUS") {
-                                    Text(it.status.name)
+                                    Text(
+                                        text = it.status.capitalizedName,
+                                        modifier = Modifier
+                                            .background(
+                                                color = (when (it.status) {
+                                                    AccessStatus.SUCCESS -> Emerald500
+                                                    AccessStatus.PENDING -> Yellow500
+                                                    AccessStatus.FAILED -> Red600
+                                                }).copy(alpha = 0.1f),
+                                                shape = CircleShape
+                                            )
+                                            .padding(
+                                                vertical = 4.dp,
+                                                horizontal = 8.dp
+                                            ),
+                                        color = when (it.status) {
+                                            AccessStatus.SUCCESS -> Emerald500
+                                            AccessStatus.PENDING -> Yellow500
+                                            AccessStatus.FAILED -> Red600
+                                        }
+                                    )
                                 },
                                 TableColumn("CATATAN", 2f) {
                                     Text(it.notes ?: "")
@@ -608,7 +634,7 @@ private fun RecentAccessActivitySection(
                 }
             }
 
-            Box(
+            if (accessLogs.data == null) Box(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(100.dp),

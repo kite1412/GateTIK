@@ -520,6 +520,8 @@ private fun DesktopAccessLogsScreenPreview() {
                             id = 1,
                             userId = 1,
                             gateId = 1,
+                            userFullName = "Username",
+                            userRole = UserRole.ADMIN,
                             status = AccessStatus.FAILED,
                             accessMethod = AccessMethod.MOBILE,
                             action = AccessAction.ENTRY,

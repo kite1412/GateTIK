@@ -7,6 +7,7 @@ import kite1412.gatetik.model.AccessAction
 import kite1412.gatetik.model.AccessLog
 import kite1412.gatetik.model.AccessMethod
 import kite1412.gatetik.model.AccessStatus
+import kite1412.gatetik.model.UserRole
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlin.time.Clock
@@ -81,6 +82,8 @@ class DesktopAccessLogsViewModel(
                 id = 1,
                 userId = 1,
                 gateId = 1,
+                userFullName = "Username",
+                userRole = UserRole.ADMIN,
                 status = AccessStatus.FAILED,
                 accessMethod = AccessMethod.MOBILE,
                 action = AccessAction.ENTRY,
@@ -92,6 +95,8 @@ class DesktopAccessLogsViewModel(
                 id = 2,
                 userId = 1,
                 gateId = 1,
+                userFullName = "Username",
+                userRole = UserRole.ADMIN,
                 status = AccessStatus.FAILED,
                 accessMethod = AccessMethod.MOBILE,
                 action = AccessAction.ENTRY,

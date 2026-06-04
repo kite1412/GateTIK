@@ -1,6 +1,7 @@
 package kite1412.gatetik.network.backend.dto.model
 
 import kite1412.gatetik.model.AccessLog
+import kite1412.gatetik.model.UserRole
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlin.time.Instant
@@ -29,6 +30,8 @@ data class BackendAccessLog(
         id = id,
         userId = userId,
         gateId = gateId,
+        userFullName = user?.fullName ?: "",
+        userRole = user?.role?.toModel() ?: UserRole.STAFF,
         status = accessStatus.toModel(),
         accessMethod = accessMethod.toModel(),
         action = action.toModel(),

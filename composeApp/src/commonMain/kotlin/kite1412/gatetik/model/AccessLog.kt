@@ -6,6 +6,8 @@ data class AccessLog(
     val id: Int,
     val userId: Int,
     val gateId: Int,
+    val userFullName: String,
+    val userRole: UserRole,
     val status: AccessStatus,
     val accessMethod: AccessMethod,
     val action: AccessAction,

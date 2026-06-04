@@ -59,7 +59,9 @@ val mockParkingQuota = ParkingQuota(
 val mockAccessLogs = listOf(
     AccessLog(
         id = 1,
-        userId = 0,
+        userId = 101,
+        userFullName = "john.doe",
+        userRole = UserRole.STUDENT,
         gateId = 1,
         status = AccessStatus.SUCCESS,
         accessMethod = AccessMethod.MOBILE,
@@ -70,7 +72,9 @@ val mockAccessLogs = listOf(
     ),
     AccessLog(
         id = 2,
-        userId = 0,
+        userId = 102,
+        userFullName = "sarah.smith",
+        userRole = UserRole.STUDENT,
         gateId = 2,
         status = AccessStatus.PENDING,
         accessMethod = AccessMethod.MOBILE,
@@ -82,6 +86,8 @@ val mockAccessLogs = listOf(
     AccessLog(
         id = 3,
         userId = 103,
+        userFullName = "michael.brown",
+        userRole = UserRole.STAFF,
         gateId = 1,
         status = AccessStatus.SUCCESS,
         accessMethod = AccessMethod.MOBILE,
@@ -93,6 +99,8 @@ val mockAccessLogs = listOf(
     AccessLog(
         id = 4,
         userId = 104,
+        userFullName = "admin.jane",
+        userRole = UserRole.ADMIN,
         gateId = 1,
         status = AccessStatus.FAILED,
         accessMethod = AccessMethod.MOBILE,
@@ -104,6 +112,8 @@ val mockAccessLogs = listOf(
     AccessLog(
         id = 5,
         userId = 105,
+        userFullName = "david.wilson",
+        userRole = UserRole.STAFF,
         gateId = 1,
         status = AccessStatus.SUCCESS,
         accessMethod = AccessMethod.MOBILE,
