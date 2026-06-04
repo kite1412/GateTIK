@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -25,12 +26,18 @@ import com.patrykandpatrick.vico.compose.cartesian.CartesianChartHost
 import com.patrykandpatrick.vico.compose.cartesian.axis.HorizontalAxis
 import com.patrykandpatrick.vico.compose.cartesian.axis.VerticalAxis
 import com.patrykandpatrick.vico.compose.cartesian.axis.VerticalAxis.ItemPlacer.Companion.count
+import com.patrykandpatrick.vico.compose.cartesian.axis.rememberAxisLabelComponent
 import com.patrykandpatrick.vico.compose.cartesian.data.CartesianChartModelProducer
 import com.patrykandpatrick.vico.compose.cartesian.data.CartesianValueFormatter
 import com.patrykandpatrick.vico.compose.cartesian.data.lineModel
+import com.patrykandpatrick.vico.compose.cartesian.layer.LineCartesianLayer
+import com.patrykandpatrick.vico.compose.cartesian.layer.rememberLine
 import com.patrykandpatrick.vico.compose.cartesian.layer.rememberLineCartesianLayer
 import com.patrykandpatrick.vico.compose.cartesian.rememberCartesianChart
+import com.patrykandpatrick.vico.compose.cartesian.rememberVicoScrollState
+import com.patrykandpatrick.vico.compose.common.Fill
 import com.patrykandpatrick.vico.compose.common.data.ExtraStore
+import com.patrykandpatrick.vico.compose.common.vicoTheme
 import kite1412.gatetik.Logger
 import kite1412.gatetik.designsystem.component.GlassBox
 import kite1412.gatetik.designsystem.theme.GateTikTheme
@@ -56,7 +63,7 @@ private val BottomAxisValueFormatter = CartesianValueFormatter { context, value,
 }
 
 @Composable
-fun AccessTrend(
+fun AccessLogTrend(
     accessLogs: LoadState<List<AccessLog>>,
     modifier: Modifier = Modifier
 ) {
@@ -68,7 +75,7 @@ fun AccessTrend(
             modelProducer.runTransaction(trends)
         }
     }
-    AccessTrend(
+    AccessLogTrend(
         totalLogGroups = trends?.size ?: 0,
         accessLogs = accessLogs,
         modelProducer = modelProducer,
@@ -77,7 +84,7 @@ fun AccessTrend(
 }
 
 @Composable
-private fun AccessTrend(
+private fun AccessLogTrend(
     totalLogGroups: Int,
     accessLogs: LoadState<List<AccessLog>>,
     modelProducer: CartesianChartModelProducer,
@@ -153,19 +160,42 @@ private fun Chart(
     modelProducer: CartesianChartModelProducer,
     modifier: Modifier = Modifier
 ) {
+    val labelStyle = MaterialTheme.typography.bodySmall
+    val axisLabelComponent = rememberAxisLabelComponent(
+        style = labelStyle.copy(
+            color = LocalContentColor.current
+        )
+    )
+
+
     CartesianChartHost(
         rememberCartesianChart(
-            rememberLineCartesianLayer(),
+            rememberLineCartesianLayer(
+                lineProvider = LineCartesianLayer.LineProvider.series(
+                    vicoTheme.lineCartesianLayerColors.map { color ->
+                        LineCartesianLayer.rememberLine(
+                            fill = LineCartesianLayer.LineFill.single(Fill(color)),
+                            interpolator = LineCartesianLayer.Interpolator.catmullRom(),
+                            areaFill = LineCartesianLayer.AreaFill.single(
+                                fill = Fill(color.copy(alpha = 0.1f))
+                            )
+                        )
+                    }
+                )
+            ),
             startAxis = VerticalAxis.rememberStart(
                 valueFormatter = StartAxisValueFormatter,
-                itemPlacer = remember { count(count = { totalLogGroups + 1 } ) }
+                itemPlacer = remember { count(count = { totalLogGroups + 1 } ) },
+                label = axisLabelComponent
             ),
             bottomAxis = HorizontalAxis.rememberBottom(
-                valueFormatter = BottomAxisValueFormatter
+                valueFormatter = BottomAxisValueFormatter,
+                label = axisLabelComponent
             ),
         ),
         modelProducer = modelProducer,
-        modifier = modifier
+        modifier = modifier,
+        scrollState = rememberVicoScrollState(scrollEnabled = false)
     )
 }
 
@@ -217,7 +247,7 @@ private fun AccessTrendPreview() {
 
     GateTikTheme {
         Scaffold { p ->
-              AccessTrend(
+              AccessLogTrend(
                   totalLogGroups = trends.size,
                   accessLogs = LoadState.Success(mockAccessLogs),
                   modelProducer = modelProducer,

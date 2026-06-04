@@ -51,7 +51,7 @@ import kite1412.gatetik.designsystem.theme.Yellow500
 import kite1412.gatetik.designsystem.util.GateTikIcons
 import kite1412.gatetik.designsystem.util.WindowWidthSize
 import kite1412.gatetik.designsystem.util.rememberWindowWidthSize
-import kite1412.gatetik.feature.monitoring.desktop.component.AccessTrend
+import kite1412.gatetik.feature.monitoring.desktop.component.AccessLogTrend
 import kite1412.gatetik.feature.monitoring.desktop.component.DashboardSummaryCard
 import kite1412.gatetik.feature.monitoring.desktop.component.DesktopLayout
 import kite1412.gatetik.feature.monitoring.desktop.component.LiveCameraSection
@@ -201,7 +201,7 @@ private fun DesktopDashboardScreen(
                 )
             }
             item {
-                AccessTrend(
+                AccessLogTrend(
                     accessLogs = accessLogs
                 )
             }
@@ -359,13 +359,16 @@ private fun GateControlCard(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(16.dp)
             ) {
+                val textStyle = MaterialTheme.typography.labelSmall
+
                 GateControlButton(
                     isOpen = true,
                     actionEnabled = true,
                     onClick = onOpenGate,
                     backgroundBrush = SolidColor(Blue500),
                     color = Color.White,
-                    modifier = Modifier.weight(1f)
+                    modifier = Modifier.weight(1f),
+                    textStyle = textStyle
                 )
                 GateControlButton(
                     isOpen = false,
@@ -373,7 +376,8 @@ private fun GateControlCard(
                     onClick = onCloseGate,
                     backgroundBrush = SolidColor(Red500),
                     color = Color.White,
-                    modifier = Modifier.weight(1f)
+                    modifier = Modifier.weight(1f),
+                    textStyle = textStyle
                 )
             }
         }

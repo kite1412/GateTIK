@@ -24,6 +24,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -48,6 +49,9 @@ fun GateControlButton(
     disabledColor: Color = Gray900.copy(alpha = 0.5f),
     contentPadding: PaddingValues = PaddingValues(
         vertical = 12.dp
+    ),
+    textStyle: TextStyle = MaterialTheme.typography.labelLarge.copy(
+        fontWeight = FontWeight.Bold
     )
 ) {
     val shape = RoundedCornerShape(16.dp)
@@ -86,9 +90,7 @@ fun GateControlButton(
             )
             Text(
                 text = (if (isOpen) "BUKA" else "TUTUP") + " GATE",
-                style = MaterialTheme.typography.labelLarge.copy(
-                    fontWeight = FontWeight.Bold
-                ),
+                style = textStyle,
                 color = color
             )
         }
