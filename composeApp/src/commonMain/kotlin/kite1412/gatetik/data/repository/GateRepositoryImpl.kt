@@ -8,7 +8,8 @@ import kite1412.gatetik.model.Gate
 import kite1412.gatetik.network.domain.datasource.GateRemoteDataSource
 
 class GateRepositoryImpl(
-    private val remoteDataSource: GateRemoteDataSource
+    private val remoteDataSource: GateRemoteDataSource,
+    private val parkingQuotaRepositoryImpl: ParkingQuotaRepositoryImpl
 ) : GateRepository {
     private val logTag = "GateRepositoryImpl"
 
@@ -34,7 +35,17 @@ class GateRepositoryImpl(
     ): GateResult<Boolean> = tryOrThrowUnknown(
         logTag = logTag,
         errorMessage = "Failed to enter gate"
-    ) { _ -> remoteDataSource.enterGate(id, location) }
+    ) { _ ->
+        val isSuccess = remoteDataSource.enterGate(id, location)
+        if (isSuccess) parkingQuotaRepositoryImpl.updateParkingQuotaFlow { parkingQuota ->
+            parkingQuota?.let {
+                parkingQuota.copy(
+                    usedSlots = parkingQuota.usedSlots + 1
+                )
+            }
+        }
+        isSuccess
+    }
 
     override suspend fun exitGate(
         id: Int,
@@ -42,5 +53,15 @@ class GateRepositoryImpl(
     ): GateResult<Boolean> = tryOrThrowUnknown(
         logTag = logTag,
         errorMessage = "Failed to exit gate"
-    ) { _ -> remoteDataSource.exitGate(id, location) }
+    ) { _ ->
+        val isSuccess = remoteDataSource.exitGate(id, location)
+        if (isSuccess) parkingQuotaRepositoryImpl.updateParkingQuotaFlow { parkingQuota ->
+            parkingQuota?.let {
+                parkingQuota.copy(
+                    usedSlots = parkingQuota.usedSlots - 1
+                )
+            }
+        }
+        isSuccess
+    }
 }

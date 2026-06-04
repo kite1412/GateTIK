@@ -22,7 +22,8 @@ val dataModule = module {
 
     single {
         GateRepositoryImpl(
-            remoteDataSource = get()
+            remoteDataSource = get(),
+            parkingQuotaRepositoryImpl = get()
         )
     } bind GateRepository::class
 

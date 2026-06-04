@@ -273,7 +273,7 @@ private fun AuthenticationScreen(
                 }
                 item {
                     GradientTextButton(
-                        text = if (!isInProgress) "Masuk" else "",
+                        text = if (!isInProgress) if (isSignIn) "Masuk" else "Daftar" else "",
                         onClick = {
                             if (isSignIn) onSignIn(email, password)
                             else idCard?.let { idCard ->
