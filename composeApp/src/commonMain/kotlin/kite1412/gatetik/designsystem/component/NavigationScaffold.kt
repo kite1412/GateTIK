@@ -61,6 +61,7 @@ import kite1412.gatetik.designsystem.theme.Blue900
 import kite1412.gatetik.designsystem.theme.BlueIndigoGradient
 import kite1412.gatetik.designsystem.theme.GateTikTheme
 import kite1412.gatetik.designsystem.theme.Gray200
+import kite1412.gatetik.designsystem.theme.Red500
 import kite1412.gatetik.designsystem.theme.Slate400
 import kite1412.gatetik.designsystem.theme.Slate500
 import kite1412.gatetik.designsystem.theme.Slate900
@@ -113,7 +114,8 @@ fun NavigationScaffold(
                 destinations = destinations,
                 isDarkMode = isDarkMode,
                 selectedDestination = selectedDestination,
-                onDestinationClick = onDestinationClick
+                onDestinationClick = onDestinationClick,
+                onSignOutClick = onSignOutClick
             )
         }
 
@@ -130,7 +132,7 @@ fun NavigationScaffold(
                 onDestinationClick = onDestinationClick,
                 userName = username,
                 userEmail = userEmail,
-                onLogoutClick = onSignOutClick,
+                onSignOutClick = onSignOutClick,
                 onDismissRequest = onDismissNavBar
             )
         }
@@ -162,6 +164,7 @@ data class Destination(
     }
 }
 
+@Suppress("ModifierFactoryExtensionFunction")
 private fun navBarSizeConsumerModifier(density: Density, consumer: ((DpSize) -> Unit)?): Modifier =
     if (consumer != null) Modifier.onGloballyPositioned { coordinates ->
         consumer(
@@ -196,6 +199,7 @@ private fun SideNavigationRail(
     destinations: List<Destination>,
     isDarkMode: Boolean,
     onDestinationClick: (Destination) -> Unit,
+    onSignOutClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val containerColor by containerColor(isDarkMode)
@@ -213,26 +217,43 @@ private fun SideNavigationRail(
                     horizontal = 24.dp,
                     vertical = 32.dp
                 ),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+            verticalArrangement = Arrangement.SpaceBetween
         ) {
-            destinations.forEach { destination ->
-                val selected = selectedDestination == destination
-                val iconColor by animateColorAsState(
-                    targetValue = if (selected) onSurface else onSurface.copy(alpha = 0.4f)
-                )
+            Column(
+                verticalArrangement = Arrangement.spacedBy(16.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                destinations.forEach { destination ->
+                    val selected = selectedDestination == destination
+                    val iconColor by animateColorAsState(
+                        targetValue = if (selected) onSurface else onSurface.copy(alpha = 0.4f)
+                    )
 
-                if (destination.icon != null) Icon(
-                    painter = painterResource(destination.icon),
-                    contentDescription = destination.label,
-                    modifier = Modifier
-                        .size(24.dp)
-                        .clickable(
-                            indication = null,
-                            interactionSource = null
-                        ) { onDestinationClick(destination) },
-                    tint = iconColor
-                )
+                    if (destination.icon != null) Icon(
+                        painter = painterResource(destination.icon),
+                        contentDescription = destination.label,
+                        modifier = Modifier
+                            .size(24.dp)
+                            .clickable(
+                                indication = null,
+                                interactionSource = null
+                            ) { onDestinationClick(destination) },
+                        tint = iconColor
+                    )
+                }
             }
+            Icon(
+                painter = painterResource(GateTikIcons.logout),
+                contentDescription = "sign out",
+                modifier = Modifier
+                    .size(24.dp)
+                    .clickable(
+                        indication = null,
+                        interactionSource = null,
+                        onClick = onSignOutClick
+                    ),
+                tint = Red500
+            )
         }
         EndBorder(isDarkMode)
     }
@@ -246,7 +267,7 @@ private fun SideNavigationDrawer(
     onDestinationClick: (Destination) -> Unit,
     userName: String,
     userEmail: String,
-    onLogoutClick: () -> Unit,
+    onSignOutClick: () -> Unit,
     onDismissRequest: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -375,13 +396,15 @@ private fun SideNavigationDrawer(
                         )
                     }
                     Spacer(modifier = Modifier.width(8.dp))
-                    ComposeIcon(
+                    Icon(
                         painter = painterResource(GateTikIcons.logout),
                         contentDescription = "Logout",
-                        tint = if (isDarkMode) Slate400 else Slate500,
+                        tint = Red500,
                         modifier = Modifier
+                            .clip(CircleShape)
+                            .clickable { onSignOutClick() }
+                            .padding(4.dp)
                             .size(20.dp)
-                            .clickable { onLogoutClick() }
                     )
                 }
             }

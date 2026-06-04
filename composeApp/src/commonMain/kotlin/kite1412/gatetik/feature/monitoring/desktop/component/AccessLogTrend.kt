@@ -38,7 +38,6 @@ import com.patrykandpatrick.vico.compose.cartesian.rememberVicoScrollState
 import com.patrykandpatrick.vico.compose.common.Fill
 import com.patrykandpatrick.vico.compose.common.data.ExtraStore
 import com.patrykandpatrick.vico.compose.common.vicoTheme
-import kite1412.gatetik.Logger
 import kite1412.gatetik.designsystem.component.GlassBox
 import kite1412.gatetik.designsystem.theme.GateTikTheme
 import kite1412.gatetik.model.AccessLog
@@ -114,7 +113,8 @@ private fun AccessLogTrend(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(250.dp)
-                    .background(Color.Transparent)
+                    .background(Color.Transparent),
+                contentAlignment = Alignment.Center
             ) {
                 LoadState(
                     state = accessLogs,
@@ -125,22 +125,26 @@ private fun AccessLogTrend(
                         ) {
                             CircularProgressIndicator()
                             Text(
-                                text = "Memuat trend akses log",
+                                text = "Memuat tren akses log",
                                 style = MaterialTheme.typography.bodySmall
                             )
                         }
                     },
                     error = {
                         Text(
-                            text = "Gagal memuat trend akses log",
+                            text = "Gagal memuat tren akses log",
                             style = MaterialTheme.typography.titleSmall
                         )
                     },
                     success = {
-                        Chart(
+                        if (it.isNotEmpty()) Chart(
                             totalLogGroups = totalLogGroups,
                             modelProducer = modelProducer,
                             modifier = Modifier.fillMaxSize()
+                        ) else Text(
+                            text = "Tidak ada akses log",
+                            style = MaterialTheme.typography.labelSmall,
+                            modifier = Modifier.align(Alignment.Center)
                         )
                     }
                 )
@@ -166,7 +170,6 @@ private fun Chart(
             color = LocalContentColor.current
         )
     )
-
 
     CartesianChartHost(
         rememberCartesianChart(
@@ -226,12 +229,6 @@ private fun List<AccessLog>.toTrends(): List<AccessLogTrend> {
                 hour = "$hour:00",
                 count = accessLogs.size
             )
-                .also {
-                    Logger.i(
-                        tag = "AccessTrend",
-                        message = it.toString()
-                    )
-                }
         }
         .sortedBy { it.hour }
 }

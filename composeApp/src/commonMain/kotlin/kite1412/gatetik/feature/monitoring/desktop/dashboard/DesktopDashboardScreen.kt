@@ -334,6 +334,7 @@ private fun GateControlCard(
                                     ?.capitalizedName
                             } • Terakhir dibuka ${
                                 accessLogs.data
+                                    ?.takeIf { it.isNotEmpty() }
                                     ?.maxOf { it.createdAt }
                                     ?.timestampString
                                     ?: "~"
@@ -471,7 +472,9 @@ private fun RecentAccessActivitySection(
     accessLogs: LoadState<List<AccessLog>>
 ) {
     GlassBox {
-        Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
+        Column(
+            verticalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -493,7 +496,7 @@ private fun RecentAccessActivitySection(
                 loading = { CircularProgressIndicator() },
                 error = { Text("Gagal memuat log akses") },
                 success = { accessLogs ->
-                    CompositionLocalProvider(
+                    if (accessLogs.isNotEmpty()) CompositionLocalProvider(
                         LocalTextStyle provides MaterialTheme.typography.bodySmall
                     ) {
                         Table(
@@ -546,7 +549,11 @@ private fun RecentAccessActivitySection(
                             ),
                             items = accessLogs
                         )
-                    }
+                    } else Text(
+                        text = "Tidak ada akses log",
+                        style = MaterialTheme.typography.labelSmall,
+                        modifier = Modifier.align(Alignment.CenterHorizontally)
+                    )
                 }
             )
 
