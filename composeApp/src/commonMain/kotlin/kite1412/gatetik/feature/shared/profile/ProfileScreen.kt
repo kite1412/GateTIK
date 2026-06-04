@@ -44,11 +44,10 @@ import kite1412.gatetik.ui.component.SettingsDivider
 import kite1412.gatetik.ui.component.SettingsGroup
 import kite1412.gatetik.ui.component.SettingsItem
 import kite1412.gatetik.ui.compositionlocal.LocalDarkMode
-import kite1412.gatetik.ui.compositionlocal.LocalScaffoldComponentsController
 import kite1412.gatetik.ui.preview.DevicePreviews
 import kite1412.gatetik.ui.util.LoadState
 import kite1412.gatetik.ui.util.LoadingState
-import kite1412.gatetik.ui.util.ScaffoldComponent
+import kite1412.gatetik.ui.util.navBarPadding
 import org.jetbrains.compose.resources.painterResource
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -78,7 +77,6 @@ private fun ProfileScreen(
     modifier: Modifier = Modifier
 ) {
     val isDarkMode = LocalDarkMode.current
-    val scaffoldComponentsController = LocalScaffoldComponentsController.current
 
     Box(
         modifier = modifier.fillMaxSize()
@@ -87,9 +85,7 @@ private fun ProfileScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(contentPadding),
-            contentPadding = PaddingValues(
-                bottom = scaffoldComponentsController.getState(ScaffoldComponent.NAV_BAR).size.height
-            ),
+            contentPadding = navBarPadding(),
             verticalArrangement = Arrangement.spacedBy(24.dp)
         ) {
             item {

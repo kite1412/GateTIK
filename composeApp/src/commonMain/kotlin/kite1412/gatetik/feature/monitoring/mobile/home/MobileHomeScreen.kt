@@ -57,6 +57,7 @@ import kite1412.gatetik.designsystem.theme.White20
 import kite1412.gatetik.designsystem.theme.White60
 import kite1412.gatetik.designsystem.theme.White80
 import kite1412.gatetik.designsystem.util.GateTikIcons
+import kite1412.gatetik.ui.util.navBarPadding
 import kite1412.gatetik.model.AccessLog
 import kite1412.gatetik.model.Cctv
 import kite1412.gatetik.model.Gate
@@ -69,11 +70,9 @@ import kite1412.gatetik.ui.component.HeaderSection
 import kite1412.gatetik.ui.component.ParkingQuotaCard
 import kite1412.gatetik.ui.component.SmallCircularProgressIndicator
 import kite1412.gatetik.ui.compositionlocal.LocalDarkMode
-import kite1412.gatetik.ui.compositionlocal.LocalScaffoldComponentsController
 import kite1412.gatetik.ui.compositionlocal.LocalSnackbarHostStateWrapper
 import kite1412.gatetik.ui.preview.DevicePreviews
 import kite1412.gatetik.ui.util.LoadState
-import kite1412.gatetik.ui.util.ScaffoldComponent
 import kite1412.gatetik.ui.util.UiEvent
 import kite1412.gatetik.util.timeAgo
 import kotlinx.coroutines.delay
@@ -135,15 +134,12 @@ private fun MobileHomeScreen(
     modifier: Modifier = Modifier
 ) {
     val isDarkMode = LocalDarkMode.current
-    val scaffoldComponentsController = LocalScaffoldComponentsController.current
 
     LazyColumn(
         modifier = modifier
             .fillMaxSize()
             .padding(contentPadding),
-        contentPadding = PaddingValues(
-            bottom = scaffoldComponentsController.getState(ScaffoldComponent.NAV_BAR).size.height
-        ),
+        contentPadding = navBarPadding(),
         verticalArrangement = Arrangement.spacedBy(24.dp)
     ) {
         item {

@@ -1,11 +1,14 @@
 package kite1412.gatetik.ui.util
 
 import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import kite1412.gatetik.designsystem.util.WindowWidthSize
+import kite1412.gatetik.designsystem.util.rememberWindowWidthSize
 import kite1412.gatetik.ui.compositionlocal.LocalScaffoldComponentsController
 
 @Composable
@@ -18,4 +21,18 @@ fun Modifier.consumeSideNavBarWidth(): Modifier {
     )
 
     return padding(start = startPadding)
+}
+
+@Composable
+fun navBarPadding(): PaddingValues {
+    val scaffoldComponentsController = LocalScaffoldComponentsController.current
+    val windowWidthSize = rememberWindowWidthSize()
+    val navBarSize = scaffoldComponentsController
+        .getState(ScaffoldComponent.NAV_BAR)
+        .size
+
+    return PaddingValues(
+        bottom = if (windowWidthSize == WindowWidthSize.COMPACT) navBarSize.height else 0.dp,
+        start = if (windowWidthSize != WindowWidthSize.COMPACT) navBarSize.width else 0.dp
+    )
 }

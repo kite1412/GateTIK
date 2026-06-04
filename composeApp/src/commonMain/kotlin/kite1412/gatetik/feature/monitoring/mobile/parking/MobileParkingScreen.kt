@@ -39,6 +39,7 @@ import kite1412.gatetik.designsystem.theme.GateTikTheme
 import kite1412.gatetik.designsystem.theme.Slate900
 import kite1412.gatetik.designsystem.theme.White
 import kite1412.gatetik.designsystem.util.GateTikIcons
+import kite1412.gatetik.ui.util.navBarPadding
 import kite1412.gatetik.model.ParkingQuota
 import kite1412.gatetik.ui.component.InfoCard
 import kite1412.gatetik.ui.component.StatCard
@@ -48,7 +49,6 @@ import kite1412.gatetik.ui.preview.DevicePreviews
 import kite1412.gatetik.ui.util.LoadState
 import kite1412.gatetik.ui.util.LoadingState
 import kite1412.gatetik.ui.util.MockScaffoldComponentController
-import kite1412.gatetik.ui.util.ScaffoldComponent
 import org.jetbrains.compose.resources.painterResource
 import org.koin.compose.viewmodel.koinViewModel
 import kotlin.math.max
@@ -84,9 +84,7 @@ private fun MobileParkingScreen(
     ) {
         LazyColumn(
             modifier = Modifier.fillMaxSize(),
-            contentPadding = PaddingValues(
-                bottom = scaffoldComponentsController.getState(ScaffoldComponent.NAV_BAR).size.height
-            ),
+            contentPadding = navBarPadding(),
             verticalArrangement = arrangement
         ) {
             item {

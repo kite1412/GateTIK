@@ -43,13 +43,12 @@ import kite1412.gatetik.designsystem.theme.Red600
 import kite1412.gatetik.designsystem.theme.White
 import kite1412.gatetik.designsystem.theme.White20
 import kite1412.gatetik.designsystem.util.GateTikIcons
+import kite1412.gatetik.ui.util.navBarPadding
 import kite1412.gatetik.model.Cctv
 import kite1412.gatetik.ui.component.InfoCard
 import kite1412.gatetik.ui.compositionlocal.LocalDarkMode
-import kite1412.gatetik.ui.compositionlocal.LocalScaffoldComponentsController
 import kite1412.gatetik.ui.preview.DevicePreviews
 import kite1412.gatetik.ui.util.LoadState
-import kite1412.gatetik.ui.util.ScaffoldComponent
 import kotlinx.coroutines.delay
 import org.jetbrains.compose.resources.painterResource
 import org.koin.compose.viewmodel.koinViewModel
@@ -75,7 +74,6 @@ private fun MobileCctvScreen(
     contentPadding: PaddingValues,
     modifier: Modifier = Modifier
 ) {
-    val scaffoldComponentsController = LocalScaffoldComponentsController.current
     val isDarkMode = LocalDarkMode.current
     var showInFullScreen by retain { mutableStateOf(false) }
 
@@ -84,9 +82,7 @@ private fun MobileCctvScreen(
     ) {
         LazyColumn(
             modifier = Modifier.padding(contentPadding),
-            contentPadding = PaddingValues(
-                bottom = scaffoldComponentsController.getState(ScaffoldComponent.NAV_BAR).size.height
-            ),
+            contentPadding = navBarPadding(),
             verticalArrangement = Arrangement.spacedBy(24.dp)
         ) {
             item {
