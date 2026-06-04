@@ -5,11 +5,10 @@ import androidx.lifecycle.viewModelScope
 import kite1412.gatetik.domain.Authentication
 import kite1412.gatetik.domain.SessionStatus
 import kite1412.gatetik.domain.repository.AccessLogRepository
-import kite1412.gatetik.domain.usecase.CloseGateUseCase
+import kite1412.gatetik.domain.usecase.AccessGateUseCase
 import kite1412.gatetik.domain.usecase.GetMainCctvUseCase
 import kite1412.gatetik.domain.usecase.GetMainGateUseCase
 import kite1412.gatetik.domain.usecase.GetMainParkingQuotaUseCase
-import kite1412.gatetik.domain.usecase.OpenGateUseCase
 import kite1412.gatetik.model.AccessLog
 import kite1412.gatetik.ui.util.LoadState
 import kite1412.gatetik.ui.util.UiEvent
@@ -33,8 +32,7 @@ class MobileHomeViewModel(
     getMainCctvUseCase: GetMainCctvUseCase,
     getMainParkingQuotaUseCase: GetMainParkingQuotaUseCase,
     accessLogRepository: AccessLogRepository,
-    private val openGateUseCase: OpenGateUseCase,
-    private val closeGateUseCase: CloseGateUseCase
+    private val accessGateUseCase: AccessGateUseCase
 ) : ViewModel() {
     private var gateId = 0
     private val _uiEvent = MutableSharedFlow<UiEvent>()
@@ -80,7 +78,7 @@ class MobileHomeViewModel(
 
     fun openGate() {
         viewModelScope.launch {
-            openGateUseCase(gateId)
+            accessGateUseCase.open(gateId)
                 .onSuccess { success ->
                     _uiEvent.emit(
                         UiEvent.ShowSnackbar(
@@ -97,7 +95,7 @@ class MobileHomeViewModel(
 
     fun closeGate() {
         viewModelScope.launch {
-            closeGateUseCase(gateId)
+            accessGateUseCase.close(gateId)
                 .onSuccess { success ->
                     _uiEvent.emit(
                         UiEvent.ShowSnackbar(

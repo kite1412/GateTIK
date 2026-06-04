@@ -2,6 +2,7 @@ package kite1412.gatetik.data.repository
 
 import kite1412.gatetik.Location
 import kite1412.gatetik.data.util.tryOrThrowUnknown
+import kite1412.gatetik.domain.model.GateAccessType
 import kite1412.gatetik.domain.repository.GateRepository
 import kite1412.gatetik.domain.repository.GateResult
 import kite1412.gatetik.model.Gate
@@ -63,5 +64,28 @@ class GateRepositoryImpl(
             }
         }
         isSuccess
+    }
+
+    override suspend fun enterOrExitGate(
+        id: Int,
+        location: Location
+    ): GateResult<GateAccessType> = tryOrThrowUnknown(
+        logTag = logTag,
+        errorMessage = "Failed to access gate"
+    ) { throwError ->
+        val res = remoteDataSource.enterOrExitGate(id, location)
+
+        res?.also { type ->
+            parkingQuotaRepositoryImpl.updateParkingQuotaFlow { parkingQuota ->
+                parkingQuota?.let {
+                    parkingQuota.copy(
+                        usedSlots = when (type) {
+                            GateAccessType.ENTER -> parkingQuota.usedSlots + 1
+                            GateAccessType.EXIT -> parkingQuota.usedSlots - 1
+                        }
+                    )
+                }
+            }
+        } ?: throwError()
     }
 }

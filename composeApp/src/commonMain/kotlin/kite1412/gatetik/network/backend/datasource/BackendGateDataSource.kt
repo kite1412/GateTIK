@@ -1,6 +1,7 @@
 package kite1412.gatetik.network.backend.datasource
 
 import kite1412.gatetik.Location
+import kite1412.gatetik.domain.model.GateAccessType
 import kite1412.gatetik.getPlatform
 import kite1412.gatetik.model.Gate
 import kite1412.gatetik.network.backend.BackendClient
@@ -68,6 +69,25 @@ class BackendGateDataSource : GateRemoteDataSource {
         )
 
         return res.success
+    }
+
+    override suspend fun enterOrExitGate(
+        id: Int,
+        location: Location
+    ): GateAccessType {
+        val res = BackendClient.post<BackendLocationGateAccessRequest, BackendResponse<BackendOpenGateResponse>>(
+            path = "gate/access",
+            body = locationGateAccess(
+                id = id,
+                open = true,
+                location = location
+            )
+        )
+
+        return res.data?.let { data ->
+            if (data.action == "entry") GateAccessType.ENTER
+            else GateAccessType.EXIT
+        } ?: throw RuntimeException("Failed to access gate")
     }
 
     private fun gateAccess(id: Int, open: Boolean) = BackendGateAccessRequest(

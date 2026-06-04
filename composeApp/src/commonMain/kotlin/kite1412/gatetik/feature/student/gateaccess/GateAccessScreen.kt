@@ -105,7 +105,7 @@ fun GateAccessScreen(
             isActionDelayed = viewModel.delayAction,
             isDarkMode = LocalDarkMode.current,
             contentPadding = contentPadding,
-            onGateOpen = viewModel::openGate,
+            onGateOpen = viewModel::enterOrExitGate,
             onLocationPermissionChange = viewModel::updateIsLocationPermissionGranted,
             modifier = modifier
         )

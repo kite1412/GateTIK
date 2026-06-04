@@ -44,7 +44,7 @@ private val sharedViewModelModule = module {
             getMainParkingQuotaUseCase = get(),
             locationService = get(),
             getMainGateUseCase = get(),
-            openGateUseCase = get()
+            accessGateUseCase = get()
         )
     }
 }
@@ -57,8 +57,7 @@ private val mobileMonitoringViewModelModule = module {
             getMainCctvUseCase = get(),
             getMainParkingQuotaUseCase = get(),
             accessLogRepository = get(),
-            openGateUseCase = get(),
-            closeGateUseCase = get()
+            accessGateUseCase = get()
         )
     }
     viewModel {
@@ -83,8 +82,7 @@ private val desktopMonitoringViewModel = module {
             getMainCctvUseCase = get(),
             userRepository = get(),
             accessLogRepository = get(),
-            openGateUseCase = get(),
-            closeGateUseCase = get(),
+            accessGateUseCase = get()
         )
     }
     viewModel {

@@ -11,9 +11,9 @@ import kite1412.gatetik.LocationService
 import kite1412.gatetik.LocationState
 import kite1412.gatetik.domain.Authentication
 import kite1412.gatetik.domain.SessionStatus
+import kite1412.gatetik.domain.usecase.AccessGateUseCase
 import kite1412.gatetik.domain.usecase.GetMainGateUseCase
 import kite1412.gatetik.domain.usecase.GetMainParkingQuotaUseCase
-import kite1412.gatetik.domain.usecase.OpenGateUseCase
 import kite1412.gatetik.model.User
 import kite1412.gatetik.ui.util.UiEvent
 import kite1412.gatetik.ui.util.stateIn
@@ -37,7 +37,7 @@ class GateAccessViewModel(
     getMainParkingQuotaUseCase: GetMainParkingQuotaUseCase,
     locationService: LocationService,
     private val getMainGateUseCase: GetMainGateUseCase,
-    private val openGateUseCase: OpenGateUseCase
+    private val accessGateUseCase: AccessGateUseCase
 ) : ViewModel() {
     private val _uiEvent = MutableSharedFlow<UiEvent>()
     val uiEvent = _uiEvent.asSharedFlow()
@@ -74,20 +74,20 @@ class GateAccessViewModel(
             initialValue = LocationState.Loading
         )
 
-    fun openGate() {
+    fun enterOrExitGate() {
         viewModelScope.launch {
             getMainGateUseCase.observeAsFlow().first()?.let { gate ->
                 delayAction = true
                 val state = locationState.first()
 
                 if (state is LocationState.Available) {
-                    openGateUseCase.enter(
+                    accessGateUseCase.enterOrExitGate(
                         id = gate.id,
                         location = state.currentLocation
                     )
-                        .onSuccess { success ->
+                        .onSuccess {
                             _uiEvent.emit(
-                                UiEvent.ShowSnackbar(if (success) "Berhasil membuka gate" else "Gagal membuka gate, pastikan berada di sekitar gate")
+                                UiEvent.ShowSnackbar("Berhasil membuka gate")
                             )
                         }
                         .onError {

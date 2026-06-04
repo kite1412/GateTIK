@@ -1,6 +1,7 @@
 package kite1412.gatetik.network.domain.datasource
 
 import kite1412.gatetik.Location
+import kite1412.gatetik.domain.model.GateAccessType
 import kite1412.gatetik.model.Gate
 
 interface GateRemoteDataSource {
@@ -13,4 +14,6 @@ interface GateRemoteDataSource {
     suspend fun enterGate(id: Int, location: Location): Boolean
 
     suspend fun exitGate(id: Int, location: Location): Boolean
+
+    suspend fun enterOrExitGate(id: Int, location: Location): GateAccessType?
 }

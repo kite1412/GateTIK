@@ -1,6 +1,7 @@
 package kite1412.gatetik.domain.repository
 
 import kite1412.gatetik.Location
+import kite1412.gatetik.domain.model.GateAccessType
 import kite1412.gatetik.model.Gate
 import kite1412.gatetik.util.Error
 import kite1412.gatetik.util.Result
@@ -17,4 +18,6 @@ interface GateRepository {
     suspend fun enterGate(id: Int, location: Location): GateResult<Boolean>
 
     suspend fun exitGate(id: Int, location: Location): GateResult<Boolean>
+
+    suspend fun enterOrExitGate(id: Int, location: Location): GateResult<GateAccessType>
 }

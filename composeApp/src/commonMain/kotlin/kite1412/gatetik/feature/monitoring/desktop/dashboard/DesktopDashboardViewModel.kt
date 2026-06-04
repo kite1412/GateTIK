@@ -8,11 +8,10 @@ import kite1412.gatetik.datastore.GateTikDataStore
 import kite1412.gatetik.domain.Authentication
 import kite1412.gatetik.domain.repository.AccessLogRepository
 import kite1412.gatetik.domain.repository.UserRepository
-import kite1412.gatetik.domain.usecase.CloseGateUseCase
+import kite1412.gatetik.domain.usecase.AccessGateUseCase
 import kite1412.gatetik.domain.usecase.GetMainCctvUseCase
 import kite1412.gatetik.domain.usecase.GetMainGateUseCase
 import kite1412.gatetik.domain.usecase.GetMainParkingQuotaUseCase
-import kite1412.gatetik.domain.usecase.OpenGateUseCase
 import kite1412.gatetik.feature.monitoring.desktop.DesktopBaseViewModel
 import kite1412.gatetik.model.AccessLog
 import kite1412.gatetik.ui.util.LoadState
@@ -34,8 +33,7 @@ class DesktopDashboardViewModel(
     getMainCctvUseCase: GetMainCctvUseCase,
     private val userRepository: UserRepository,
     private val accessLogRepository: AccessLogRepository,
-    private val openGateUseCase: OpenGateUseCase,
-    private val closeGateUseCase: CloseGateUseCase
+    private val accessGateUseCase: AccessGateUseCase
 ) : DesktopBaseViewModel(authentication, dataStore) {
     private val _uiEvent = MutableSharedFlow<UiEvent>()
     val uiEvent = _uiEvent.asSharedFlow()
@@ -54,7 +52,7 @@ class DesktopDashboardViewModel(
     fun openGate() {
         viewModelScope.launch {
             gate.first().data?.let { gate ->
-                openGateUseCase(gate.id)
+                accessGateUseCase.open(gate.id)
                     .onSuccess { success ->
                         _uiEvent.emit(
                             UiEvent.ShowSnackbar(
@@ -73,7 +71,7 @@ class DesktopDashboardViewModel(
     fun closeGate() {
         viewModelScope.launch {
             gate.first().data?.let { gate ->
-                closeGateUseCase(gate.id)
+                accessGateUseCase.close(gate.id)
                     .onSuccess { success ->
                         _uiEvent.emit(
                             UiEvent.ShowSnackbar(
