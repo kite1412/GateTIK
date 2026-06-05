@@ -20,6 +20,8 @@ import kite1412.gatetik.util.onError
 import kite1412.gatetik.util.onSuccess
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
 
 class DesktopUserManagementViewModel(
@@ -38,21 +40,16 @@ class DesktopUserManagementViewModel(
         private set
     var users by mutableStateOf<LoadState<List<User>>>(LoadState.Loading("Memuat daftar pengguna"))
         private set
-    private val params = combine(
-        flow = snapshotFlow { selectedRole },
-        flow2 = snapshotFlow { selectedStatus },
-        flow3 = snapshotFlow { searchText },
-        flow4 = snapshotFlow { perPage }
-    ) { role, status, searchText, perPage ->
-        val params = UserRepository.GetParams(
-            role = role,
-            status = status,
+    private val params = snapshotFlow {
+        UserRepository.GetParams(
+            role = selectedRole,
+            status = selectedStatus,
             search = searchText,
             perPage = perPage
         )
-        updateUsersOnParamsChange(params)
-        params
     }
+        .distinctUntilChanged()
+        .onEach(::updateUsersOnParamsChange)
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.Eagerly,

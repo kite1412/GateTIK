@@ -46,7 +46,6 @@ import kite1412.gatetik.designsystem.theme.Emerald500
 import kite1412.gatetik.designsystem.theme.GateTikTheme
 import kite1412.gatetik.designsystem.theme.Purple400
 import kite1412.gatetik.designsystem.theme.Red500
-import kite1412.gatetik.designsystem.theme.Red600
 import kite1412.gatetik.designsystem.theme.Yellow500
 import kite1412.gatetik.designsystem.util.GateTikIcons
 import kite1412.gatetik.designsystem.util.WindowWidthSize
@@ -518,26 +517,15 @@ private fun RecentAccessActivitySection(
                                     Text(it.accessMethod.capitalizedName)
                                 },
                                 TableColumn("STATUS") {
-                                    Text(
+                                    val (containerColor, contentColor) = when (it.status) {
+                                        AccessStatus.SUCCESS -> Emerald500.copy(alpha = 0.1f) to Emerald500
+                                        AccessStatus.FAILED -> Red500.copy(alpha = 0.1f) to Red500
+                                        AccessStatus.PENDING -> Yellow500.copy(alpha = 0.1f) to Yellow500
+                                    }
+                                    Badge(
                                         text = it.status.capitalizedName,
-                                        modifier = Modifier
-                                            .background(
-                                                color = (when (it.status) {
-                                                    AccessStatus.SUCCESS -> Emerald500
-                                                    AccessStatus.PENDING -> Yellow500
-                                                    AccessStatus.FAILED -> Red600
-                                                }).copy(alpha = 0.1f),
-                                                shape = CircleShape
-                                            )
-                                            .padding(
-                                                vertical = 4.dp,
-                                                horizontal = 8.dp
-                                            ),
-                                        color = when (it.status) {
-                                            AccessStatus.SUCCESS -> Emerald500
-                                            AccessStatus.PENDING -> Yellow500
-                                            AccessStatus.FAILED -> Red600
-                                        }
+                                        containerColor = containerColor,
+                                        contentColor = contentColor
                                     )
                                 },
                                 TableColumn("CATATAN", 2f) {

@@ -12,6 +12,7 @@ import kite1412.gatetik.model.ParkingQuota
 import kite1412.gatetik.model.User
 import kite1412.gatetik.model.UserRole
 import kite1412.gatetik.model.UserStatus
+import kite1412.gatetik.util.now
 import kotlin.time.Instant
 
 val mockUser = User(
@@ -20,7 +21,8 @@ val mockUser = User(
     email = "mock@gatetik.com",
     role = UserRole.ADMIN,
     status = UserStatus.ACTIVE,
-    instituteNumber = "mock-1"
+    instituteNumber = "mock-1",
+    createdAt = now()
 )
 
 val mockIotDevice = IotDevice(

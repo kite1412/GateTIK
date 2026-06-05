@@ -9,5 +9,6 @@ fun User.toDataStoreUser() = DataStoreUser(
     email = email,
     role = role.name,
     status = status.name,
-    instituteNumber = instituteNumber
+    instituteNumber = instituteNumber,
+    createdAt = createdAt
 )

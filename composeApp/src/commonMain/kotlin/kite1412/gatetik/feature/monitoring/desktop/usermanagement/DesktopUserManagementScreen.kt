@@ -61,6 +61,8 @@ import kite1412.gatetik.ui.preview.DevicePreviews
 import kite1412.gatetik.ui.util.LoadState
 import kite1412.gatetik.ui.util.MockScaffoldComponentController
 import kite1412.gatetik.ui.util.data
+import kite1412.gatetik.util.now
+import kite1412.gatetik.util.timestampString
 import org.jetbrains.compose.resources.painterResource
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -242,9 +244,9 @@ private fun DesktopUserManagementContent(
                                                 contentColor = contentColor
                                             )
                                         },
-                                        TableColumn("TERDAFTAR", 2f) {
+                                        TableColumn("TERDAFTAR", 2f) { user ->
                                             Text(
-                                                text = "31 Mei 2026, 12:49:37", // Dummy
+                                                text = user.createdAt.timestampString,
                                                 style = MaterialTheme.typography.bodySmall,
                                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                                             )
@@ -349,7 +351,8 @@ private fun DesktopUserManagementScreenPreview() {
                                 "student@example.com",
                                 UserRole.STUDENT,
                                 UserStatus.ACTIVE,
-                                "STU001"
+                                "STU001",
+                                now()
                             ),
                             User(
                                 2,
@@ -357,7 +360,8 @@ private fun DesktopUserManagementScreenPreview() {
                                 "student2@example.com",
                                 UserRole.STUDENT,
                                 UserStatus.PENDING,
-                                "STU002"
+                                "STU002",
+                                now()
                             )
                         )
                     ),

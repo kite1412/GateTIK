@@ -21,6 +21,8 @@ import kite1412.gatetik.util.onError
 import kite1412.gatetik.util.onSuccess
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
 
 class DesktopAccessLogsViewModel(
@@ -29,36 +31,31 @@ class DesktopAccessLogsViewModel(
     private val accessLogRepository: AccessLogRepository
 ) : DesktopBaseViewModel(authentication, dataStore) {
     private val logStore = mutableStateMapOf<AccessLogRepository.GetParams, PaginatedListResult<AccessLog>>()
-    var searchText by mutableStateOf("")
+    var searchText by mutableStateOf<String?>(null)
         private set
-
     var selectedStatusFilter by mutableStateOf<AccessStatus?>(null)
         private set
-
+    var selectedTrendStatusFilter by mutableStateOf<AccessStatus?>(null)
+        private set
     var selectedMethodFilter by mutableStateOf<AccessMethod?>(null)
         private set
-
     var selectedActionFilter by mutableStateOf<AccessAction?>(null)
         private set
-
     var selectedSort by mutableStateOf(Sort.ASC)
         private set
+    var accessLogs by mutableStateOf<LoadState<List<AccessLog>>>(LoadState.Loading("Memuat log akses"))
+        private set
 
-    val params = combine(
-        flow = snapshotFlow { selectedStatusFilter },
-        flow2 = snapshotFlow { selectedMethodFilter },
-        flow3 = snapshotFlow { selectedActionFilter },
-        flow4 = snapshotFlow { searchText }
-    ) { status, method, action, search ->
-        val params = AccessLogRepository.GetParams(
-            status = status,
-            method = method,
-            action = action,
-            search = search
+    val params = snapshotFlow {
+        AccessLogRepository.GetParams(
+            status = selectedStatusFilter,
+            method = selectedMethodFilter,
+            action = selectedActionFilter,
+            search = searchText
         )
-        updateLogsOnParamsChange(params)
-        params
     }
+        .distinctUntilChanged()
+        .onEach(::updateLogsOnParamsChange)
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(5000),
@@ -77,8 +74,23 @@ class DesktopAccessLogsViewModel(
             initialValue = null
         )
 
-    var accessLogs by mutableStateOf<LoadState<List<AccessLog>>>(LoadState.Loading("Memuat log akses"))
-        private set
+    val trendAccessLogs = snapshotFlow {
+        val logs = logStore[AccessLogRepository.GetParams()]?.data
+        val filter = selectedTrendStatusFilter
+
+        logs?.let {
+            LoadState.Success(
+                filter?.let { status ->
+                    it.filter { log -> log.status == status }
+                } ?: it
+            )
+        } ?: LoadState.Loading("Memuat log akses")
+    }
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = LoadState.Loading("Memuat log akses")
+        )
 
     fun updateSearchText(text: String) {
         searchText = text
@@ -86,6 +98,10 @@ class DesktopAccessLogsViewModel(
 
     fun updateStatusFilter(status: AccessStatus?) {
         selectedStatusFilter = status
+    }
+
+    fun updateTrendStatusFilter(status: AccessStatus?) {
+        selectedTrendStatusFilter = status
     }
 
     fun updateMethodFilter(method: AccessMethod?) {

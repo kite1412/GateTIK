@@ -4,6 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -64,7 +65,8 @@ private val BottomAxisValueFormatter = CartesianValueFormatter { context, value,
 @Composable
 fun AccessLogTrend(
     accessLogs: LoadState<List<AccessLog>>,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    headerTrailing: (@Composable () -> Unit)? = null
 ) {
     val modelProducer = remember { CartesianChartModelProducer() }
     val trends = accessLogs.data?.toTrends()
@@ -79,7 +81,8 @@ fun AccessLogTrend(
         trends = trends,
         accessLogs = accessLogs,
         modelProducer = modelProducer,
-        modifier = modifier
+        modifier = modifier,
+        headerTrailing = headerTrailing
     )
 }
 
@@ -89,26 +92,36 @@ private fun AccessLogTrend(
     trends: List<AccessLogTrend>?,
     accessLogs: LoadState<List<AccessLog>>,
     modelProducer: CartesianChartModelProducer,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    headerTrailing: (@Composable () -> Unit)? = null
 ) {
     GlassBox(
         modifier = modifier
     ) {
         Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
-            Column {
-                Text(
-                    text = "TREN AKSES",
-                    style = MaterialTheme.typography.labelSmall.copy(
-                        fontWeight = FontWeight.Bold,
-                        letterSpacing = 1.sp
-                    ),
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-                Text(
-                    text = "24 jam terakhir",
-                    style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold),
-                    color = MaterialTheme.colorScheme.onSurface
-                )
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Column(
+                    verticalArrangement = Arrangement.spacedBy(4.dp)
+                ) {
+                    Text(
+                        text = "TREN AKSES",
+                        style = MaterialTheme.typography.labelSmall.copy(
+                            fontWeight = FontWeight.Bold,
+                            letterSpacing = 1.sp
+                        ),
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                    Text(
+                        text = "24 jam terakhir",
+                        style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold),
+                        color = MaterialTheme.colorScheme.onSurface
+                    )
+                }
+                headerTrailing?.invoke()
             }
 
             Box(
