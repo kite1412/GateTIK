@@ -69,13 +69,14 @@ fun AccessLogTrend(
     val modelProducer = remember { CartesianChartModelProducer() }
     val trends = accessLogs.data?.toTrends()
 
-    LaunchedEffect(accessLogs.data) {
+    LaunchedEffect(trends) {
         trends?.let { trends ->
-            modelProducer.runTransaction(trends)
+            if (trends.isNotEmpty()) modelProducer.runTransaction(trends)
         }
     }
     AccessLogTrend(
         totalLogGroups = trends?.size ?: 0,
+        trends = trends,
         accessLogs = accessLogs,
         modelProducer = modelProducer,
         modifier = modifier
@@ -85,6 +86,7 @@ fun AccessLogTrend(
 @Composable
 private fun AccessLogTrend(
     totalLogGroups: Int,
+    trends: List<AccessLogTrend>?,
     accessLogs: LoadState<List<AccessLog>>,
     modelProducer: CartesianChartModelProducer,
     modifier: Modifier = Modifier
@@ -137,7 +139,7 @@ private fun AccessLogTrend(
                         )
                     },
                     success = {
-                        if (it.isNotEmpty()) Chart(
+                        if (trends?.isNotEmpty() == true) Chart(
                             totalLogGroups = totalLogGroups,
                             modelProducer = modelProducer,
                             modifier = Modifier.fillMaxSize()
@@ -246,6 +248,7 @@ private fun AccessTrendPreview() {
         Scaffold { p ->
               AccessLogTrend(
                   totalLogGroups = trends.size,
+                  trends = trends,
                   accessLogs = LoadState.Success(mockAccessLogs),
                   modelProducer = modelProducer,
                   modifier = Modifier.padding(p)

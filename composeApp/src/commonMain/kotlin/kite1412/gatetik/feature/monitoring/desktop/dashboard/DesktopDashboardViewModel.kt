@@ -43,6 +43,7 @@ class DesktopDashboardViewModel(
     var totalUsers by mutableStateOf<LoadState<Int>>(LoadState.Loading())
         private set
     var accessLogs by mutableStateOf<LoadState<List<AccessLog>>>(LoadState.Loading())
+        private set
 
     init {
         initTotalUsers()
