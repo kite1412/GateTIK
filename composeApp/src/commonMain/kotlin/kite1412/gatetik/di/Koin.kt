@@ -111,7 +111,8 @@ private val desktopMonitoringViewModel = module {
     viewModel {
         DesktopAccessLogsViewModel(
             authentication = get(),
-            dataStore = get()
+            dataStore = get(),
+            accessLogRepository = get()
         )
     }
 }

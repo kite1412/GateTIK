@@ -18,6 +18,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -46,6 +47,7 @@ import kite1412.gatetik.designsystem.theme.GateTikTheme
 import kite1412.gatetik.designsystem.theme.Red500
 import kite1412.gatetik.designsystem.theme.Yellow500
 import kite1412.gatetik.designsystem.util.GateTikIcons
+import kite1412.gatetik.feature.monitoring.desktop.accesslogs.util.Sort
 import kite1412.gatetik.feature.monitoring.desktop.component.DesktopLayout
 import kite1412.gatetik.feature.monitoring.desktop.util.desktopBaseModifier
 import kite1412.gatetik.model.AccessAction
@@ -53,14 +55,15 @@ import kite1412.gatetik.model.AccessLog
 import kite1412.gatetik.model.AccessMethod
 import kite1412.gatetik.model.AccessStatus
 import kite1412.gatetik.model.UserRole
+import kite1412.gatetik.network.mock.mockAccessLogs
 import kite1412.gatetik.ui.compositionlocal.LocalScaffoldComponentsController
 import kite1412.gatetik.ui.preview.DevicePreviews
+import kite1412.gatetik.ui.util.LoadState
 import kite1412.gatetik.ui.util.MockScaffoldComponentController
-import kotlinx.datetime.TimeZone
-import kotlinx.datetime.toLocalDateTime
+import kite1412.gatetik.ui.util.data
+import kite1412.gatetik.util.timestampString
 import org.jetbrains.compose.resources.painterResource
 import org.koin.compose.viewmodel.koinViewModel
-import kotlin.time.Instant
 
 @Composable
 fun DesktopAccessLogsScreen(
@@ -69,32 +72,27 @@ fun DesktopAccessLogsScreen(
     viewModel: DesktopAccessLogsViewModel = koinViewModel()
 ) {
     val user by viewModel.signedInUser.collectAsStateWithLifecycle()
-    val searchText by viewModel.searchText.collectAsStateWithLifecycle()
-    val statusFilter by viewModel.selectedStatusFilter.collectAsStateWithLifecycle()
-    val methodFilter by viewModel.selectedMethodFilter.collectAsStateWithLifecycle()
-    val actionFilter by viewModel.selectedActionFilter.collectAsStateWithLifecycle()
-    val sort by viewModel.selectedSort.collectAsStateWithLifecycle()
-    val accessLogs by viewModel.accessLogs.collectAsStateWithLifecycle()
-    val currentPage by viewModel.currentPage.collectAsStateWithLifecycle()
-    val itemsPerPage by viewModel.itemsPerPage.collectAsStateWithLifecycle()
+    val pagination by viewModel.pagination.collectAsStateWithLifecycle()
+    val accessLogs = viewModel.accessLogs
 
     user?.let { user ->
         DesktopAccessLogsScreen(
             userRole = user.role,
-            searchText = searchText,
-            onSearchTextChange = viewModel::updateSearchText,
-            statusFilter = statusFilter,
-            onStatusFilterChange = viewModel::updateStatusFilter,
-            methodFilter = methodFilter,
-            onMethodFilterChange = viewModel::updateMethodFilter,
-            actionFilter = actionFilter,
-            onActionFilterChange = viewModel::updateActionFilter,
-            sort = sort,
-            onSortChange = viewModel::updateSort,
             accessLogs = accessLogs,
-            currentPage = currentPage,
-            onPageChange = viewModel::updatePage,
-            itemsPerPage = itemsPerPage.toString(),
+            searchText = viewModel.searchText,
+            onSearchTextChange = viewModel::updateSearchText,
+            statusFilter = viewModel.selectedStatusFilter,
+            onStatusFilterChange = viewModel::updateStatusFilter,
+            methodFilter = viewModel.selectedMethodFilter,
+            onMethodFilterChange = viewModel::updateMethodFilter,
+            actionFilter = viewModel.selectedActionFilter,
+            onActionFilterChange = viewModel::updateActionFilter,
+            sort = viewModel.selectedSort,
+            onSortChange = viewModel::updateSort,
+            currentPage = pagination?.currentPage ?: 1,
+            totalPages = pagination?.totalPages ?: 1,
+            onPageChange = {},
+            itemsPerPage = (pagination?.perPage ?: 15).toString(),
             onItemsPerPageChange = {},
             onExportCsv = viewModel::exportCsv,
             contentPadding = contentPadding,
@@ -107,6 +105,7 @@ fun DesktopAccessLogsScreen(
 @Composable
 private fun DesktopAccessLogsScreen(
     userRole: UserRole,
+    accessLogs: LoadState<List<AccessLog>>,
     searchText: String,
     onSearchTextChange: (String) -> Unit,
     statusFilter: AccessStatus?,
@@ -115,10 +114,10 @@ private fun DesktopAccessLogsScreen(
     onMethodFilterChange: (AccessMethod?) -> Unit,
     actionFilter: AccessAction?,
     onActionFilterChange: (AccessAction?) -> Unit,
-    sort: String,
-    onSortChange: (String) -> Unit,
-    accessLogs: List<AccessLog>,
+    sort: Sort,
+    onSortChange: (Sort) -> Unit,
     currentPage: Int,
+    totalPages: Int,
     onPageChange: (Int) -> Unit,
     itemsPerPage: String,
     onItemsPerPageChange: (String) -> Unit,
@@ -192,7 +191,9 @@ private fun DesktopAccessLogsScreen(
             item {
                 AccessLogsTableSection(
                     accessLogs = accessLogs,
+                    sort = sort,
                     currentPage = currentPage,
+                    totalPages = totalPages,
                     onPageChange = onPageChange,
                     itemsPerPage = itemsPerPage,
                     onItemsPerPageChange = onItemsPerPageChange
@@ -313,8 +314,8 @@ private fun FilterSection(
     onMethodChange: (AccessMethod?) -> Unit,
     actionFilter: AccessAction?,
     onActionChange: (AccessAction?) -> Unit,
-    sort: String,
-    onSortChange: (String) -> Unit
+    sort: Sort,
+    onSortChange: (Sort) -> Unit
 ) {
     FlowRow(
         modifier = Modifier.fillMaxWidth(),
@@ -386,91 +387,107 @@ private fun FilterSection(
         Select(
             label = "Urutkan",
             selectedOption = sort,
-            options = listOf("Terbaru", "Terlama"),
-            onOptionSelected = onSortChange
+            options = Sort.entries,
+            onOptionSelected = onSortChange,
+            optionToString = { it.string }
         )
     }
 }
 
 @Composable
 private fun AccessLogsTableSection(
-    accessLogs: List<AccessLog>,
+    accessLogs: LoadState<List<AccessLog>>,
+    sort: Sort,
     currentPage: Int,
+    totalPages: Int,
     onPageChange: (Int) -> Unit,
     itemsPerPage: String,
-    onItemsPerPageChange: (String) -> Unit
+    onItemsPerPageChange: (String) -> Unit,
+    modifier: Modifier = Modifier
 ) {
-    Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
-        Table(
-            columns = listOf(
-                TableColumn(title = "Pengguna", weight = 1.2f) { _ ->
-                    Text(
-                        text = "John Doe",
-                        style = MaterialTheme.typography.bodySmall,
-                        fontWeight = FontWeight.Bold
-                    )
-                },
-                TableColumn(title = "Peran", weight = 1f) { _ ->
-                    Text(
-                        text = "Mahasiswa", // Placeholder for actual role
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                },
-                TableColumn(title = "Aksi", weight = 0.8f) { log ->
-                    Text(
-                        text = when (log.action) {
-                            AccessAction.OPEN -> "Buka"
-                            AccessAction.CLOSE -> "Tutup"
-                            AccessAction.ENTRY -> "Masuk"
-                            AccessAction.EXIT -> "Keluar"
-                        },
-                        style = MaterialTheme.typography.bodySmall,
-                        fontWeight = FontWeight.Bold
-                    )
-                },
-                TableColumn(title = "Metode", weight = 0.8f) { log ->
-                    Text(
-                        text = when (log.accessMethod) {
-                            AccessMethod.MOBILE -> "Mobile"
-                            AccessMethod.WEB -> "Web"
-                            AccessMethod.DESKTOP -> "Desktop"
-                        },
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                },
-                TableColumn(title = "Status", weight = 1f) { log ->
-                    val (containerColor, contentColor, text) = when (log.status) {
-                        AccessStatus.SUCCESS -> Triple(Emerald500.copy(alpha = 0.1f), Emerald500, "Sukses")
-                        AccessStatus.FAILED -> Triple(Red500.copy(alpha = 0.1f), Red500, "Gagal")
-                        AccessStatus.PENDING -> Triple(Yellow500.copy(alpha = 0.1f), Yellow500, "Tertunda")
-                    }
-                    Badge(
-                        text = text,
-                        containerColor = containerColor,
-                        contentColor = contentColor
-                    )
-                },
-                TableColumn(title = "Catatan", weight = 2.5f) { log ->
-                    Text(
-                        text = log.notes ?: "-",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                },
-                TableColumn(title = "Waktu", weight = 1.5f) { log ->
-                    Text(
-                        text = log.createdAt.toLocalDateTime(TimeZone.currentSystemDefault()).run {
-                            val monthName = month.name.lowercase().replaceFirstChar { it.uppercase() }
-                            "$monthName $day, $year jam $hour:$minute:$second"
-                        },
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
+    Column(
+        modifier = modifier.fillMaxWidth(),
+        verticalArrangement = Arrangement.spacedBy(16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        LoadState(
+            state = accessLogs,
+            loading = { Text(it) },
+            error = { Text(it) },
+            success = { accessLogs ->
+                CompositionLocalProvider(
+                    LocalTextStyle provides MaterialTheme.typography.bodySmall
+                ) {
+                    if (accessLogs.isNotEmpty()) Table(
+                        columns = listOf(
+                            TableColumn(title = "Pengguna", weight = 1.2f) { _ ->
+                                Text(
+                                    text = "John Doe",
+                                    fontWeight = FontWeight.Bold
+                                )
+                            },
+                            TableColumn(title = "Role", weight = 1f) { _ ->
+                                Text(
+                                    text = "Mahasiswa",
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                            },
+                            TableColumn(title = "Aksi", weight = 0.8f) { log ->
+                                Text(
+                                    text = when (log.action) {
+                                        AccessAction.OPEN -> "Buka"
+                                        AccessAction.CLOSE -> "Tutup"
+                                        AccessAction.ENTRY -> "Masuk"
+                                        AccessAction.EXIT -> "Keluar"
+                                    },
+                                    fontWeight = FontWeight.Bold
+                                )
+                            },
+                            TableColumn(title = "Metode", weight = 0.8f) { log ->
+                                Text(
+                                    text = when (log.accessMethod) {
+                                        AccessMethod.MOBILE -> "Mobile"
+                                        AccessMethod.WEB -> "Web"
+                                        AccessMethod.DESKTOP -> "Desktop"
+                                    },
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                            },
+                            TableColumn(title = "Status", weight = 1f) { log ->
+                                val (containerColor, contentColor, text) = when (log.status) {
+                                    AccessStatus.SUCCESS -> Triple(Emerald500.copy(alpha = 0.1f), Emerald500, "Sukses")
+                                    AccessStatus.FAILED -> Triple(Red500.copy(alpha = 0.1f), Red500, "Gagal")
+                                    AccessStatus.PENDING -> Triple(Yellow500.copy(alpha = 0.1f), Yellow500, "Tertunda")
+                                }
+                                Badge(
+                                    text = text,
+                                    containerColor = containerColor,
+                                    contentColor = contentColor
+                                )
+                            },
+                            TableColumn(title = "Catatan", weight = 2.5f) { log ->
+                                Text(
+                                    text = log.notes ?: "-",
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                            },
+                            TableColumn(title = "Waktu", weight = 1.5f) { log ->
+                                Text(
+                                    text = log.createdAt.timestampString,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                            }
+                        ),
+                        items = accessLogs
+                            .run {
+                                when (sort) {
+                                    Sort.ASC -> sortedByDescending { it.createdAt }
+                                    Sort.DESC -> sortedBy { it.createdAt }
+                                }
+                            }
+                    ) else Text("Log akses tidak ditemukan")
                 }
-            ),
-            items = accessLogs
+            }
         )
 
         Row(
@@ -479,7 +496,7 @@ private fun AccessLogsTableSection(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                text = "Halaman $currentPage dari 1 • ${accessLogs.size} log",
+                text = "Halaman $currentPage dari $totalPages • ${accessLogs.data?.size ?: 0} log",
                 style = MaterialTheme.typography.labelSmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -513,24 +530,11 @@ private fun DesktopAccessLogsScreenPreview() {
                     onMethodFilterChange = {},
                     actionFilter = null,
                     onActionFilterChange = {},
-                    sort = "Terbaru",
+                    sort = Sort.ASC,
                     onSortChange = {},
-                    accessLogs = listOf(
-                        AccessLog(
-                            id = 1,
-                            userId = 1,
-                            gateId = 1,
-                            userFullName = "Username",
-                            userRole = UserRole.ADMIN,
-                            status = AccessStatus.FAILED,
-                            accessMethod = AccessMethod.MOBILE,
-                            action = AccessAction.ENTRY,
-                            notes = "User is outside the allowed gate radius. Access denied.",
-                            updatedAt = Instant.fromEpochMilliseconds(0),
-                            createdAt = Instant.fromEpochMilliseconds(0)
-                        )
-                    ),
+                    accessLogs = LoadState.Success(mockAccessLogs),
                     currentPage = 1,
+                    totalPages = 1,
                     onPageChange = {},
                     itemsPerPage = "15",
                     onItemsPerPageChange = {},

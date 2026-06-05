@@ -1,5 +1,6 @@
 package kite1412.gatetik.domain.repository
 
+import kite1412.gatetik.common.extension.includeIfNotNull
 import kite1412.gatetik.domain.model.PaginatedListResult
 import kite1412.gatetik.model.User
 import kite1412.gatetik.model.UserRole
@@ -32,10 +33,6 @@ interface UserRepository {
                 value = search?.takeIf { it.isNotBlank() }
             )
             includeIfNotNull("per_page", perPage?.toString())
-        }
-
-        private fun MutableMap<String, String>.includeIfNotNull(key: String, value: String?) {
-            if (value != null) set(key, value)
         }
     }
 }

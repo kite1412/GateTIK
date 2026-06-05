@@ -12,11 +12,11 @@ class AccessLogRepositoryImpl(
 ) : AccessLogRepository {
     private val logTag = "AccessLogRepositoryImpl"
 
-    override suspend fun getAll(): AccessLogResult<PaginatedListResult<AccessLog>> = tryOrThrowUnknown(
+    override suspend fun getAll(params: AccessLogRepository.GetParams): AccessLogResult<PaginatedListResult<AccessLog>> = tryOrThrowUnknown(
         logTag = logTag,
         errorMessage = "Failed to get access logs"
     ) { throwError ->
-        val res = remoteDataSource.getLogs(emptyMap())
+        val res = remoteDataSource.getLogs(params.toMap())
 
         res ?: throwError()
     }

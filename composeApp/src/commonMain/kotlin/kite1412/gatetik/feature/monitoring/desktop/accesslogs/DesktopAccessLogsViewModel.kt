@@ -1,109 +1,122 @@
 package kite1412.gatetik.feature.monitoring.desktop.accesslogs
 
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateMapOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
+import androidx.lifecycle.viewModelScope
 import kite1412.gatetik.datastore.GateTikDataStore
 import kite1412.gatetik.domain.Authentication
+import kite1412.gatetik.domain.model.PaginatedListResult
+import kite1412.gatetik.domain.repository.AccessLogRepository
 import kite1412.gatetik.feature.monitoring.desktop.DesktopBaseViewModel
+import kite1412.gatetik.feature.monitoring.desktop.accesslogs.util.Sort
 import kite1412.gatetik.model.AccessAction
 import kite1412.gatetik.model.AccessLog
 import kite1412.gatetik.model.AccessMethod
 import kite1412.gatetik.model.AccessStatus
-import kite1412.gatetik.model.UserRole
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlin.time.Clock
-import kotlin.time.Duration.Companion.minutes
+import kite1412.gatetik.ui.util.LoadState
+import kite1412.gatetik.util.onError
+import kite1412.gatetik.util.onSuccess
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.stateIn
 
 class DesktopAccessLogsViewModel(
     authentication: Authentication,
-    dataStore: GateTikDataStore
+    dataStore: GateTikDataStore,
+    private val accessLogRepository: AccessLogRepository
 ) : DesktopBaseViewModel(authentication, dataStore) {
+    private val logStore = mutableStateMapOf<AccessLogRepository.GetParams, PaginatedListResult<AccessLog>>()
+    var searchText by mutableStateOf("")
+        private set
 
-    private val _searchText = MutableStateFlow("")
-    val searchText = _searchText.asStateFlow()
+    var selectedStatusFilter by mutableStateOf<AccessStatus?>(null)
+        private set
 
-    private val _selectedStatusFilter = MutableStateFlow<AccessStatus?>(null)
-    val selectedStatusFilter = _selectedStatusFilter.asStateFlow()
+    var selectedMethodFilter by mutableStateOf<AccessMethod?>(null)
+        private set
 
-    private val _selectedMethodFilter = MutableStateFlow<AccessMethod?>(null)
-    val selectedMethodFilter = _selectedMethodFilter.asStateFlow()
+    var selectedActionFilter by mutableStateOf<AccessAction?>(null)
+        private set
 
-    private val _selectedActionFilter = MutableStateFlow<AccessAction?>(null)
-    val selectedActionFilter = _selectedActionFilter.asStateFlow()
+    var selectedSort by mutableStateOf(Sort.ASC)
+        private set
 
-    private val _selectedSort = MutableStateFlow("Terbaru")
-    val selectedSort = _selectedSort.asStateFlow()
+    val params = combine(
+        flow = snapshotFlow { selectedStatusFilter },
+        flow2 = snapshotFlow { selectedMethodFilter },
+        flow3 = snapshotFlow { selectedActionFilter },
+        flow4 = snapshotFlow { searchText }
+    ) { status, method, action, search ->
+        val params = AccessLogRepository.GetParams(
+            status = status,
+            method = method,
+            action = action,
+            search = search
+        )
+        updateLogsOnParamsChange(params)
+        params
+    }
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = null
+        )
 
-    private val _currentPage = MutableStateFlow(1)
-    val currentPage = _currentPage.asStateFlow()
+    val pagination = combine(
+        flow = snapshotFlow { logStore },
+        flow2 = params
+    ) { logStore, params ->
+        logStore[params]?.pagination
+    }
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = null
+        )
 
-    private val _itemsPerPage = MutableStateFlow(15)
-    val itemsPerPage = _itemsPerPage.asStateFlow()
-
-    private val _accessLogs = MutableStateFlow(createDummyLogs())
-    val accessLogs = _accessLogs.asStateFlow()
+    var accessLogs by mutableStateOf<LoadState<List<AccessLog>>>(LoadState.Loading("Memuat log akses"))
+        private set
 
     fun updateSearchText(text: String) {
-        _searchText.value = text
+        searchText = text
     }
 
     fun updateStatusFilter(status: AccessStatus?) {
-        _selectedStatusFilter.value = status
+        selectedStatusFilter = status
     }
 
     fun updateMethodFilter(method: AccessMethod?) {
-        _selectedMethodFilter.value = method
+        selectedMethodFilter = method
     }
 
     fun updateActionFilter(action: AccessAction?) {
-        _selectedActionFilter.value = action
+        selectedActionFilter = action
     }
 
-    fun updateSort(sort: String) {
-        _selectedSort.value = sort
-    }
-
-    fun updatePage(page: Int) {
-        _currentPage.value = page
-    }
-
-    fun updateItemsPerPage(count: Int) {
-        _itemsPerPage.value = count
+    fun updateSort(sort: Sort) {
+        selectedSort = sort
     }
 
     fun exportCsv() {
-        // Implement export logic or just a print for now
         println("Exporting CSV...")
     }
 
-    private fun createDummyLogs(): List<AccessLog> {
-        val now = Clock.System.now()
-        return listOf(
-            AccessLog(
-                id = 1,
-                userId = 1,
-                gateId = 1,
-                userFullName = "Username",
-                userRole = UserRole.ADMIN,
-                status = AccessStatus.FAILED,
-                accessMethod = AccessMethod.MOBILE,
-                action = AccessAction.ENTRY,
-                notes = "User is outside the allowed gate radius. Access denied.",
-                updatedAt = now,
-                createdAt = now
-            ),
-            AccessLog(
-                id = 2,
-                userId = 1,
-                gateId = 1,
-                userFullName = "Username",
-                userRole = UserRole.ADMIN,
-                status = AccessStatus.FAILED,
-                accessMethod = AccessMethod.MOBILE,
-                action = AccessAction.ENTRY,
-                notes = "User is outside the allowed gate radius. Access denied.",
-                updatedAt = now.minus(5.minutes),
-                createdAt = now.minus(5.minutes)
-            )
-        )
+    private suspend fun updateLogsOnParamsChange(params: AccessLogRepository.GetParams) {
+        if (logStore[params] != null)
+            accessLogs = LoadState.Success(logStore[params]!!.data)
+        else {
+            accessLogs = LoadState.Loading("Memuat log akses")
+            accessLogRepository.getAll(params)
+                .onSuccess {
+                    accessLogs = LoadState.Success(it.data)
+                    logStore[params] = it
+                }
+                .onError {
+                    accessLogs = LoadState.Error("Gagal memuat log akses")
+                }
+        }
     }
 }
