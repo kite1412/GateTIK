@@ -32,12 +32,20 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.input.key.Key
+import androidx.compose.ui.input.key.KeyEventType
+import androidx.compose.ui.input.key.isCtrlPressed
+import androidx.compose.ui.input.key.key
+import androidx.compose.ui.input.key.onPreviewKeyEvent
+import androidx.compose.ui.input.key.type
 import androidx.compose.ui.text.LinkAnnotation
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.withLink
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Window
+import androidx.compose.ui.window.WindowPlacement
 import androidx.compose.ui.window.application
+import androidx.compose.ui.window.rememberWindowState
 import kite1412.gatetik.app.GateTikApp
 import kite1412.gatetik.datastore.GateTikDataStore
 import kite1412.gatetik.designsystem.component.GlassBox
@@ -75,18 +83,44 @@ fun main() {
             mutableStateOf(true)
         }
         val coroutineScope = rememberCoroutineScope()
+        val state = rememberWindowState()
 
         Window(
             onCloseRequest = {
                 koinApp.close()
                 exitApplication()
             },
+            state = state,
             title = "Gate TIK"
         ) {
             window.minimumSize = Dimension(800, 600)
 
             Box(
-                modifier = Modifier.fillMaxSize(),
+                modifier = Modifier
+                    .fillMaxSize()
+                    .onPreviewKeyEvent { event ->
+                        if (event.type == KeyEventType.KeyUp) {
+                            if (event.isCtrlPressed) {
+                                when (event.key) {
+                                    Key.F -> {
+                                        state.placement =
+                                            if (state.placement == WindowPlacement.Maximized)
+                                                WindowPlacement.Floating
+                                            else
+                                                WindowPlacement.Maximized
+
+                                        true
+                                    }
+                                    Key.C -> {
+                                        window.setLocationRelativeTo(null)
+
+                                        true
+                                    }
+                                    else -> false
+                                }
+                            } else false
+                        } else false
+                    },
                 contentAlignment = Alignment.Center
             ) {
                 when (sessionStatus) {
