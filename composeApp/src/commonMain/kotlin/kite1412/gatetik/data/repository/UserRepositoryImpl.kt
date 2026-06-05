@@ -5,7 +5,6 @@ import kite1412.gatetik.domain.model.PaginatedListResult
 import kite1412.gatetik.domain.repository.UserRepository
 import kite1412.gatetik.domain.repository.UserResult
 import kite1412.gatetik.model.User
-import kite1412.gatetik.model.UserRole
 import kite1412.gatetik.network.domain.datasource.UserRemoteDataSource
 
 class UserRepositoryImpl(
@@ -14,12 +13,12 @@ class UserRepositoryImpl(
     private val logTag = "UserRepository"
 
     override suspend fun getAll(
-        role: UserRole?
+        params: UserRepository.GetParams
     ): UserResult<PaginatedListResult<User>> = tryOrThrowUnknown(
         logTag = logTag,
         errorMessage = "Failed to get users"
     ) { throwError ->
-        val res = remoteDataSource.getAll(role)
+        val res = remoteDataSource.getAll(params.toMap())
 
         res ?: throwError()
     }

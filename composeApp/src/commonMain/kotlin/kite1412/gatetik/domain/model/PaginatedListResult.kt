@@ -6,7 +6,7 @@ data class PaginatedListResult<T>(
 )
 
 data class Pagination(
-    val totalPage: Int,
+    val totalPages: Int,
     val perPage: Int,
     val currentPage: Int,
     val lastPage: Int,

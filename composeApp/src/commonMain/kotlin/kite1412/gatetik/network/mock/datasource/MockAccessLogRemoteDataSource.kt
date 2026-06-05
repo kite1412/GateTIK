@@ -13,7 +13,7 @@ class MockAccessLogRemoteDataSource : AccessLogRemoteDataSource {
         return PaginatedListResult(
             data = mockAccessLogs,
             pagination = Pagination(
-                totalPage = -1,
+                totalPages = -1,
                 perPage = -1,
                 currentPage = -1,
                 lastPage = -1,

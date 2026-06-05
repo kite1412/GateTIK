@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -22,7 +23,8 @@ fun SearchField(
     onValueChange: (String) -> Unit,
     placeholder: String,
     modifier: Modifier = Modifier,
-    isDarkMode: Boolean = LocalDarkMode.current
+    isDarkMode: Boolean = LocalDarkMode.current,
+    keyboardActions: KeyboardActions = KeyboardActions.Default
 ) {
     GlassBox(
         modifier = modifier,
@@ -48,7 +50,8 @@ fun SearchField(
                 onValueChange = onValueChange,
                 modifier = Modifier.weight(1f),
                 placeholder = placeholder,
-                singleLine = true
+                singleLine = true,
+                keyboardActions = keyboardActions
             )
         }
     }

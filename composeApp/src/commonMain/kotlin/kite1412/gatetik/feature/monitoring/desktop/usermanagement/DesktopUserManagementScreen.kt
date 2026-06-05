@@ -21,10 +21,17 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.retain.retain
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.key.Key
+import androidx.compose.ui.input.key.KeyEventType
+import androidx.compose.ui.input.key.key
+import androidx.compose.ui.input.key.onPreviewKeyEvent
+import androidx.compose.ui.input.key.type
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
@@ -49,8 +56,11 @@ import kite1412.gatetik.model.UserRole
 import kite1412.gatetik.model.UserStatus
 import kite1412.gatetik.ui.component.ActionIconButton
 import kite1412.gatetik.ui.compositionlocal.LocalScaffoldComponentsController
+import kite1412.gatetik.ui.compositionlocal.LocalSnackbarHostStateWrapper
 import kite1412.gatetik.ui.preview.DevicePreviews
+import kite1412.gatetik.ui.util.LoadState
 import kite1412.gatetik.ui.util.MockScaffoldComponentController
+import kite1412.gatetik.ui.util.data
 import org.jetbrains.compose.resources.painterResource
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -61,13 +71,15 @@ fun DesktopUserManagementScreen(
     viewModel: DesktopUserManagementViewModel = koinViewModel()
 ) {
     val user by viewModel.signedInUser.collectAsStateWithLifecycle()
-    val users by viewModel.users.collectAsState()
-    
+    val pagination by viewModel.pagination.collectAsStateWithLifecycle()
+
     user?.let { user ->
         DesktopUserManagementContent(
             userRole = user.role,
-            users = users,
-            searchText = viewModel.searchText,
+            users = viewModel.users,
+            currentPage = pagination?.currentPage ?: 1,
+            totalPages = pagination?.totalPages ?: 1,
+            itemsPerPage = pagination?.perPage ?: 15,
             contentPadding = contentPadding,
             onSearchTextChange = viewModel::onSearchTextChange,
             selectedRole = viewModel.selectedRole,
@@ -75,6 +87,8 @@ fun DesktopUserManagementScreen(
             selectedStatus = viewModel.selectedStatus,
             onStatusFilterChange = viewModel::onStatusFilterChange,
             onThemeToggle = viewModel::updateDarkMode,
+            onPageChange = {},
+            onItemsPerPageChange = viewModel::updatePerPage,
             modifier = modifier
         )
     }
@@ -84,8 +98,10 @@ fun DesktopUserManagementScreen(
 @Composable
 private fun DesktopUserManagementContent(
     userRole: UserRole,
-    users: List<User>,
-    searchText: String,
+    users: LoadState<List<User>>,
+    currentPage: Int,
+    totalPages: Int,
+    itemsPerPage: Int,
     contentPadding: PaddingValues,
     onSearchTextChange: (String) -> Unit,
     selectedRole: UserRole?,
@@ -93,8 +109,14 @@ private fun DesktopUserManagementContent(
     selectedStatus: UserStatus?,
     onStatusFilterChange: (UserStatus?) -> Unit,
     onThemeToggle: (Boolean) -> Unit,
+    onPageChange: (Int) -> Unit,
+    onItemsPerPageChange: (Int) -> Unit,
     modifier: Modifier = Modifier
 ) {
+    var searchText by retain {
+        mutableStateOf("")
+    }
+
     DesktopLayout(
         title = "Manajemen Pengguna",
         userRole = userRole,
@@ -117,11 +139,17 @@ private fun DesktopUserManagementContent(
             ) {
                 SearchField(
                     value = searchText,
-                    onValueChange = onSearchTextChange,
+                    onValueChange = { searchText = it },
                     placeholder = "Cari nama, email, NPM/NIP, atau telepon...",
                     modifier = Modifier
                         .widthIn(min = 400.dp, max = 500.dp)
                         .fillMaxWidth()
+                        .onPreviewKeyEvent {
+                            if (it.type == KeyEventType.KeyUp && it.key == Key.Enter) {
+                                onSearchTextChange(searchText)
+                                true
+                            } else false
+                        }
                 )
 
                 Icon(
@@ -178,75 +206,82 @@ private fun DesktopUserManagementContent(
                     CompositionLocalProvider(
                         LocalTextStyle provides MaterialTheme.typography.bodySmall
                     ) {
-                        Table(
-                            columns = listOf(
-                                TableColumn("NAMA", 2f) { user ->
-                                    Text(
-                                        text = user.fullName,
-                                        style = LocalTextStyle.current.copy(
-                                            fontWeight = FontWeight.Bold
-                                        )
-                                    )
-                                },
-                                TableColumn("ROLE", 1.5f) { user ->
-                                    Text(user.role.toIdString())
-                                },
-                                TableColumn("EMAIL", 2.5f) { user ->
-                                    Text(user.email)
-                                },
-                                TableColumn("NPM/NIP", 1.5f) { user ->
-                                    Text(user.instituteNumber)
-                                },
-                                TableColumn("STATUS", 1.5f) { user ->
-                                    val (containerColor, contentColor) = when (user.status) {
-                                        UserStatus.ACTIVE -> Emerald500.copy(alpha = 0.1f) to Emerald500
-                                        UserStatus.PENDING -> Yellow500.copy(alpha = 0.1f) to Yellow500
-                                        UserStatus.SUSPENDED -> Red500.copy(alpha = 0.1f) to Red500
-                                    }
-                                    Badge(
-                                        text = user.status.name,
-                                        containerColor = containerColor,
-                                        contentColor = contentColor
-                                    )
-                                },
-                                TableColumn("TERDAFTAR", 2f) {
-                                    Text(
-                                        text = "31 Mei 2026, 12:49:37", // Dummy
-                                        style = MaterialTheme.typography.bodySmall,
-                                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                                    )
-                                },
-                                TableColumn("AKSI", 2f) {
-                                    FlowRow(
-                                        horizontalArrangement = Arrangement.spacedBy(4.dp),
-                                        verticalArrangement = Arrangement.spacedBy(4.dp),
-                                        itemVerticalAlignment = Alignment.CenterVertically
-                                    ) {
-                                        ActionIconButton(
-                                            icon = GateTikIcons.eyeOpen,
-                                            onClick = { },
-                                            tint = Blue500
-                                        )
-                                        ActionIconButton(
-                                            icon = GateTikIcons.userCheck,
-                                            onClick = { },
-                                            tint = Emerald500
-                                        )
-                                        ActionIconButton(
-                                            icon = GateTikIcons.userPen,
-                                            onClick = { },
-                                            tint = Yellow500
-                                        )
-                                        ActionIconButton(
-                                            icon = GateTikIcons.trash,
-                                            onClick = { },
-                                            tint = Red500
-                                        )
-                                    }
-                                }
-                            ),
-                            items = users,
-                            modifier = Modifier.fillMaxWidth()
+                        LoadState(
+                            state = users,
+                            loading = { Text(it) },
+                            error = { Text(it) },
+                            success = {
+                                Table(
+                                    columns = listOf(
+                                        TableColumn("NAMA", 2f) { user ->
+                                            Text(
+                                                text = user.fullName,
+                                                style = LocalTextStyle.current.copy(
+                                                    fontWeight = FontWeight.Bold
+                                                )
+                                            )
+                                        },
+                                        TableColumn("ROLE", 1.5f) { user ->
+                                            Text(user.role.toIdString())
+                                        },
+                                        TableColumn("EMAIL", 2.5f) { user ->
+                                            Text(user.email)
+                                        },
+                                        TableColumn("NPM/NIP", 1.5f) { user ->
+                                            Text(user.instituteNumber)
+                                        },
+                                        TableColumn("STATUS", 1.5f) { user ->
+                                            val (containerColor, contentColor) = when (user.status) {
+                                                UserStatus.ACTIVE -> Emerald500.copy(alpha = 0.1f) to Emerald500
+                                                UserStatus.PENDING -> Yellow500.copy(alpha = 0.1f) to Yellow500
+                                                UserStatus.SUSPENDED -> Red500.copy(alpha = 0.1f) to Red500
+                                            }
+                                            Badge(
+                                                text = user.status.name,
+                                                containerColor = containerColor,
+                                                contentColor = contentColor
+                                            )
+                                        },
+                                        TableColumn("TERDAFTAR", 2f) {
+                                            Text(
+                                                text = "31 Mei 2026, 12:49:37", // Dummy
+                                                style = MaterialTheme.typography.bodySmall,
+                                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                                            )
+                                        },
+                                        TableColumn("AKSI", 2f) {
+                                            FlowRow(
+                                                horizontalArrangement = Arrangement.spacedBy(4.dp),
+                                                verticalArrangement = Arrangement.spacedBy(4.dp),
+                                                itemVerticalAlignment = Alignment.CenterVertically
+                                            ) {
+                                                ActionIconButton(
+                                                    icon = GateTikIcons.eyeOpen,
+                                                    onClick = { },
+                                                    tint = Blue500
+                                                )
+                                                ActionIconButton(
+                                                    icon = GateTikIcons.userCheck,
+                                                    onClick = { },
+                                                    tint = Emerald500
+                                                )
+                                                ActionIconButton(
+                                                    icon = GateTikIcons.userPen,
+                                                    onClick = { },
+                                                    tint = Yellow500
+                                                )
+                                                ActionIconButton(
+                                                    icon = GateTikIcons.trash,
+                                                    onClick = { },
+                                                    tint = Red500
+                                                )
+                                            }
+                                        }
+                                    ),
+                                    items = it,
+                                    modifier = Modifier.fillMaxWidth()
+                                )
+                            }
                         )
                     }
                 }
@@ -258,18 +293,36 @@ private fun DesktopUserManagementContent(
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
+                        val snackbarHostStateWrapper = LocalSnackbarHostStateWrapper.current
+                        var itemsPerPage by retain(itemsPerPage) {
+                            mutableStateOf("$itemsPerPage")
+                        }
+
                         Text(
-                            text = "Halaman 1 dari 1 • ${users.size} pengguna",
+                            text = "Halaman $currentPage dari $totalPages • ${users.data?.size ?: "~"} pengguna",
                             style = MaterialTheme.typography.labelMedium,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
 
                         Pagination(
-                            currentPage = 1,
-                            totalPages = 1,
-                            onPageChange = { },
-                            itemsPerPage = 15,
-                            onItemsPerPageChange = { }
+                            currentPage = currentPage,
+                            totalPages = totalPages,
+                            onPageChange = onPageChange,
+                            itemsPerPage = itemsPerPage,
+                            onItemsPerPageChange = { itemsPerPage = it },
+                            modifier = Modifier.onPreviewKeyEvent {
+                                if (it.type == KeyEventType.KeyUp && it.key == Key.Enter) {
+                                    (runCatching {
+                                        itemsPerPage.toInt()
+                                    }
+                                        .getOrNull()
+                                        ?.let(onItemsPerPageChange) != null)
+                                        .also { success ->
+                                            if (!success) snackbarHostStateWrapper
+                                                .showSnackbar("Masukkan angka untuk item per halaman")
+                                        }
+                                } else false
+                            }
                         )
                     }
                 }
@@ -288,18 +341,38 @@ private fun DesktopUserManagementScreenPreview() {
             Scaffold { p ->
                 DesktopUserManagementContent(
                     userRole = UserRole.ADMIN,
-                    users = listOf(
-                        User(1, "John Doe", "student@example.com", UserRole.STUDENT, UserStatus.ACTIVE, "STU001"),
-                        User(2, "Jane Smith", "student2@example.com", UserRole.STUDENT, UserStatus.PENDING, "STU002")
+                    users = LoadState.Success(
+                        listOf(
+                            User(
+                                1,
+                                "John Doe",
+                                "student@example.com",
+                                UserRole.STUDENT,
+                                UserStatus.ACTIVE,
+                                "STU001"
+                            ),
+                            User(
+                                2,
+                                "Jane Smith",
+                                "student2@example.com",
+                                UserRole.STUDENT,
+                                UserStatus.PENDING,
+                                "STU002"
+                            )
+                        )
                     ),
-                    searchText = "",
                     contentPadding = p,
                     onSearchTextChange = {},
                     selectedRole = null,
                     onRoleFilterChange = {},
                     selectedStatus = null,
                     onStatusFilterChange = {},
-                    onThemeToggle = {}
+                    onThemeToggle = {},
+                    currentPage = 1,
+                    totalPages = 1,
+                    itemsPerPage = 15,
+                    onPageChange = {},
+                    onItemsPerPageChange = {}
                 )
             }
         }

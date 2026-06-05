@@ -94,8 +94,8 @@ fun DesktopAccessLogsScreen(
             accessLogs = accessLogs,
             currentPage = currentPage,
             onPageChange = viewModel::updatePage,
-            itemsPerPage = itemsPerPage,
-            onItemsPerPageChange = viewModel::updateItemsPerPage,
+            itemsPerPage = itemsPerPage.toString(),
+            onItemsPerPageChange = {},
             onExportCsv = viewModel::exportCsv,
             contentPadding = contentPadding,
             onThemeToggle = viewModel::updateDarkMode,
@@ -120,8 +120,8 @@ private fun DesktopAccessLogsScreen(
     accessLogs: List<AccessLog>,
     currentPage: Int,
     onPageChange: (Int) -> Unit,
-    itemsPerPage: Int,
-    onItemsPerPageChange: (Int) -> Unit,
+    itemsPerPage: String,
+    onItemsPerPageChange: (String) -> Unit,
     onExportCsv: () -> Unit,
     contentPadding: PaddingValues,
     onThemeToggle: (Boolean) -> Unit,
@@ -397,8 +397,8 @@ private fun AccessLogsTableSection(
     accessLogs: List<AccessLog>,
     currentPage: Int,
     onPageChange: (Int) -> Unit,
-    itemsPerPage: Int,
-    onItemsPerPageChange: (Int) -> Unit
+    itemsPerPage: String,
+    onItemsPerPageChange: (String) -> Unit
 ) {
     Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
         Table(
@@ -532,7 +532,7 @@ private fun DesktopAccessLogsScreenPreview() {
                     ),
                     currentPage = 1,
                     onPageChange = {},
-                    itemsPerPage = 15,
+                    itemsPerPage = "15",
                     onItemsPerPageChange = {},
                     onExportCsv = {},
                     contentPadding = PaddingValues(24.dp),

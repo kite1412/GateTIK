@@ -104,7 +104,8 @@ private val desktopMonitoringViewModel = module {
     viewModel {
         DesktopUserManagementViewModel(
             authentication = get(),
-            dataStore = get()
+            dataStore = get(),
+            userRepository = get()
         )
     }
     viewModel {

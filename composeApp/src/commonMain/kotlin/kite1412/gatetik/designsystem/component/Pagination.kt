@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
@@ -17,6 +18,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import kite1412.gatetik.designsystem.theme.Blue500
 import kite1412.gatetik.designsystem.theme.White
@@ -29,8 +31,8 @@ fun Pagination(
     currentPage: Int,
     totalPages: Int,
     onPageChange: (Int) -> Unit,
-    itemsPerPage: Int,
-    onItemsPerPageChange: (Int) -> Unit,
+    itemsPerPage: String,
+    onItemsPerPageChange: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Row(
@@ -55,13 +57,15 @@ fun Pagination(
                     .padding(horizontal = 8.dp, vertical = 4.dp)
             ) {
                 Row(
+                    modifier = Modifier.widthIn(max = 32.dp),
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.spacedBy(4.dp)
                 ) {
-                    Text(
-                        text = itemsPerPage.toString(),
-                        style = MaterialTheme.typography.labelMedium,
-                        fontWeight = FontWeight.Bold
+                    BasicTextField(
+                        value = itemsPerPage,
+                        onValueChange = onItemsPerPageChange,
+                        singleLine = true,
+                        keyboardType = KeyboardType.Number
                     )
                 }
             }
