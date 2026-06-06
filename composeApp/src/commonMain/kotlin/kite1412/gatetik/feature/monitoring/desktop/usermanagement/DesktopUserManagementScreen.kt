@@ -1,8 +1,10 @@
 package kite1412.gatetik.feature.monitoring.desktop.usermanagement
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
@@ -12,14 +14,17 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.calculateEndPadding
 import androidx.compose.foundation.layout.calculateStartPadding
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
@@ -27,17 +32,20 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.retain.retain
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.KeyEventType
 import androidx.compose.ui.input.key.key
 import androidx.compose.ui.input.key.onPreviewKeyEvent
 import androidx.compose.ui.input.key.type
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
@@ -60,6 +68,8 @@ import kite1412.gatetik.designsystem.theme.Red600_90
 import kite1412.gatetik.designsystem.theme.Yellow500
 import kite1412.gatetik.designsystem.util.GateTikIcons
 import kite1412.gatetik.feature.monitoring.desktop.component.DesktopLayout
+import kite1412.gatetik.feature.monitoring.desktop.usermanagement.compositionlocal.LocalRemoteImageResolver
+import kite1412.gatetik.feature.monitoring.desktop.usermanagement.compositionlocal.rememberRemoteImageLoader
 import kite1412.gatetik.feature.monitoring.desktop.util.desktopBaseModifier
 import kite1412.gatetik.model.User
 import kite1412.gatetik.model.UserRole
@@ -87,23 +97,27 @@ fun DesktopUserManagementScreen(
     val pagination by viewModel.pagination.collectAsStateWithLifecycle()
 
     user?.let { user ->
-        DesktopUserManagementContent(
-            userRole = user.role,
-            users = viewModel.users,
-            currentPage = pagination?.currentPage ?: 1,
-            totalPages = pagination?.lastPage ?: 1,
-            itemsPerPage = pagination?.perPage ?: 15,
-            contentPadding = contentPadding,
-            onSearchTextChange = viewModel::onSearchTextChange,
-            selectedRole = viewModel.selectedRole,
-            onRoleFilterChange = viewModel::onRoleFilterChange,
-            selectedStatus = viewModel.selectedStatus,
-            onStatusFilterChange = viewModel::onStatusFilterChange,
-            onThemeToggle = viewModel::updateDarkMode,
-            onPageChange = {},
-            onItemsPerPageChange = viewModel::updatePerPage,
-            modifier = modifier
-        )
+        CompositionLocalProvider(
+            LocalRemoteImageResolver provides viewModel.kmpResolver
+        ) {
+            DesktopUserManagementContent(
+                userRole = user.role,
+                users = viewModel.users,
+                currentPage = pagination?.currentPage ?: 1,
+                totalPages = pagination?.lastPage ?: 1,
+                itemsPerPage = pagination?.perPage ?: 15,
+                contentPadding = contentPadding,
+                onSearchTextChange = viewModel::onSearchTextChange,
+                selectedRole = viewModel.selectedRole,
+                onRoleFilterChange = viewModel::onRoleFilterChange,
+                selectedStatus = viewModel.selectedStatus,
+                onStatusFilterChange = viewModel::onStatusFilterChange,
+                onThemeToggle = viewModel::updateDarkMode,
+                onPageChange = {},
+                onItemsPerPageChange = viewModel::updatePerPage,
+                modifier = modifier
+            )
+        }
     }
 }
 
@@ -426,7 +440,7 @@ private fun UserDetailDialog(
                 item {
                     UserDetailField(
                         key = "no. telepon",
-                        value = phoneNumber ?: ""
+                        value = phoneNumber ?: "-"
                     )
                 }
                 item {
@@ -450,7 +464,7 @@ private fun UserDetailDialog(
                 item {
                     UserDetailField(
                         key = "login terakhir",
-                        value = lastLoginAt?.timestampString ?: ""
+                        value = lastLoginAt?.timestampString ?: "-"
                     )
                 }
                 if (user.role == UserRole.STUDENT) item {
@@ -466,7 +480,7 @@ private fun UserDetailDialog(
                         GlassBox(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .aspectRatio(16f/9f),
+                                .aspectRatio(16f/10f),
                             contentPadding = PaddingValues(0.dp)
                         ) {
                             if (ktmPath == null) Text(
@@ -474,7 +488,77 @@ private fun UserDetailDialog(
                                 modifier = Modifier.align(Alignment.Center),
                                 color = Red600_90,
                                 style = MaterialTheme.typography.bodySmall
-                            )
+                            ) else {
+                                val remoteImageResolver = LocalRemoteImageResolver.current
+                                val remoteImageLoader = rememberRemoteImageLoader(user.id)
+                                var imageBitmap by retain {
+                                    mutableStateOf<ImageBitmap?>(null)
+                                }
+                                var showFullScreen by retain {
+                                    mutableStateOf(false)
+                                }
+
+                                LaunchedEffect(Unit) {
+                                    if (imageBitmap == null)
+                                        imageBitmap = remoteImageLoader.resolveWith(remoteImageResolver)
+                                }
+                                imageBitmap?.let { imageBitmap ->
+                                    Box {
+                                        Image(
+                                            bitmap = imageBitmap,
+                                            contentDescription = "KTM",
+                                            modifier = Modifier.fillMaxSize(),
+                                            contentScale = ContentScale.FillBounds
+                                        )
+                                        IconButton(
+                                            onClick = { showFullScreen = true },
+                                            modifier = Modifier.align(Alignment.TopEnd)
+                                        ) {
+                                            Icon(
+                                                painter = painterResource(GateTikIcons.zoomIn),
+                                                contentDescription = "full screen"
+                                            )
+                                        }
+                                    }
+
+                                    if (showFullScreen) Dialog(
+                                        onDismissRequest = { showFullScreen = false },
+                                        properties = DialogProperties(
+                                            dismissOnBackPress = true,
+                                            dismissOnClickOutside = true,
+                                            usePlatformDefaultWidth = false
+                                        )
+                                    ) {
+                                        Box(
+                                            modifier = Modifier
+                                                .clickable(
+                                                    indication = null,
+                                                    interactionSource = null
+                                                ) { showFullScreen = false }
+                                                .padding(32.dp)
+                                        ) {
+                                            Image(
+                                                bitmap = imageBitmap,
+                                                contentDescription = "KTM",
+                                                modifier = Modifier.fillMaxWidth()
+                                            )
+                                            GlassBox(
+                                                modifier = Modifier.align(Alignment.TopEnd),
+                                                contentPadding = PaddingValues(0.dp),
+                                                shape = CircleShape
+                                            ) {
+                                                Icon(
+                                                    painter = painterResource(GateTikIcons.x),
+                                                    contentDescription = "batal",
+                                                    modifier = Modifier
+                                                        .clickable { showFullScreen = false }
+                                                        .padding(12.dp)
+                                                )
+                                            }
+                                        }
+                                    }
+                                }
+                            }
                         }
                     }
                 }

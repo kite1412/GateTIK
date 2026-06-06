@@ -18,6 +18,8 @@ interface UserRepository {
 
     suspend fun deleteUser(id: Int): UserResult<Boolean>
 
+    suspend fun previewKtm(studentId: Int): UserResult<ByteArray?>
+
     data class GetParams(
         val role: UserRole? = null,
         val status: UserStatus? = null,

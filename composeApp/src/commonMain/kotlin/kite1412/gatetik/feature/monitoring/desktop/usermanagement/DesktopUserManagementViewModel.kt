@@ -12,6 +12,7 @@ import kite1412.gatetik.domain.Authentication
 import kite1412.gatetik.domain.model.PaginatedListResult
 import kite1412.gatetik.domain.repository.UserRepository
 import kite1412.gatetik.feature.monitoring.desktop.DesktopBaseViewModel
+import kite1412.gatetik.feature.monitoring.desktop.usermanagement.compositionlocal.RemoteImageResolver
 import kite1412.gatetik.model.User
 import kite1412.gatetik.model.UserRole
 import kite1412.gatetik.model.UserStatus
@@ -40,6 +41,7 @@ class DesktopUserManagementViewModel(
         private set
     var users by mutableStateOf<LoadState<List<User>>>(LoadState.Loading("Memuat daftar pengguna"))
         private set
+
     private val params = snapshotFlow {
         UserRepository.GetParams(
             role = selectedRole,
@@ -67,6 +69,18 @@ class DesktopUserManagementViewModel(
             started = SharingStarted.WhileSubscribed(5000),
             initialValue = null
         )
+    val kmpResolver = RemoteImageResolver { payload ->
+        runCatching { payload.toString().toInt() }
+            .getOrNull()
+            ?.let { studentId ->
+                userRepository.previewKtm(studentId)
+                    .onSuccess {
+                        return@let it
+                    }
+
+                null
+            }
+    }
 
     fun onSearchTextChange(text: String) {
         searchText = text

@@ -10,4 +10,6 @@ interface UserRemoteDataSource {
     suspend fun updateUser(data: UserUpdate): User
 
     suspend fun deleteUser(id: Int): Boolean
+
+    suspend fun previewKtm(studentId: Int): ByteArray?
 }

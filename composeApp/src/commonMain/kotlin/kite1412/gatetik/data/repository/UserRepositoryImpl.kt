@@ -33,4 +33,9 @@ class UserRepositoryImpl(
         logTag = logTag,
         errorMessage = "Failed to update user: $id"
     ) { _ -> remoteDataSource.deleteUser(id) }
+
+    override suspend fun previewKtm(studentId: Int): UserResult<ByteArray?> = tryOrThrowUnknown(
+        logTag = logTag,
+        errorMessage = "Failed to get ktm preview"
+    ) { _ -> remoteDataSource.previewKtm(studentId) }
 }

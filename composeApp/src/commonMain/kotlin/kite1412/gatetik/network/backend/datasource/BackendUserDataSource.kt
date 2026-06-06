@@ -32,6 +32,11 @@ class BackendUserDataSource : UserRemoteDataSource {
         BackendClient.delete<BackendResponse<Unit>>(path = "users/${id}")
             .success
 
+    override suspend fun previewKtm(studentId: Int): ByteArray =
+        BackendClient.get<ByteArray>(
+            path = "users/$studentId/ktm"
+        )
+
 
     private fun BackendResponse<List<BackendUser>>.toModel(): PaginatedListResult<User>? =
         if (data == null || pagination == null) null
