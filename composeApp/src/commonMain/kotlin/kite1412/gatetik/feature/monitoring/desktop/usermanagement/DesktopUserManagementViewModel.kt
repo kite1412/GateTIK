@@ -109,29 +109,11 @@ class DesktopUserManagementViewModel(
 
     fun editUser(data: UserUpdate) {
         viewModelScope.launch {
-            userRepository.updateUser(data)
-                .onSuccess { user ->
-                    userStore.forEach { (params, res) ->
-                        val index = res.data.indexOfFirst { it.id == user.id }
-                        if (index != -1) userStore[params] = res.copy(
-                            data = res.data.toMutableList().apply {
-                                set(index, user)
-                            }
-                        )
-
-                        if (params == this@DesktopUserManagementViewModel.params.first())
-                            updateUsersOnParamsChange(params)
-                    }
-
-                    _uiEvent.emit(
-                        UiEvent.ShowSnackbar("Berhasil mengedit pengguna")
-                    )
-                }
-                .onError {
-                    _uiEvent.emit(
-                        UiEvent.ShowSnackbar("Gagal mengedit pengguna, harap coba lagi")
-                    )
-                }
+            updateUser(
+                data = data,
+                successMessage = "Berhasil mengedit pengguna",
+                errorMessage = "Gagal mengedit pengguna, harap coba lagi"
+            )
         }
     }
 
@@ -154,16 +136,95 @@ class DesktopUserManagementViewModel(
                         }
                     }
 
-                    _uiEvent.emit(
-                        UiEvent.ShowSnackbar("Berhasil menambah pengguna")
-                    )
+                    showSnackbar("Berhasil menambahkan pengguna")
                 }
                 .onError {
-                    _uiEvent.emit(
-                        UiEvent.ShowSnackbar("Gagal menambah pengguna, harap coba lagi")
-                    )
+                    showSnackbar("Gagal menambahkan pengguna, harap coba lagi")
                 }
         }
+    }
+
+    fun activateUser(user: User) {
+        viewModelScope.launch {
+            with(user) {
+                updateUser(
+                    data = UserUpdate(
+                        id = id,
+                        fullName = fullName,
+                        email = email,
+                        password = null,
+                        npmNip = institutionNumber,
+                        phoneNumber = phoneNumber,
+                        role = role,
+                        status = UserStatus.ACTIVE,
+                        ktmPath = ktmPath
+                    ),
+                    successMessage = "Berhasil mengaktivasi pengguna",
+                    errorMessage = "Gagal mengaktivasi pengguna"
+                )
+            }
+        }
+    }
+
+    fun deleteUser(user: User) {
+        viewModelScope.launch {
+            userRepository.deleteUser(user.id)
+                .onSuccess {
+                    userStore.forEach { (params, res) ->
+                        val index = res.data.indexOfFirst { it.id == user.id }
+                        if (index != -1) userStore[params] = res.copy(
+                            data = res.data.toMutableList().apply {
+                                removeAt(index)
+                            }
+                        )
+
+                        if (params == this@DesktopUserManagementViewModel.params.first())
+                            updateUsersOnParamsChange(params)
+                    }
+
+                    showSnackbar("Berhasil menghapus pengguna")
+                }
+                .onError {
+                    showSnackbar("Gagal menghapus pengguna, harap coba lagi")
+                }
+        }
+    }
+
+    private suspend fun updateUser(
+        data: UserUpdate,
+        successMessage: String,
+        errorMessage: String
+    ) {
+        userRepository.updateUser(data)
+            .onSuccess { user ->
+                userStore.forEach { (params, res) ->
+                    val index = res.data.indexOfFirst { it.id == user.id }
+
+                    if (index != -1) userStore[params] = res.copy(
+                        data = res.data.toMutableList().apply {
+                            if (
+                                (params.role != null && user.role != params.role) ||
+                                (params.status != null && user.status != params.status)
+                            )
+                                removeAt(index)
+                            else set(index, user)
+                        }
+                    ) else {
+                        if (params.role == user.role || params.status == user.status)
+                            userStore[params] = res.copy(
+                                data = listOf(user) + res.data
+                            )
+                    }
+
+                    if (params == this@DesktopUserManagementViewModel.params.first())
+                        updateUsersOnParamsChange(params)
+                }
+
+                showSnackbar(successMessage)
+            }
+            .onError {
+                showSnackbar(errorMessage)
+            }
     }
 
     private suspend fun updateUsersOnParamsChange(params: UserRepository.GetParams) {
@@ -184,5 +245,9 @@ class DesktopUserManagementViewModel(
                     users = LoadState.Error("Gagal memuat daftar pengguna")
                 }
         }
+    }
+
+    private suspend fun showSnackbar(message: String) {
+        _uiEvent.emit(UiEvent.ShowSnackbar(message))
     }
 }

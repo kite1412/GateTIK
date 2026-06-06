@@ -142,6 +142,8 @@ fun DesktopUserManagementScreen(
                 onItemsPerPageChange = viewModel::updatePerPage,
                 onEditUser = viewModel::editUser,
                 onAddUser = viewModel::addUser,
+                onDeleteUser = viewModel::deleteUser,
+                onActivateUser = viewModel::activateUser,
                 modifier = modifier
             )
         }
@@ -167,6 +169,8 @@ private fun DesktopUserManagementScreen(
     onItemsPerPageChange: (Int) -> Unit,
     onEditUser: (data: UserUpdate) -> Unit,
     onAddUser: (data: UserCreate) -> Unit,
+    onDeleteUser: (User) -> Unit,
+    onActivateUser: (User) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val windowBlurRequester = LocalWindowBlurRequester.current
@@ -310,7 +314,7 @@ private fun DesktopUserManagementScreen(
                     UserTable(
                         users = users,
                         onDetailClick = { requestPopup("detail", it) },
-                        onActivateUserClick = { requestPopup("activate-user", it) },
+                        onActivateUserClick = { onActivateUser(it) },
                         onEditUserClick = { requestPopup("edit-user", it) },
                         onDeleteUserClick = { requestPopup("delete-user", it) },
                         modifier = Modifier.fillMaxWidth()
@@ -391,7 +395,10 @@ private fun DesktopUserManagementScreen(
             "delete-user" -> UserDeleteDialog(
                 user = it,
                 onDismissRequest = dismissPopup,
-                onDelete = { dismissPopup() }
+                onDelete = {
+                    onDeleteUser(it)
+                    dismissPopup()
+                }
             )
             else -> {}
         }
@@ -489,7 +496,7 @@ private fun UserTable(
                                     onClick = { onDetailClick(user) },
                                     tint = Blue500
                                 )
-                                ActionIconButton(
+                                if (user.status != UserStatus.ACTIVE) ActionIconButton(
                                     icon = GateTikIcons.userCheck,
                                     onClick = { onActivateUserClick(user) },
                                     tint = Emerald500
@@ -1000,7 +1007,9 @@ private fun DesktopUserManagementScreenPreview() {
                     onPageChange = {},
                     onItemsPerPageChange = {},
                     onEditUser = {},
-                    onAddUser = {}
+                    onAddUser = {},
+                    onDeleteUser = {},
+                    onActivateUser = {}
                 )
             }
         }
