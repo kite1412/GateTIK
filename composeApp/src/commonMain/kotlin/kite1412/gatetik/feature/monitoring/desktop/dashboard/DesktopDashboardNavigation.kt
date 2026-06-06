@@ -5,8 +5,16 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import kite1412.gatetik.feature.monitoring.MonitoringGraph
 
-fun NavGraphBuilder.desktopDashboardScreen(contentPadding: PaddingValues) {
+fun NavGraphBuilder.desktopDashboardScreen(
+    contentPadding: PaddingValues,
+    navigateToCctv: () -> Unit,
+    navigateToAccessLogs: () -> Unit
+) {
     composable(MonitoringGraph.Desktop.Dashboard.name) {
-        DesktopDashboardScreen(contentPadding = contentPadding)
+        DesktopDashboardScreen(
+            contentPadding = contentPadding,
+            navigateToCctv = navigateToCctv,
+            navigateToAccessLogs = navigateToAccessLogs
+        )
     }
 }

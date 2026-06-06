@@ -1,6 +1,7 @@
 package kite1412.gatetik.feature.monitoring.desktop.dashboard
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -78,6 +79,8 @@ import kotlin.math.roundToInt
 @Composable
 fun DesktopDashboardScreen(
     contentPadding: PaddingValues,
+    navigateToCctv: () -> Unit,
+    navigateToAccessLogs: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: DesktopDashboardViewModel = koinViewModel()
 ) {
@@ -107,6 +110,8 @@ fun DesktopDashboardScreen(
             onThemeToggle = viewModel::updateDarkMode,
             onOpenGate = viewModel::openGate,
             onCloseGate = viewModel::closeGate,
+            onCctvFullScreenClick = navigateToCctv,
+            onSeeAllAccessLogClick = navigateToAccessLogs,
             modifier = modifier
         )
     }
@@ -124,6 +129,8 @@ private fun DesktopDashboardScreen(
     onThemeToggle: (darkMode: Boolean) -> Unit,
     onOpenGate: () -> Unit,
     onCloseGate: () -> Unit,
+    onCctvFullScreenClick: () -> Unit,
+    onSeeAllAccessLogClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val windowWidthSize = rememberWindowWidthSize()
@@ -190,13 +197,17 @@ private fun DesktopDashboardScreen(
                         cameraName = cctv.data?.cameraName ?: "~",
                         modifier = Modifier
                             .weight(2f)
-                            .fillMaxHeight()
+                            .fillMaxHeight(),
+                        showFullScreenButton = true,
+                        onFullScreenClick = onCctvFullScreenClick
                     )
                 }
             }
             if (!isLargeWindow) item {
                 LiveCameraSection(
-                    cameraName = cctv.data?.cameraName ?: "~"
+                    cameraName = cctv.data?.cameraName ?: "~",
+                    showFullScreenButton = true,
+                    onFullScreenClick = onCctvFullScreenClick
                 )
             }
             item {
@@ -206,7 +217,8 @@ private fun DesktopDashboardScreen(
             }
             item {
                 RecentAccessActivitySection(
-                    accessLogs = accessLogs
+                    accessLogs = accessLogs,
+                    onSeeAllAccessLogClick = onSeeAllAccessLogClick
                 )
             }
         }
@@ -427,7 +439,7 @@ private fun ParkingOccupancyCardSection(
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                     Text(
-                        text = "50",
+                        text = parkingQuota.data?.totalSlots?.toString() ?: "~",
                         style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold)
                     )
                 }
@@ -438,7 +450,7 @@ private fun ParkingOccupancyCardSection(
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                     Text(
-                        text = "0",
+                        text = parkingQuota.data?.usedSlots?.toString() ?: "~",
                         style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold)
                     )
                 }
@@ -449,7 +461,9 @@ private fun ParkingOccupancyCardSection(
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                     Text(
-                        text = "50",
+                        text = parkingQuota.data?.run {
+                            totalSlots - usedSlots
+                        }?.toString() ?: "~",
                         style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold)
                     )
                 }
@@ -468,7 +482,8 @@ private fun ParkingOccupancyCardSection(
 
 @Composable
 private fun RecentAccessActivitySection(
-    accessLogs: LoadState<List<AccessLog>>
+    accessLogs: LoadState<List<AccessLog>>,
+    onSeeAllAccessLogClick: () -> Unit,
 ) {
     GlassBox {
         Column(
@@ -486,6 +501,11 @@ private fun RecentAccessActivitySection(
                 )
                 Text(
                     text = "Lihat semua",
+                    modifier = Modifier.clickable(
+                        indication = null,
+                        interactionSource = null,
+                        onClick = onSeeAllAccessLogClick
+                    ),
                     style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Bold),
                     color = Blue500
                 )
@@ -568,6 +588,8 @@ private fun DesktopDashboardScreenPreview() {
         Scaffold { p ->
             DesktopDashboardScreen(
                 contentPadding = PaddingValues(24.dp),
+                navigateToCctv = {},
+                navigateToAccessLogs = {},
                 modifier = Modifier.padding(p)
             )
         }

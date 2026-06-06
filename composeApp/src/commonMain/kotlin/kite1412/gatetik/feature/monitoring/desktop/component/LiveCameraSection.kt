@@ -1,6 +1,7 @@
 package kite1412.gatetik.feature.monitoring.desktop.component
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -35,7 +36,9 @@ import org.jetbrains.compose.resources.painterResource
 @Composable
 fun LiveCameraSection(
     cameraName: String,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    showFullScreenButton: Boolean = false,
+    onFullScreenClick: () -> Unit = {},
 ) {
     GlassBox(
         modifier = modifier,
@@ -103,8 +106,13 @@ fun LiveCameraSection(
                     ),
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
-                Text(
+                if (showFullScreenButton) Text(
                     text = "Layar Penuh ↗",
+                    modifier = Modifier.clickable(
+                        indication = null,
+                        interactionSource = null,
+                        onClick = onFullScreenClick
+                    ),
                     style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Bold),
                     color = Blue500
                 )

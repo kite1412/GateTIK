@@ -35,7 +35,10 @@ fun NavGraphBuilder.monitoringGraph(
             else MonitoringGraph.Mobile.Home.name,
         route = MonitoringGraph.route
     ) {
-        if (isDesktop) desktopMonitoringGraph(scaffoldPadding)
+        if (isDesktop) desktopMonitoringGraph(
+            scaffoldPadding = scaffoldPadding,
+            navigateToRootDestination = navigateToRootDestination
+        )
         else mobileMonitoringGraph(
             scaffoldPadding = scaffoldPadding,
             navigateToRootDestination = navigateToRootDestination
@@ -113,8 +116,15 @@ object MonitoringGraph : Graph {
     }
 }
 
-private fun NavGraphBuilder.desktopMonitoringGraph(scaffoldPadding: PaddingValues) {
-    desktopDashboardScreen(contentPadding = normalContentPadding(scaffoldPadding))
+private fun NavGraphBuilder.desktopMonitoringGraph(
+    scaffoldPadding: PaddingValues,
+    navigateToRootDestination: (RootDestination) -> Unit
+) {
+    desktopDashboardScreen(
+        contentPadding = normalContentPadding(scaffoldPadding),
+        navigateToCctv = { navigateToRootDestination(MonitoringGraph.Desktop.Cctv) },
+        navigateToAccessLogs = { navigateToRootDestination(MonitoringGraph.Desktop.AccessLogs) }
+    )
     desktopCctvScreen(contentPadding = normalContentPadding(scaffoldPadding))
     desktopParkingScreen(contentPadding = normalContentPadding(scaffoldPadding))
     desktopUserManagementScreen(contentPadding = normalContentPadding(scaffoldPadding))

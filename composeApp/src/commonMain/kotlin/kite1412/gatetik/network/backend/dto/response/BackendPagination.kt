@@ -17,7 +17,7 @@ data class BackendPagination(
     val to: Int?
 ) {
     fun toModel() = Pagination(
-        totalPages = total,
+        total = total,
         perPage = perPage,
         currentPage = currentPage,
         lastPage = lastPage,
