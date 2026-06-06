@@ -2,6 +2,7 @@ package kite1412.gatetik.data.repository
 
 import kite1412.gatetik.data.util.tryOrThrowUnknown
 import kite1412.gatetik.domain.model.PaginatedListResult
+import kite1412.gatetik.domain.model.UserCreate
 import kite1412.gatetik.domain.model.UserUpdate
 import kite1412.gatetik.domain.repository.UserRepository
 import kite1412.gatetik.domain.repository.UserResult
@@ -23,6 +24,11 @@ class UserRepositoryImpl(
 
         res ?: throwError()
     }
+
+    override suspend fun addUser(data: UserCreate) = tryOrThrowUnknown(
+        logTag = logTag,
+        errorMessage = "Failed to add user",
+    ) { _ -> remoteDataSource.addUser(data) }
 
     override suspend fun updateUser(data: UserUpdate): UserResult<User> = tryOrThrowUnknown(
         logTag = logTag,

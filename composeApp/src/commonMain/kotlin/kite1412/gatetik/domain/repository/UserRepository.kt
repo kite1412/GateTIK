@@ -2,6 +2,7 @@ package kite1412.gatetik.domain.repository
 
 import kite1412.gatetik.common.extension.includeIfNotNull
 import kite1412.gatetik.domain.model.PaginatedListResult
+import kite1412.gatetik.domain.model.UserCreate
 import kite1412.gatetik.domain.model.UserUpdate
 import kite1412.gatetik.model.User
 import kite1412.gatetik.model.UserRole
@@ -13,6 +14,8 @@ typealias UserResult<T> = Result<T, Error>
 
 interface UserRepository {
     suspend fun getAll(params: GetParams = GetParams()): UserResult<PaginatedListResult<User>>
+
+    suspend fun addUser(data: UserCreate): UserResult<User>
 
     suspend fun updateUser(data: UserUpdate): UserResult<User>
 
