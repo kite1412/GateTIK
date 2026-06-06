@@ -1,12 +1,13 @@
 package kite1412.gatetik.feature.monitoring.desktop.usermanagement
 
+import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.PaddingValues
@@ -39,6 +40,7 @@ import androidx.compose.runtime.retain.retain
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.KeyEventType
@@ -46,7 +48,10 @@ import androidx.compose.ui.input.key.key
 import androidx.compose.ui.input.key.onPreviewKeyEvent
 import androidx.compose.ui.input.key.type
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
@@ -55,16 +60,25 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kite1412.gatetik.designsystem.component.Badge
 import kite1412.gatetik.designsystem.component.FilterChip
 import kite1412.gatetik.designsystem.component.GlassBox
+import kite1412.gatetik.designsystem.component.GlassBoxDialog
+import kite1412.gatetik.designsystem.component.GradientTextButton
+import kite1412.gatetik.designsystem.component.OutlinedTextField
 import kite1412.gatetik.designsystem.component.Pagination
 import kite1412.gatetik.designsystem.component.SearchField
+import kite1412.gatetik.designsystem.component.Select
 import kite1412.gatetik.designsystem.component.Table
 import kite1412.gatetik.designsystem.component.TableColumn
 import kite1412.gatetik.designsystem.theme.Blue500
 import kite1412.gatetik.designsystem.theme.Emerald500
 import kite1412.gatetik.designsystem.theme.Emerald700
 import kite1412.gatetik.designsystem.theme.GateTikTheme
+import kite1412.gatetik.designsystem.theme.Gray200
 import kite1412.gatetik.designsystem.theme.Red500
 import kite1412.gatetik.designsystem.theme.Red600_90
+import kite1412.gatetik.designsystem.theme.RoyalBlue800_50
+import kite1412.gatetik.designsystem.theme.Slate900
+import kite1412.gatetik.designsystem.theme.White
+import kite1412.gatetik.designsystem.theme.White50
 import kite1412.gatetik.designsystem.theme.Yellow500
 import kite1412.gatetik.designsystem.util.GateTikIcons
 import kite1412.gatetik.feature.monitoring.desktop.component.DesktopLayout
@@ -76,6 +90,7 @@ import kite1412.gatetik.model.UserRole
 import kite1412.gatetik.model.UserStatus
 import kite1412.gatetik.network.mock.mockUser
 import kite1412.gatetik.ui.component.ActionIconButton
+import kite1412.gatetik.ui.compositionlocal.LocalDarkMode
 import kite1412.gatetik.ui.compositionlocal.LocalScaffoldComponentsController
 import kite1412.gatetik.ui.compositionlocal.LocalSnackbarHostStateWrapper
 import kite1412.gatetik.ui.compositionlocal.LocalWindowBlurRequester
@@ -100,7 +115,7 @@ fun DesktopUserManagementScreen(
         CompositionLocalProvider(
             LocalRemoteImageResolver provides viewModel.kmpResolver
         ) {
-            DesktopUserManagementContent(
+            DesktopUserManagementScreen(
                 userRole = user.role,
                 users = viewModel.users,
                 currentPage = pagination?.currentPage ?: 1,
@@ -123,7 +138,7 @@ fun DesktopUserManagementScreen(
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
-private fun DesktopUserManagementContent(
+private fun DesktopUserManagementScreen(
     userRole: UserRole,
     users: LoadState<List<User>>,
     currentPage: Int,
@@ -148,7 +163,7 @@ private fun DesktopUserManagementContent(
         mutableStateOf("")
     }
     var selectedUser by retain { mutableStateOf<User?>(null) }
-    val requestPopup = { name: String, user: User ->
+    val requestPopup = { name: String, user: User? ->
         popup = name
         selectedUser = user
         windowBlurRequester.applyWindowBlur()
@@ -236,6 +251,40 @@ private fun DesktopUserManagementContent(
                         }
                     )
                 }
+
+                CompositionLocalProvider(
+                    LocalTextStyle provides MaterialTheme.typography.bodySmall
+                ) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalAlignment = Alignment.Bottom,
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        Text(
+                            text = users.data?.let { users ->
+                                "${users.size} pengguna terdaftar"
+                            } ?: "",
+                            color = LocalContentColor.current.copy(alpha = 0.6f)
+                        )
+                        GradientTextButton(
+                            text = "Tambah Pengguna",
+                            onClick = { requestPopup("add-user", null) },
+                            leading = {
+                                Icon(
+                                    painter = painterResource(GateTikIcons.userPlus),
+                                    contentDescription = "tambah pengguna",
+                                    modifier = Modifier.size((LocalTextStyle.current.fontSize.value * 1.3f).dp),
+                                    tint = White
+                                )
+                            },
+                            contentPadding = PaddingValues(
+                                vertical = 8.dp,
+                                horizontal = 12.dp
+                            ),
+                            shape = RoundedCornerShape(8.dp)
+                        )
+                    }
+                }
             }
             LazyColumn(
                 verticalArrangement = Arrangement.spacedBy(16.dp),
@@ -303,12 +352,26 @@ private fun DesktopUserManagementContent(
                 user = it,
                 onDismissRequest = dismissPopup
             )
-            "activate-user" -> {}
-            "edit-user" -> {}
-            "delete-user" -> {}
+            "edit-user" -> UserFormDialog(
+                user = it,
+                onDismissRequest = dismissPopup,
+                onSave = { dismissPopup() }
+            )
+            "delete-user" -> UserDeleteDialog(
+                user = it,
+                onDismissRequest = dismissPopup,
+                onDelete = { dismissPopup() }
+            )
             else -> {}
         }
-    } 
+    }
+    if (popup == "add-user") {
+        UserFormDialog(
+            user = selectedUser,
+            onDismissRequest = { dismissPopup() },
+            onSave = {  }
+        )
+    }
 }
 
 @Composable
@@ -400,6 +463,248 @@ private fun UserTable(
                 )
             }
         )
+    }
+}
+
+@Composable
+private fun UserFormDialog(
+    user: User?,
+    onDismissRequest: () -> Unit,
+    onSave: (User) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    var fullName by retain { mutableStateOf(user?.fullName ?: "") }
+    var email by retain { mutableStateOf(user?.email ?: "") }
+    var password by retain { mutableStateOf("") }
+    var institutionNumber by retain { mutableStateOf(user?.institutionNumber ?: "") }
+    var phoneNumber by retain { mutableStateOf(user?.phoneNumber ?: "") }
+    var role by retain { mutableStateOf(user?.role ?: UserRole.STAFF) }
+    var status by retain { mutableStateOf(user?.status ?: UserStatus.PENDING) }
+
+    GlassBoxDialog(
+        title = "${if (user != null) "Edit" else "Tambah"} Pengguna",
+        desc = if (user != null) "Perbarui data pengguna." else "Tambah pengguna baru.",
+        onDismissRequest = onDismissRequest,
+        modifier = modifier
+    ) {
+        LazyColumn(
+            verticalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            item {
+                UserFormFieldPair(
+                    firstValue = fullName,
+                    secondValue = email,
+                    firstLabel = "nama lengkap",
+                    secondLabel = "email",
+                    firstPlaceholder = "Masukkan nama lengkap",
+                    secondPlaceholder = "Masukkan email",
+                    onFirstChange = { fullName = it },
+                    onSecondChange = { email = it }
+                )
+            }
+            item {
+                var showPassword by retain {
+                    mutableStateOf(false)
+                }
+
+                OutlinedTextField(
+                    value = password ?: "",
+                    onValueChange = { password = it },
+                    modifier = Modifier.fillMaxWidth(),
+                    label = buildAnnotatedString { append("PASSWORD") },
+                    placeholder = if (user != null) "Kosongkan jika tidak mengubah password" else "Password minimal 8 karakter",
+                    visualTransformation = if (showPassword) VisualTransformation.None else PasswordVisualTransformation(),
+                    actions = {
+                        Icon(
+                            painter = painterResource(if (showPassword) GateTikIcons.eyeClose else GateTikIcons.eyeOpen),
+                            contentDescription = null,
+                            modifier = Modifier.clickable(
+                                indication = null,
+                                interactionSource = null
+                            ) { showPassword = !showPassword }
+                        )
+                    }
+                )
+            }
+            item {
+                UserFormFieldPair(
+                    firstValue = institutionNumber,
+                    secondValue = phoneNumber,
+                    firstLabel = "npm/nip",
+                    secondLabel = "no. telepon",
+                    firstPlaceholder = "NPM/NIP",
+                    secondPlaceholder = "No. Telepon",
+                    onFirstChange = { institutionNumber = it },
+                    onSecondChange = { phoneNumber = it }
+                )
+            }
+            item {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(
+                        space = 16.dp,
+                        alignment = Alignment.CenterHorizontally
+                    )
+                ) {
+                    UserFormSelect(
+                        selectedOption = role,
+                        label = "role",
+                        options = UserRole.entries,
+                        onOptionSelected = { role = it },
+                        modifier = Modifier.weight(1f),
+                        optionToString = { it.toIdString() }
+                    )
+                    UserFormSelect(
+                        selectedOption = status,
+                        label = "status",
+                        options = UserStatus.entries,
+                        onOptionSelected = { status = it },
+                        modifier = Modifier.weight(1f),
+                        optionToString = { it.capitalizedName }
+                    )
+                }
+            }
+            item {
+                GradientTextButton(
+                    text = "Simpan",
+                    onClick = {  },
+                    modifier = Modifier.fillMaxWidth(),
+                    enabled = fullName.isNotBlank() &&
+                        email.isNotBlank() &&
+                        institutionNumber.isNotBlank() &&
+                        (password.length >= 8 || (user != null && password.isBlank()))
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun <T> UserFormSelect(
+    selectedOption: T,
+    label: String,
+    options: List<T>,
+    onOptionSelected: (T) -> Unit,
+    modifier: Modifier = Modifier,
+    isDarkMode: Boolean = LocalDarkMode.current,
+    optionToString: (T) -> String = { it.toString() }
+) {
+    val labelColor by animateColorAsState(if (!isDarkMode) RoyalBlue800_50 else White50)
+    
+    Column(
+        modifier = modifier,
+        verticalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        Text(
+            text = label.uppercase(),
+            style = MaterialTheme.typography.bodySmall,
+            fontWeight = FontWeight.Bold,
+            color = labelColor
+        )
+        Select(
+            selectedOption = selectedOption,
+            options = options,
+            onOptionSelected = onOptionSelected,
+            optionToString = optionToString
+        )
+    }
+}
+
+@Composable
+private fun UserFormFieldPair(
+    firstValue: String,
+    secondValue: String,
+    firstLabel: String,
+    secondLabel: String,
+    firstPlaceholder: String,
+    secondPlaceholder: String,
+    onFirstChange: (String) -> Unit,
+    onSecondChange: (String) -> Unit,
+    modifier: Modifier = Modifier,
+    firstVisualTransformation: VisualTransformation = VisualTransformation.None,
+    secondVisualTransformation: VisualTransformation = VisualTransformation.None,
+    firstActions: (@Composable () -> Unit)? = null,
+    secondActions: (@Composable () -> Unit)? = null
+) {
+    FlowRow(
+        modifier = modifier.fillMaxWidth(),
+        verticalArrangement = Arrangement.spacedBy(16.dp),
+        horizontalArrangement = Arrangement.spacedBy(16.dp)
+    ) {
+        val contentModifier = Modifier
+            .widthIn(min = 200.dp)
+            .weight(1f)
+
+        OutlinedTextField(
+            value = firstValue,
+            onValueChange = onFirstChange,
+            label = buildAnnotatedString { append(firstLabel.uppercase()) },
+            placeholder = firstPlaceholder,
+            modifier = contentModifier,
+            visualTransformation = firstVisualTransformation,
+            actions = firstActions
+        )
+        OutlinedTextField(
+            value = secondValue,
+            onValueChange = onSecondChange,
+            label = buildAnnotatedString { append(secondLabel.uppercase()) },
+            placeholder = secondPlaceholder,
+            modifier = contentModifier,
+            visualTransformation = secondVisualTransformation,
+            actions = secondActions
+        )
+    }
+}
+
+@Composable
+private fun UserDeleteDialog(
+    user: User,
+    onDismissRequest: () -> Unit,
+    onDelete: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val isDarkMode = LocalDarkMode.current
+
+    GlassBoxDialog(
+        title = "Hapus Pengguna",
+        desc = "Apakah Anda yakin ingin menghapus ${user.fullName}?",
+        onDismissRequest = onDismissRequest,
+        modifier = modifier.widthIn(max = 400.dp)
+    ) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(12.dp, Alignment.End),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Box(
+                modifier = Modifier
+                    .clip(RoundedCornerShape(12.dp))
+                    .background(if (isDarkMode) Slate900 else Gray200)
+                    .clickable(onClick = onDismissRequest)
+                    .padding(vertical = 8.dp, horizontal = 16.dp)
+            ) {
+                Text(
+                    text = "Batal",
+                    style = MaterialTheme.typography.labelLarge,
+                    fontWeight = FontWeight.Bold
+                )
+            }
+            Box(
+                modifier = Modifier
+                    .clip(RoundedCornerShape(12.dp))
+                    .background(Red500)
+                    .clickable(onClick = onDelete)
+                    .padding(vertical = 8.dp, horizontal = 16.dp)
+            ) {
+                Text(
+                    text = "Hapus",
+                    style = MaterialTheme.typography.labelLarge,
+                    fontWeight = FontWeight.Bold,
+                    color = White
+                )
+            }
+        }
     }
 }
 
@@ -602,63 +907,6 @@ private fun UserDetailField(
     }
 }
 
-@Composable
-private fun GlassBoxDialog(
-    title: String,
-    desc: String,
-    onDismissRequest: () -> Unit,
-    modifier: Modifier = Modifier,
-    contentPadding: PaddingValues = PaddingValues(24.dp),
-    content: @Composable ColumnScope.() -> Unit
-) {
-    Dialog(
-        onDismissRequest = onDismissRequest,
-        properties = DialogProperties(
-            dismissOnClickOutside = true
-        )
-    ) {
-        GlassBox(
-            modifier = modifier
-                .widthIn(min = 500.dp, max = 700.dp)
-                .fillMaxWidth(),
-            contentPadding = contentPadding
-        ) {
-            Column(
-                verticalArrangement = Arrangement.spacedBy(contentPadding.calculateBottomPadding())
-            ) {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-                    Column(
-                        verticalArrangement = Arrangement.spacedBy(4.dp)
-                    ) {
-                        Text(title)
-                        Text(
-                            text = desc,
-                            style = MaterialTheme.typography.bodySmall,
-                            color = LocalContentColor.current.copy(alpha = 0.6f)
-                        )
-                    }
-                    GlassBox(
-                        contentPadding = PaddingValues(0.dp),
-                        shape = RoundedCornerShape(8.dp)
-                    ) {
-                        Icon(
-                            painter = painterResource(GateTikIcons.x),
-                            contentDescription = null,
-                            modifier = Modifier
-                                .clickable(onClick = onDismissRequest)
-                                .padding(4.dp)
-                        )
-                    }
-                }
-                content()
-            }
-        }
-    }
-}
 
 @DevicePreviews
 @Composable
@@ -668,7 +916,7 @@ private fun DesktopUserManagementScreenPreview() {
     ) {
         GateTikTheme(darkMode = isSystemInDarkTheme()) {
             Scaffold { p ->
-                DesktopUserManagementContent(
+                DesktopUserManagementScreen(
                     userRole = UserRole.ADMIN,
                     users = LoadState.Success(listOf(mockUser, mockUser)),
                     contentPadding = p,

@@ -1,5 +1,6 @@
 package kite1412.gatetik.ui.component
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -22,12 +23,14 @@ fun ActionIconButton(
     icon: DrawableResource,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
+    containerColor: Color = Color.Transparent,
     tint: Color = MaterialTheme.colorScheme.primary
 ) {
     Box(
         modifier = modifier
             .size(32.dp)
             .clip(CircleShape)
+            .background(containerColor)
             .clickable(onClick = onClick)
             .padding(6.dp),
         contentAlignment = Alignment.Center

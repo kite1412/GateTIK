@@ -4,6 +4,7 @@ import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -17,6 +18,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.dropShadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.shadow.Shadow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.DpOffset
@@ -38,9 +40,13 @@ fun GradientTextButton(
     textColor: Color = animateColorAsState(
         targetValue = if (enabled) White else White30
     ).value,
+    contentPadding: PaddingValues = PaddingValues(
+        horizontal = 16.dp,
+        vertical = 12.dp
+    ),
+    shape: Shape = RoundedCornerShape(16.dp),
     leading: (@Composable () -> Unit)? = null
 ) {
-    val shape = RoundedCornerShape(16.dp)
     val dropShadow by animateColorAsState(
         targetValue = if (enabled) Blue500Alt.copy(alpha = 0.4f) else Gray900.copy(alpha = 0.4f)
     )
@@ -68,10 +74,7 @@ fun GradientTextButton(
             )
             .clip(shape)
             .clickable(enabled = enabled, onClick = onClick)
-            .padding(
-                vertical = 12.dp,
-                horizontal = 16.dp
-            ),
+            .padding(contentPadding),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(
             space = 8.dp,
