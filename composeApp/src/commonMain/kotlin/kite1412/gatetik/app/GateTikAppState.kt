@@ -2,7 +2,11 @@ package kite1412.gatetik.app
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.NavDestination
 import androidx.navigation.navOptions
@@ -11,6 +15,7 @@ import kite1412.gatetik.feature.monitoring.MonitoringGraph
 import kite1412.gatetik.feature.student.StudentGraph
 import kite1412.gatetik.getPlatform
 import kite1412.gatetik.model.UserRole
+import kite1412.gatetik.ui.compositionlocal.WindowBlurRequester
 import kite1412.gatetik.ui.navigation.RootDestination
 import kite1412.gatetik.ui.navigation.RootDestinationsProvider
 
@@ -50,6 +55,18 @@ class GateTikAppState(
                     _currentRootDestination = it
                 }
         }
+    var windowBlur by mutableStateOf(0.dp)
+        private set
+
+    val windowBlurRequester = object : WindowBlurRequester {
+        override fun applyWindowBlur() {
+            windowBlur = 4.dp
+        }
+
+        override fun removeWindowBlue() {
+            windowBlur = 0.dp
+        }
+    }
 
     fun navigateToRootDestination(route: String) {
         if (_currentRootDestination?.route == route) return

@@ -1,12 +1,15 @@
 package kite1412.gatetik.feature.monitoring.desktop.usermanagement
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.calculateEndPadding
 import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -14,7 +17,10 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -35,9 +41,12 @@ import androidx.compose.ui.input.key.type
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kite1412.gatetik.designsystem.component.Badge
 import kite1412.gatetik.designsystem.component.FilterChip
+import kite1412.gatetik.designsystem.component.GlassBox
 import kite1412.gatetik.designsystem.component.Pagination
 import kite1412.gatetik.designsystem.component.SearchField
 import kite1412.gatetik.designsystem.component.Table
@@ -47,6 +56,7 @@ import kite1412.gatetik.designsystem.theme.Emerald500
 import kite1412.gatetik.designsystem.theme.Emerald700
 import kite1412.gatetik.designsystem.theme.GateTikTheme
 import kite1412.gatetik.designsystem.theme.Red500
+import kite1412.gatetik.designsystem.theme.Red600_90
 import kite1412.gatetik.designsystem.theme.Yellow500
 import kite1412.gatetik.designsystem.util.GateTikIcons
 import kite1412.gatetik.feature.monitoring.desktop.component.DesktopLayout
@@ -54,14 +64,15 @@ import kite1412.gatetik.feature.monitoring.desktop.util.desktopBaseModifier
 import kite1412.gatetik.model.User
 import kite1412.gatetik.model.UserRole
 import kite1412.gatetik.model.UserStatus
+import kite1412.gatetik.network.mock.mockUser
 import kite1412.gatetik.ui.component.ActionIconButton
 import kite1412.gatetik.ui.compositionlocal.LocalScaffoldComponentsController
 import kite1412.gatetik.ui.compositionlocal.LocalSnackbarHostStateWrapper
+import kite1412.gatetik.ui.compositionlocal.LocalWindowBlurRequester
 import kite1412.gatetik.ui.preview.DevicePreviews
 import kite1412.gatetik.ui.util.LoadState
 import kite1412.gatetik.ui.util.MockScaffoldComponentController
 import kite1412.gatetik.ui.util.data
-import kite1412.gatetik.util.now
 import kite1412.gatetik.util.timestampString
 import org.jetbrains.compose.resources.painterResource
 import org.koin.compose.viewmodel.koinViewModel
@@ -115,8 +126,22 @@ private fun DesktopUserManagementContent(
     onItemsPerPageChange: (Int) -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val windowBlurRequester = LocalWindowBlurRequester.current
     var searchText by retain {
         mutableStateOf("")
+    }
+    var popup by retain {
+        mutableStateOf("")
+    }
+    var selectedUser by retain { mutableStateOf<User?>(null) }
+    val requestPopup = { name: String, user: User ->
+        popup = name
+        selectedUser = user
+        windowBlurRequester.applyWindowBlur()
+    }
+    val dismissPopup = {
+        popup = ""
+        windowBlurRequester.removeWindowBlue()
     }
 
     DesktopLayout(
@@ -205,87 +230,14 @@ private fun DesktopUserManagementContent(
                 )
             ) {
                 item {
-                    CompositionLocalProvider(
-                        LocalTextStyle provides MaterialTheme.typography.bodySmall
-                    ) {
-                        LoadState(
-                            state = users,
-                            loading = { Text(it) },
-                            error = { Text(it) },
-                            success = {
-                                Table(
-                                    columns = listOf(
-                                        TableColumn("NAMA", 2f) { user ->
-                                            Text(
-                                                text = user.fullName,
-                                                style = LocalTextStyle.current.copy(
-                                                    fontWeight = FontWeight.Bold
-                                                )
-                                            )
-                                        },
-                                        TableColumn("ROLE", 1.5f) { user ->
-                                            Text(user.role.toIdString())
-                                        },
-                                        TableColumn("EMAIL", 2.5f) { user ->
-                                            Text(user.email)
-                                        },
-                                        TableColumn("NPM/NIP", 1.5f) { user ->
-                                            Text(user.instituteNumber)
-                                        },
-                                        TableColumn("STATUS", 1.5f) { user ->
-                                            val (containerColor, contentColor) = when (user.status) {
-                                                UserStatus.ACTIVE -> Emerald500.copy(alpha = 0.1f) to Emerald500
-                                                UserStatus.PENDING -> Yellow500.copy(alpha = 0.1f) to Yellow500
-                                                UserStatus.SUSPENDED -> Red500.copy(alpha = 0.1f) to Red500
-                                            }
-                                            Badge(
-                                                text = user.status.name,
-                                                containerColor = containerColor,
-                                                contentColor = contentColor
-                                            )
-                                        },
-                                        TableColumn("TERDAFTAR", 2f) { user ->
-                                            Text(
-                                                text = user.createdAt.timestampString,
-                                                style = MaterialTheme.typography.bodySmall,
-                                                color = MaterialTheme.colorScheme.onSurfaceVariant
-                                            )
-                                        },
-                                        TableColumn("AKSI", 2f) {
-                                            FlowRow(
-                                                horizontalArrangement = Arrangement.spacedBy(4.dp),
-                                                verticalArrangement = Arrangement.spacedBy(4.dp),
-                                                itemVerticalAlignment = Alignment.CenterVertically
-                                            ) {
-                                                ActionIconButton(
-                                                    icon = GateTikIcons.eyeOpen,
-                                                    onClick = { },
-                                                    tint = Blue500
-                                                )
-                                                ActionIconButton(
-                                                    icon = GateTikIcons.userCheck,
-                                                    onClick = { },
-                                                    tint = Emerald500
-                                                )
-                                                ActionIconButton(
-                                                    icon = GateTikIcons.userPen,
-                                                    onClick = { },
-                                                    tint = Yellow500
-                                                )
-                                                ActionIconButton(
-                                                    icon = GateTikIcons.trash,
-                                                    onClick = { },
-                                                    tint = Red500
-                                                )
-                                            }
-                                        }
-                                    ),
-                                    items = it,
-                                    modifier = Modifier.fillMaxWidth()
-                                )
-                            }
-                        )
-                    }
+                    UserTable(
+                        users = users,
+                        onDetailClick = { requestPopup("detail", it) },
+                        onActivateUserClick = { requestPopup("activate-user", it) },
+                        onEditUserClick = { requestPopup("edit-user", it) },
+                        onDeleteUserClick = { requestPopup("delete-user", it) },
+                        modifier = Modifier.fillMaxWidth()
+                    )
                 }
                 item {
                     Row(
@@ -331,6 +283,297 @@ private fun DesktopUserManagementContent(
             }
         }
     }
+    selectedUser?.let {
+        when (popup) {
+            "detail" -> UserDetailDialog(
+                user = it,
+                onDismissRequest = dismissPopup
+            )
+            "activate-user" -> {}
+            "edit-user" -> {}
+            "delete-user" -> {}
+            else -> {}
+        }
+    } 
+}
+
+@Composable
+private fun UserTable(
+    users: LoadState<List<User>>,
+    onDetailClick: (User) -> Unit,
+    onActivateUserClick: (User) -> Unit,
+    onEditUserClick: (User) -> Unit,
+    onDeleteUserClick: (User) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    CompositionLocalProvider(
+        LocalTextStyle provides MaterialTheme.typography.bodySmall
+    ) {
+        LoadState(
+            state = users,
+            loading = { Text(it) },
+            error = { Text(it) },
+            success = {
+                Table(
+                    columns = listOf(
+                        TableColumn("NAMA", 2f) { user ->
+                            Text(
+                                text = user.fullName,
+                                style = LocalTextStyle.current.copy(
+                                    fontWeight = FontWeight.Bold
+                                )
+                            )
+                        },
+                        TableColumn("ROLE", 1.5f) { user ->
+                            Text(user.role.toIdString())
+                        },
+                        TableColumn("EMAIL", 2.5f) { user ->
+                            Text(user.email)
+                        },
+                        TableColumn("NPM/NIP", 1.5f) { user ->
+                            Text(user.institutionNumber)
+                        },
+                        TableColumn("STATUS", 1.5f) { user ->
+                            val (containerColor, contentColor) = when (user.status) {
+                                UserStatus.ACTIVE -> Emerald500.copy(alpha = 0.1f) to Emerald500
+                                UserStatus.PENDING -> Yellow500.copy(alpha = 0.1f) to Yellow500
+                                UserStatus.SUSPENDED -> Red500.copy(alpha = 0.1f) to Red500
+                            }
+                            Badge(
+                                text = user.status.name,
+                                containerColor = containerColor,
+                                contentColor = contentColor
+                            )
+                        },
+                        TableColumn("TERDAFTAR", 2f) { user ->
+                            Text(
+                                text = user.createdAt.timestampString,
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        },
+                        TableColumn("AKSI", 2f) { user -> 
+                            FlowRow(
+                                horizontalArrangement = Arrangement.spacedBy(4.dp),
+                                verticalArrangement = Arrangement.spacedBy(4.dp),
+                                itemVerticalAlignment = Alignment.CenterVertically
+                            ) {
+                                ActionIconButton(
+                                    icon = GateTikIcons.eyeOpen,
+                                    onClick = { onDetailClick(user) },
+                                    tint = Blue500
+                                )
+                                ActionIconButton(
+                                    icon = GateTikIcons.userCheck,
+                                    onClick = { onActivateUserClick(user) },
+                                    tint = Emerald500
+                                )
+                                ActionIconButton(
+                                    icon = GateTikIcons.userPen,
+                                    onClick = { onEditUserClick(user) },
+                                    tint = Yellow500
+                                )
+                                ActionIconButton(
+                                    icon = GateTikIcons.trash,
+                                    onClick = { onDeleteUserClick(user) },
+                                    tint = Red500
+                                )
+                            }
+                        }
+                    ),
+                    items = it,
+                    modifier = modifier
+                )
+            }
+        )
+    }
+}
+
+@Composable
+private fun UserDetailDialog(
+    user: User,
+    onDismissRequest: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    GlassBoxDialog(
+        title = "Detail Pengguna",
+        desc = "Detail informasi pengguna",
+        onDismissRequest = onDismissRequest,
+        modifier = modifier
+    ) {
+        with(user) {
+            LazyColumn(
+                verticalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
+                item {
+                    UserDetailField(
+                        key = "nama lengkap",
+                        value = fullName
+                    )
+                }
+                item {
+                    UserDetailField(
+                        key = "email",
+                        value = email
+                    )
+                }
+                item {
+                    UserDetailField(
+                        key = "npm/nip",
+                        value = institutionNumber
+                    )
+                }
+                item {
+                    UserDetailField(
+                        key = "no. telepon",
+                        value = phoneNumber ?: ""
+                    )
+                }
+                item {
+                    UserDetailField(
+                        key = "role",
+                        value = role.toIdString()
+                    )
+                }
+                item {
+                    UserDetailField(
+                        key = "status",
+                        value = status.capitalizedName
+                    )
+                }
+                item {
+                    UserDetailField(
+                        key = "terdaftar",
+                        value = createdAt.timestampString
+                    )
+                }
+                item {
+                    UserDetailField(
+                        key = "login terakhir",
+                        value = lastLoginAt?.timestampString ?: ""
+                    )
+                }
+                if (user.role == UserRole.STUDENT) item {
+                    Column(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        Text(
+                            text = "KTM",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = LocalContentColor.current.copy(alpha = 0.6f)
+                        )
+                        GlassBox(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .aspectRatio(16f/9f),
+                            contentPadding = PaddingValues(0.dp)
+                        ) {
+                            if (ktmPath == null) Text(
+                                text = "File KTM tidak ditemukan",
+                                modifier = Modifier.align(Alignment.Center),
+                                color = Red600_90,
+                                style = MaterialTheme.typography.bodySmall
+                            )
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun UserDetailField(
+    key: String,
+    value: String,
+    modifier: Modifier = Modifier
+) {
+    val keyColor = LocalContentColor.current.copy(alpha = 0.6f)
+
+    Column(
+        modifier = modifier,
+        verticalArrangement = Arrangement.spacedBy(16.dp)
+    ) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            CompositionLocalProvider(
+                LocalTextStyle provides MaterialTheme.typography.bodySmall
+            ) {
+                Text(
+                    text = key.uppercase(),
+                    color = keyColor
+                )
+                Text(value)
+            }
+        }
+        HorizontalDivider(
+            modifier = Modifier.fillMaxWidth(),
+            color = keyColor,
+            thickness = 1.dp
+        )
+    }
+}
+
+@Composable
+private fun GlassBoxDialog(
+    title: String,
+    desc: String,
+    onDismissRequest: () -> Unit,
+    modifier: Modifier = Modifier,
+    contentPadding: PaddingValues = PaddingValues(24.dp),
+    content: @Composable ColumnScope.() -> Unit
+) {
+    Dialog(
+        onDismissRequest = onDismissRequest,
+        properties = DialogProperties(
+            dismissOnClickOutside = true
+        )
+    ) {
+        GlassBox(
+            modifier = modifier
+                .widthIn(min = 500.dp, max = 700.dp)
+                .fillMaxWidth(),
+            contentPadding = contentPadding
+        ) {
+            Column(
+                verticalArrangement = Arrangement.spacedBy(contentPadding.calculateBottomPadding())
+            ) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Column(
+                        verticalArrangement = Arrangement.spacedBy(4.dp)
+                    ) {
+                        Text(title)
+                        Text(
+                            text = desc,
+                            style = MaterialTheme.typography.bodySmall,
+                            color = LocalContentColor.current.copy(alpha = 0.6f)
+                        )
+                    }
+                    GlassBox(
+                        contentPadding = PaddingValues(0.dp),
+                        shape = RoundedCornerShape(8.dp)
+                    ) {
+                        Icon(
+                            painter = painterResource(GateTikIcons.x),
+                            contentDescription = null,
+                            modifier = Modifier
+                                .clickable(onClick = onDismissRequest)
+                                .padding(4.dp)
+                        )
+                    }
+                }
+                content()
+            }
+        }
+    }
 }
 
 @DevicePreviews
@@ -343,28 +586,7 @@ private fun DesktopUserManagementScreenPreview() {
             Scaffold { p ->
                 DesktopUserManagementContent(
                     userRole = UserRole.ADMIN,
-                    users = LoadState.Success(
-                        listOf(
-                            User(
-                                1,
-                                "John Doe",
-                                "student@example.com",
-                                UserRole.STUDENT,
-                                UserStatus.ACTIVE,
-                                "STU001",
-                                now()
-                            ),
-                            User(
-                                2,
-                                "Jane Smith",
-                                "student2@example.com",
-                                UserRole.STUDENT,
-                                UserStatus.PENDING,
-                                "STU002",
-                                now()
-                            )
-                        )
-                    ),
+                    users = LoadState.Success(listOf(mockUser, mockUser)),
                     contentPadding = p,
                     onSearchTextChange = {},
                     selectedRole = null,

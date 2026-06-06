@@ -15,6 +15,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.blur
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewModelScope
@@ -27,6 +28,7 @@ import kite1412.gatetik.domain.SessionStatus
 import kite1412.gatetik.ui.compositionlocal.LocalDarkMode
 import kite1412.gatetik.ui.compositionlocal.LocalScaffoldComponentsController
 import kite1412.gatetik.ui.compositionlocal.LocalSnackbarHostStateWrapper
+import kite1412.gatetik.ui.compositionlocal.LocalWindowBlurRequester
 import kite1412.gatetik.ui.compositionlocal.SnackbarHostStateWrapper
 import kite1412.gatetik.ui.navigation.RootDestination
 import kite1412.gatetik.ui.navigation.toNavBarDestination
@@ -58,7 +60,8 @@ fun GateTikApp() {
     CompositionLocalProvider(
         LocalDarkMode provides (isDarkMode ?: isSystemInDarkTheme()),
         LocalScaffoldComponentsController provides scaffoldComponentsController,
-        LocalSnackbarHostStateWrapper provides snackbarHostStateWrapper
+        LocalSnackbarHostStateWrapper provides snackbarHostStateWrapper,
+        LocalWindowBlurRequester provides appState.windowBlurRequester
     ) {
         GateTikTheme {
             Scaffold { p ->
@@ -88,7 +91,10 @@ fun GateTikApp() {
                     onDismissNavBar = {
                         scaffoldComponentsController.hideComponent(ScaffoldComponent.NAV_BAR)
                     },
-                    modifier = Modifier.fillMaxSize().radialBackground()
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .radialBackground()
+                        .blur(appState.windowBlur)
                 ) {
                     Box {
                         AnimatedVisibility(

@@ -21,7 +21,7 @@ val mockUser = User(
     email = "mock@gatetik.com",
     role = UserRole.ADMIN,
     status = UserStatus.ACTIVE,
-    instituteNumber = "mock-1",
+    institutionNumber = "mock-1",
     createdAt = now()
 )
 

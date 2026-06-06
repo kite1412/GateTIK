@@ -34,7 +34,10 @@ data class BackendUser(
         email = email,
         role = role.toModel(),
         status = status.toModel(),
-        instituteNumber = npmNip,
-        createdAt = createdAt
+        institutionNumber = npmNip,
+        phoneNumber = phoneNumber,
+        ktmPath = ktmPath,
+        createdAt = createdAt,
+        lastLoginAt = lastLoginAt
     )
 }

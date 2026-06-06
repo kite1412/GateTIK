@@ -115,7 +115,7 @@ object BackendClient : KoinComponent {
     fun log(response: HttpResponse) {
         Logger.i(
             tag = LOG_TAG,
-            message = "status ${response.request.url.fullPath}: ${response.status.value}"
+            message = "${response.request.method.value} - status ${response.request.url.fullPath}: ${response.status.value}"
         )
     }
 

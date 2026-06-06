@@ -111,7 +111,7 @@ private fun ProfileScreen(
                         SettingsItem(
                             icon = painterResource(GateTikIcons.idCard),
                             title = "NPM / NIP",
-                            subtitle = user.instituteNumber
+                            subtitle = user.institutionNumber
                         )
                         SettingsDivider()
                         SettingsItem(

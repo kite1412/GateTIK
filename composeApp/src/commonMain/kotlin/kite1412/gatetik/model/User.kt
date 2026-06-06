@@ -8,6 +8,9 @@ data class User(
     val email: String,
     val role: UserRole,
     val status: UserStatus,
-    val instituteNumber: String,
-    val createdAt: Instant
+    val institutionNumber: String,
+    val phoneNumber: String? = null,
+    val ktmPath: String? = null,
+    val createdAt: Instant,
+    val lastLoginAt: Instant? = null
 )

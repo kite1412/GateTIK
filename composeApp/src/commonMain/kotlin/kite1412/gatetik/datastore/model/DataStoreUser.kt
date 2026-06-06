@@ -22,7 +22,7 @@ data class DataStoreUser(
         email = email,
         role = UserRole.valueOf(role),
         status = UserStatus.valueOf(status),
-        instituteNumber = instituteNumber,
+        institutionNumber = instituteNumber,
         createdAt = createdAt
     )
 }
