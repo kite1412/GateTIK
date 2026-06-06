@@ -177,10 +177,11 @@ private fun DesktopParkingScreen(
                                         onSaveClick = {
                                             runCatching { capacity.toInt() }
                                                 .getOrNull()
+                                                ?.takeIf { it >= 0 }
                                                 ?.let(onSaveParkingCapacity)
                                                 ?: run {
-                                                    snackbarHostStateWrapper.showSnackbar("Gagal memperbarui kapasitas parkir")
                                                     capacity = parkingQuota.totalSlots.toString()
+                                                    snackbarHostStateWrapper.showSnackbar("Gagal memperbarui kapasitas parkir")
                                                 }
                                         },
                                         modifier = Modifier
@@ -280,7 +281,9 @@ private fun Occupancy(
         titleColor = titleColor,
         titleTrailing = {
             Text(
-                text = "$usedSlots / $totalSlots (${((usedSlots.toFloat() / totalSlots) * 100).roundToInt()}%)",
+                text = if (totalSlots > 0)
+                        "$usedSlots / $totalSlots (${((usedSlots.toFloat() / totalSlots) * 100).roundToInt()}%)"
+                    else "0",
                 style = MaterialTheme.typography.bodySmall,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis

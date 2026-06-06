@@ -1,12 +1,12 @@
 package kite1412.gatetik.designsystem.component
 
-import androidx.compose.foundation.background
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.DropdownMenu
@@ -23,10 +23,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
+import kite1412.gatetik.designsystem.theme.Gray200
+import kite1412.gatetik.designsystem.theme.Slate900
+import kite1412.gatetik.designsystem.theme.White60
 import kite1412.gatetik.designsystem.util.GateTikIcons
+import kite1412.gatetik.ui.compositionlocal.LocalDarkMode
 import org.jetbrains.compose.resources.painterResource
 
 @Composable
@@ -36,6 +40,7 @@ fun <T> Select(
     onOptionSelected: (T) -> Unit,
     modifier: Modifier = Modifier,
     label: String? = null,
+    isDarkMode: Boolean = LocalDarkMode.current,
     optionToString: (T) -> String = { it.toString() }
 ) {
     var expanded by remember { mutableStateOf(false) }
@@ -55,6 +60,13 @@ fun <T> Select(
         }
 
         Box {
+            val dropdownContainerColor by animateColorAsState(
+                if (isDarkMode) Slate900.copy(alpha = 0.6f) else White60
+            )
+            val dropdownBorderColor by animateColorAsState(
+                if (isDarkMode) Gray200.copy(alpha = 0.2f) else MaterialTheme.colorScheme.primary
+            )
+
             GlassBox(
                 modifier = Modifier
                     .clip(RoundedCornerShape(8.dp))
@@ -85,7 +97,14 @@ fun <T> Select(
             DropdownMenu(
                 expanded = expanded,
                 onDismissRequest = { expanded = false },
-                modifier = Modifier.background(MaterialTheme.colorScheme.surface)
+                containerColor = dropdownContainerColor,
+                border = BorderStroke(
+                    width = 1.dp,
+                    color = dropdownBorderColor
+                ),
+                shape = RoundedCornerShape(12.dp),
+                shadowElevation = 0.dp,
+                offset = DpOffset(x = 0.dp, y = 4.dp)
             ) {
                 options.forEach { option ->
                     DropdownMenuItem(

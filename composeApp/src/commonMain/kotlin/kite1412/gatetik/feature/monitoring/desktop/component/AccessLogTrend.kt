@@ -203,13 +203,20 @@ private fun Chart(
             ),
             startAxis = VerticalAxis.rememberStart(
                 valueFormatter = StartAxisValueFormatter,
-                itemPlacer = remember { count(count = { totalLogGroups + 1 } ) },
+                itemPlacer = remember {
+                    count(
+                        count = {
+                            if (totalLogGroups == 1) totalLogGroups + 1
+                            else totalLogGroups
+                        }
+                    )
+                },
                 label = axisLabelComponent
             ),
             bottomAxis = HorizontalAxis.rememberBottom(
                 valueFormatter = BottomAxisValueFormatter,
                 label = axisLabelComponent
-            ),
+            )
         ),
         modelProducer = modelProducer,
         modifier = modifier,

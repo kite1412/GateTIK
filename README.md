@@ -1,5 +1,5 @@
 # GateTIK
-A multiplatform project for parking gate control and parking monitoring.
+A multiplatform application for parking gate control and parking monitoring.
 
 ### Tested Platforms
 | Tested On | Android | macOS | Windows | Linux |
@@ -76,7 +76,7 @@ VERSION=<Application Version>
 2. Open the downloaded repository in Android Studio / IntelliJ IDEA.
 3. Run the following gradle command:
 
-   **macOs / Linux**
+   **macOS / Linux**
    ```bash
    ./gradlew :composeApp:run
    ```

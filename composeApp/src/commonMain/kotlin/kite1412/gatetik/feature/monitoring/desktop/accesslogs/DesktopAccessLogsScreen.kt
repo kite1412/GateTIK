@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -164,7 +165,8 @@ private fun DesktopAccessLogsScreen(
                             Icon(
                                 painter = painterResource(GateTikIcons.download),
                                 contentDescription = "ekspor csv",
-                                modifier = Modifier.size(18.dp)
+                                modifier = Modifier.size(18.dp),
+                                tint = LocalContentColor.current
                             )
                             Text(
                                 text = "Ekspor CSV"
