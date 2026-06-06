@@ -6,6 +6,7 @@ import kite1412.gatetik.model.UserStatus
 data class UserUpdate(
     val id: Int,
     val fullName: String,
+    val email: String,
     val password: String? = null,
     val npmNip: String,
     val phoneNumber: String? = null,

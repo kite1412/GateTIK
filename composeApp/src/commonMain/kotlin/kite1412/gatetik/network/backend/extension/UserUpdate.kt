@@ -7,6 +7,7 @@ import kite1412.gatetik.network.backend.dto.request.BackendUserUpdateRequest
 
 fun UserUpdate.toUpdateRequest() = BackendUserUpdateRequest(
     fullName = fullName,
+    email = email,
     password = password,
     npmNip = npmNip,
     phoneNumber = phoneNumber,

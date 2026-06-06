@@ -81,6 +81,8 @@ import kite1412.gatetik.designsystem.theme.White
 import kite1412.gatetik.designsystem.theme.White50
 import kite1412.gatetik.designsystem.theme.Yellow500
 import kite1412.gatetik.designsystem.util.GateTikIcons
+import kite1412.gatetik.domain.model.UserCreate
+import kite1412.gatetik.domain.model.UserUpdate
 import kite1412.gatetik.feature.monitoring.desktop.component.DesktopLayout
 import kite1412.gatetik.feature.monitoring.desktop.usermanagement.compositionlocal.LocalRemoteImageResolver
 import kite1412.gatetik.feature.monitoring.desktop.usermanagement.compositionlocal.rememberRemoteImageLoader
@@ -97,6 +99,7 @@ import kite1412.gatetik.ui.compositionlocal.LocalWindowBlurRequester
 import kite1412.gatetik.ui.preview.DevicePreviews
 import kite1412.gatetik.ui.util.LoadState
 import kite1412.gatetik.ui.util.MockScaffoldComponentController
+import kite1412.gatetik.ui.util.UiEvent
 import kite1412.gatetik.ui.util.data
 import kite1412.gatetik.util.timestampString
 import org.jetbrains.compose.resources.painterResource
@@ -108,12 +111,19 @@ fun DesktopUserManagementScreen(
     modifier: Modifier = Modifier,
     viewModel: DesktopUserManagementViewModel = koinViewModel()
 ) {
+    val snackbarHostStateWrapper = LocalSnackbarHostStateWrapper.current
     val user by viewModel.signedInUser.collectAsStateWithLifecycle()
     val pagination by viewModel.pagination.collectAsStateWithLifecycle()
 
+    LaunchedEffect(Unit) {
+        viewModel.uiEvent.collect { event ->
+            if (event is UiEvent.ShowSnackbar)
+                snackbarHostStateWrapper.showSnackbar(event.message)
+        }
+    }
     user?.let { user ->
         CompositionLocalProvider(
-            LocalRemoteImageResolver provides viewModel.kmpResolver
+            LocalRemoteImageResolver provides viewModel.ktmResolver
         ) {
             DesktopUserManagementScreen(
                 userRole = user.role,
@@ -130,6 +140,8 @@ fun DesktopUserManagementScreen(
                 onThemeToggle = viewModel::updateDarkMode,
                 onPageChange = {},
                 onItemsPerPageChange = viewModel::updatePerPage,
+                onEditUser = viewModel::editUser,
+                onAddUser = viewModel::addUser,
                 modifier = modifier
             )
         }
@@ -153,6 +165,8 @@ private fun DesktopUserManagementScreen(
     onThemeToggle: (Boolean) -> Unit,
     onPageChange: (Int) -> Unit,
     onItemsPerPageChange: (Int) -> Unit,
+    onEditUser: (data: UserUpdate) -> Unit,
+    onAddUser: (data: UserCreate) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val windowBlurRequester = LocalWindowBlurRequester.current
@@ -355,7 +369,24 @@ private fun DesktopUserManagementScreen(
             "edit-user" -> UserFormDialog(
                 user = it,
                 onDismissRequest = dismissPopup,
-                onSave = { dismissPopup() }
+                onSave = { fullName, email, password, institutionNumber, phoneNumber, role, status ->
+                    selectedUser?.let { user ->
+                        onEditUser(
+                            UserUpdate(
+                                id = user.id,
+                                fullName = fullName,
+                                email = email,
+                                password = password,
+                                npmNip = institutionNumber,
+                                phoneNumber = phoneNumber,
+                                role = role,
+                                status = status,
+                                ktmPath = user.ktmPath
+                            )
+                        )
+                    }
+                    dismissPopup()
+                }
             )
             "delete-user" -> UserDeleteDialog(
                 user = it,
@@ -369,7 +400,25 @@ private fun DesktopUserManagementScreen(
         UserFormDialog(
             user = selectedUser,
             onDismissRequest = { dismissPopup() },
-            onSave = {  }
+            onSave = { fullName, email, password, institutionNumber, phoneNumber, role, status ->
+                password?.let { password ->
+                    onAddUser(
+                        UserCreate(
+                            fullName = fullName,
+                            email = email,
+                            password = password,
+                            institutionNumber = institutionNumber,
+                            phoneNumber = phoneNumber,
+                            role = role,
+                            status = status,
+                            profilePhoto = null,
+                            ktmPath = null,
+                            lastLoginAt = null
+                        )
+                    )
+                }
+                dismissPopup()
+            }
         )
     }
 }
@@ -470,7 +519,16 @@ private fun UserTable(
 private fun UserFormDialog(
     user: User?,
     onDismissRequest: () -> Unit,
-    onSave: (User) -> Unit,
+    // blank strings treated as null
+    onSave: (
+        fullName: String,
+        email: String,
+        password: String?,
+        institutionNumber: String,
+        phoneNumber: String?,
+        role: UserRole,
+        status: UserStatus
+    ) -> Unit,
     modifier: Modifier = Modifier
 ) {
     var fullName by retain { mutableStateOf(user?.fullName ?: "") }
@@ -568,7 +626,17 @@ private fun UserFormDialog(
             item {
                 GradientTextButton(
                     text = "Simpan",
-                    onClick = {  },
+                    onClick = {
+                        onSave(
+                            fullName,
+                            email,
+                            password.takeIf { it.isNotBlank() },
+                            institutionNumber,
+                            phoneNumber.takeIf { it.isNotBlank() },
+                            role,
+                            status
+                        )
+                    },
                     modifier = Modifier.fillMaxWidth(),
                     enabled = fullName.isNotBlank() &&
                         email.isNotBlank() &&
@@ -930,7 +998,9 @@ private fun DesktopUserManagementScreenPreview() {
                     totalPages = 1,
                     itemsPerPage = 15,
                     onPageChange = {},
-                    onItemsPerPageChange = {}
+                    onItemsPerPageChange = {},
+                    onEditUser = {},
+                    onAddUser = {}
                 )
             }
         }

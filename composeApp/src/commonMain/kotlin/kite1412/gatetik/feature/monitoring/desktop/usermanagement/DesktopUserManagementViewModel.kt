@@ -10,6 +10,8 @@ import androidx.lifecycle.viewModelScope
 import kite1412.gatetik.datastore.GateTikDataStore
 import kite1412.gatetik.domain.Authentication
 import kite1412.gatetik.domain.model.PaginatedListResult
+import kite1412.gatetik.domain.model.UserCreate
+import kite1412.gatetik.domain.model.UserUpdate
 import kite1412.gatetik.domain.repository.UserRepository
 import kite1412.gatetik.feature.monitoring.desktop.DesktopBaseViewModel
 import kite1412.gatetik.feature.monitoring.desktop.usermanagement.compositionlocal.RemoteImageResolver
@@ -17,19 +19,26 @@ import kite1412.gatetik.model.User
 import kite1412.gatetik.model.UserRole
 import kite1412.gatetik.model.UserStatus
 import kite1412.gatetik.ui.util.LoadState
+import kite1412.gatetik.ui.util.UiEvent
 import kite1412.gatetik.util.onError
 import kite1412.gatetik.util.onSuccess
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 
 class DesktopUserManagementViewModel(
     authentication: Authentication,
     dataStore: GateTikDataStore,
     private val userRepository: UserRepository
 ) : DesktopBaseViewModel(authentication, dataStore) {
+    private val _uiEvent = MutableSharedFlow<UiEvent>()
+    val uiEvent = _uiEvent.asSharedFlow()
     private val userStore = mutableStateMapOf<UserRepository.GetParams, PaginatedListResult<User>>()
     var searchText by mutableStateOf("")
         private set
@@ -69,7 +78,7 @@ class DesktopUserManagementViewModel(
             started = SharingStarted.WhileSubscribed(5000),
             initialValue = null
         )
-    val kmpResolver = RemoteImageResolver { payload ->
+    val ktmResolver = RemoteImageResolver { payload ->
         runCatching { payload.toString().toInt() }
             .getOrNull()
             ?.let { studentId ->
@@ -98,6 +107,65 @@ class DesktopUserManagementViewModel(
         this.perPage = perPage
     }
 
+    fun editUser(data: UserUpdate) {
+        viewModelScope.launch {
+            userRepository.updateUser(data)
+                .onSuccess { user ->
+                    userStore.forEach { (params, res) ->
+                        val index = res.data.indexOfFirst { it.id == user.id }
+                        if (index != -1) userStore[params] = res.copy(
+                            data = res.data.toMutableList().apply {
+                                set(index, user)
+                            }
+                        )
+
+                        if (params == this@DesktopUserManagementViewModel.params.first())
+                            updateUsersOnParamsChange(params)
+                    }
+
+                    _uiEvent.emit(
+                        UiEvent.ShowSnackbar("Berhasil mengedit pengguna")
+                    )
+                }
+                .onError {
+                    _uiEvent.emit(
+                        UiEvent.ShowSnackbar("Gagal mengedit pengguna, harap coba lagi")
+                    )
+                }
+        }
+    }
+
+    fun addUser(data: UserCreate) {
+        viewModelScope.launch {
+            userRepository.addUser(data)
+                .onSuccess { user ->
+                    userStore.forEach { (params, res) ->
+                        if (
+                            params.role == null ||
+                            params.role == user.role ||
+                            params.status == null ||
+                            user.status == params.status
+                        ) {
+                            userStore[params] = res.copy(
+                                data = listOf(user) + res.data
+                            )
+                            if (params == this@DesktopUserManagementViewModel.params.first())
+                                updateUsersOnParamsChange(params)
+                        }
+                    }
+
+                    _uiEvent.emit(
+                        UiEvent.ShowSnackbar("Berhasil menambah pengguna")
+                    )
+                }
+                .onError {
+                    _uiEvent.emit(
+                        UiEvent.ShowSnackbar("Gagal menambah pengguna, harap coba lagi")
+                    )
+                }
+        }
+    }
+
     private suspend fun updateUsersOnParamsChange(params: UserRepository.GetParams) {
         if (userStore[params] != null)
             users = LoadState.Success(userStore[params]!!.data)
@@ -105,8 +173,12 @@ class DesktopUserManagementViewModel(
             users = LoadState.Loading("Memuat daftar pengguna")
             userRepository.getAll(params)
                 .onSuccess {
-                    users = LoadState.Success(it.data)
-                    userStore[params] = it
+                    val sorted = it.data
+                        .sortedByDescending { u -> u.createdAt }
+                    users = LoadState.Success(sorted)
+                    userStore[params] = it.copy(
+                        data = sorted
+                    )
                 }
                 .onError {
                     users = LoadState.Error("Gagal memuat daftar pengguna")

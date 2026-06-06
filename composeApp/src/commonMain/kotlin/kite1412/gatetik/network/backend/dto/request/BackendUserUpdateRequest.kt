@@ -9,6 +9,7 @@ import kotlinx.serialization.Serializable
 data class BackendUserUpdateRequest(
     @SerialName("full_name")
     val fullName: String,
+    val email: String,
     val password: String? = null,
     @SerialName("npm_nip")
     val npmNip: String,
