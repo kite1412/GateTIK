@@ -21,6 +21,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.retain.retain
@@ -36,6 +37,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import kite1412.gatetik.LocalCsvExporter
 import kite1412.gatetik.designsystem.component.Badge
 import kite1412.gatetik.designsystem.component.GlassBox
 import kite1412.gatetik.designsystem.component.Icon
@@ -61,9 +63,11 @@ import kite1412.gatetik.model.AccessStatus
 import kite1412.gatetik.model.UserRole
 import kite1412.gatetik.network.mock.mockAccessLogs
 import kite1412.gatetik.ui.compositionlocal.LocalScaffoldComponentsController
+import kite1412.gatetik.ui.compositionlocal.LocalSnackbarHostStateWrapper
 import kite1412.gatetik.ui.preview.DevicePreviews
 import kite1412.gatetik.ui.util.LoadState
 import kite1412.gatetik.ui.util.MockScaffoldComponentController
+import kite1412.gatetik.ui.util.UiEvent
 import kite1412.gatetik.ui.util.data
 import kite1412.gatetik.util.timestampString
 import org.jetbrains.compose.resources.painterResource
@@ -79,7 +83,15 @@ fun DesktopAccessLogsScreen(
     val pagination by viewModel.pagination.collectAsStateWithLifecycle()
     val trendAccessLogs by viewModel.trendAccessLogs.collectAsStateWithLifecycle()
     val accessLogs = viewModel.accessLogs
+    val csvExporter = LocalCsvExporter.current
+    val snackbarHostStateWrapper = LocalSnackbarHostStateWrapper.current
 
+    LaunchedEffect(Unit) {
+        viewModel.uiEvent.collect { event ->
+            if (event is UiEvent.ShowSnackbar)
+                snackbarHostStateWrapper.showSnackbar(event.message)
+        }
+    }
     user?.let { user ->
         DesktopAccessLogsScreen(
             userRole = user.role,
@@ -102,7 +114,9 @@ fun DesktopAccessLogsScreen(
             onActionFilterChange = viewModel::updateActionFilter,
             onSortChange = viewModel::updateSort,
             onItemsPerPageChange = {},
-            onExportCsv = viewModel::exportCsv,
+            onExportCsv = {
+                viewModel.exportCsv(csvExporter)
+            },
             onThemeToggle = viewModel::updateDarkMode,
             modifier = modifier
         )

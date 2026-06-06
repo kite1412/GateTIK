@@ -6,24 +6,33 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.lifecycle.viewModelScope
+import kite1412.gatetik.CsvExportResult
+import kite1412.gatetik.CsvExporter
 import kite1412.gatetik.datastore.GateTikDataStore
 import kite1412.gatetik.domain.Authentication
 import kite1412.gatetik.domain.model.PaginatedListResult
 import kite1412.gatetik.domain.repository.AccessLogRepository
 import kite1412.gatetik.feature.monitoring.desktop.DesktopBaseViewModel
 import kite1412.gatetik.feature.monitoring.desktop.accesslogs.util.Sort
+import kite1412.gatetik.feature.monitoring.desktop.accesslogs.util.writeToCsv
 import kite1412.gatetik.model.AccessAction
 import kite1412.gatetik.model.AccessLog
 import kite1412.gatetik.model.AccessMethod
 import kite1412.gatetik.model.AccessStatus
 import kite1412.gatetik.ui.util.LoadState
+import kite1412.gatetik.ui.util.UiEvent
+import kite1412.gatetik.util.now
 import kite1412.gatetik.util.onError
 import kite1412.gatetik.util.onSuccess
+import kite1412.gatetik.util.timestampString
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 
 class DesktopAccessLogsViewModel(
     authentication: Authentication,
@@ -31,6 +40,8 @@ class DesktopAccessLogsViewModel(
     private val accessLogRepository: AccessLogRepository
 ) : DesktopBaseViewModel(authentication, dataStore) {
     private val logStore = mutableStateMapOf<AccessLogRepository.GetParams, PaginatedListResult<AccessLog>>()
+    private val _uiEvent = MutableSharedFlow<UiEvent>()
+    val uiEvent = _uiEvent.asSharedFlow()
     var searchText by mutableStateOf<String?>(null)
         private set
     var selectedStatusFilter by mutableStateOf<AccessStatus?>(null)
@@ -116,8 +127,37 @@ class DesktopAccessLogsViewModel(
         selectedSort = sort
     }
 
-    fun exportCsv() {
-        println("Exporting CSV...")
+    fun exportCsv(exporter: CsvExporter) {
+        viewModelScope.launch {
+            logStore
+                .flatMap { (_, logResult) ->
+                    logResult.data
+                }
+                .distinctBy { it.id }
+                .sortedByDescending { it.createdAt }
+                .takeIf { it.isNotEmpty() }
+                ?.let { logs ->
+                    val res = exporter.export(
+                        filename = "GateTIK-access-logs(${
+                            now().timestampString
+                                .replace(oldChar = ' ', newChar = '-')
+                                .replace(oldValue = ",", newValue = "")
+                                .replace(oldChar = ':', newChar = '_')
+                        })",
+                        write = { logs.writeToCsv(writer = this) }
+                    )
+
+                    _uiEvent.emit(
+                        UiEvent.ShowSnackbar(
+                            when (res) {
+                                is CsvExportResult.Cancelled -> res.reason
+                                is CsvExportResult.Failed -> res.reason
+                                is CsvExportResult.Success -> "Berhasil mengekspor data log akses"
+                            }
+                        )
+                    )
+                }
+        }
     }
 
     private suspend fun updateLogsOnParamsChange(params: AccessLogRepository.GetParams) {

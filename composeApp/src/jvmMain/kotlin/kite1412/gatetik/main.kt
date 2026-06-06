@@ -150,7 +150,11 @@ fun main() {
                                             authentication.logout()
                                         }
                                     }
-                                ) else GateTikApp()
+                                ) else CompositionLocalProvider(
+                                    LocalCsvExporter provides JvmCsvExporter(window)
+                                ) {
+                                    GateTikApp()
+                                }
                             }
                         }
                     }

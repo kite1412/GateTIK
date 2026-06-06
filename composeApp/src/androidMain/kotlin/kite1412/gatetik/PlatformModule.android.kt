@@ -27,6 +27,10 @@ actual val platformModule: Module = module {
             context = get()
         )
     } bind LocationService::class
+
+    single {
+        UnsupportedAndroidCsvExporter()
+    } bind CsvExporter::class
 }
 
 private fun createDataStore(context: Context): DataStore<Preferences> =
