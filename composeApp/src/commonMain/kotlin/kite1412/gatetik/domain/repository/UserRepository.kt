@@ -2,6 +2,7 @@ package kite1412.gatetik.domain.repository
 
 import kite1412.gatetik.common.extension.includeIfNotNull
 import kite1412.gatetik.domain.model.PaginatedListResult
+import kite1412.gatetik.domain.model.UserUpdate
 import kite1412.gatetik.model.User
 import kite1412.gatetik.model.UserRole
 import kite1412.gatetik.model.UserStatus
@@ -12,6 +13,10 @@ typealias UserResult<T> = Result<T, Error>
 
 interface UserRepository {
     suspend fun getAll(params: GetParams = GetParams()): UserResult<PaginatedListResult<User>>
+
+    suspend fun updateUser(data: UserUpdate): UserResult<User>
+
+    suspend fun deleteUser(id: Int): UserResult<Boolean>
 
     data class GetParams(
         val role: UserRole? = null,

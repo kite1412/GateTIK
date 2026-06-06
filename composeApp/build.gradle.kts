@@ -83,6 +83,10 @@ compose.desktop {
     application {
         mainClass = "kite1412.gatetik.MainKt"
 
+        jvmArgs(
+            "-Dapple.awt.application.appearance=system"
+        )
+
         nativeDistributions {
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
             packageName = "kite1412.gatetik"

@@ -94,15 +94,21 @@ object BackendClient : KoinComponent {
                 setBody(body)
                 block()
             }
+            .also(::log)
             .body()
     }
 
     suspend inline fun <reified Response> delete(
         path: String,
+        useToken: Boolean = true,
         block: HttpRequestBuilder.() -> Unit = {}
     ): Response {
         return httpClient
-            .delete(path, block)
+            .delete(getPath(path)) {
+                if (useToken) attachToken()
+                block()
+            }
+            .also(::log)
             .body()
     }
 
