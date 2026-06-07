@@ -249,7 +249,8 @@ private fun StudentCapacity(
             OutlinedTextField(
                 value = capacity,
                 onValueChange = onCapacityChange,
-                modifier = Modifier.weight(1f)
+                modifier = Modifier.weight(1f),
+                singleLine = true
             )
             Button(
                 onClick = { onSaveClick(capacity) },

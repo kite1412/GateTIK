@@ -28,6 +28,14 @@ class GateTikDataStore(
         dataStore.observePreference(BooleanPreferencesKey.isFirstLaunch)
             .map { it ?: true }
 
+    fun observePollingEnabled(): Flow<Boolean> =
+        dataStore.observePreference(BooleanPreferencesKey.isPollingEnabled)
+            .map { it ?: DEFAULT_POLLING_ENABLED }
+
+    fun observePollingIntervalMs(): Flow<Int> =
+        dataStore.observePreference(IntPreferencesKey.pollingIntervalMs)
+            .map { it ?: DEFAULT_POLLING_INTERVAL_MS }
+
     suspend fun getAuthSession(): DataStoreAuthSession? =
         dataStore.getJsonPreference(JsonPreferencesKey.AUTH_SESSION)
 
@@ -51,6 +59,16 @@ class GateTikDataStore(
     suspend fun setFirstLaunch(value: Boolean) = dataStore.setPreference(
         key = BooleanPreferencesKey.isFirstLaunch,
         value = value
+    )
+
+    suspend fun setPollingEnabled(value: Boolean) = dataStore.setPreference(
+        key = BooleanPreferencesKey.isPollingEnabled,
+        value = value
+    )
+
+    suspend fun setPollingIntervalMs(ms: Int) = dataStore.setPreference(
+        key = IntPreferencesKey.pollingIntervalMs,
+        value = ms
     )
 
     private suspend fun <T> DataStore<Preferences>.getPreference(
@@ -110,5 +128,10 @@ class GateTikDataStore(
         return runCatching {
             json.decodeFromString<T>(jsonString)
         }.getOrNull()
+    }
+
+    companion object {
+        const val DEFAULT_POLLING_ENABLED = true
+        const val DEFAULT_POLLING_INTERVAL_MS = 60000
     }
 }

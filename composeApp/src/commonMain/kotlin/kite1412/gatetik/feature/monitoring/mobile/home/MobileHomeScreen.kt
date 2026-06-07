@@ -57,7 +57,6 @@ import kite1412.gatetik.designsystem.theme.White20
 import kite1412.gatetik.designsystem.theme.White60
 import kite1412.gatetik.designsystem.theme.White80
 import kite1412.gatetik.designsystem.util.GateTikIcons
-import kite1412.gatetik.ui.util.navBarPadding
 import kite1412.gatetik.model.AccessLog
 import kite1412.gatetik.model.Cctv
 import kite1412.gatetik.model.Gate
@@ -74,6 +73,7 @@ import kite1412.gatetik.ui.compositionlocal.LocalSnackbarHostStateWrapper
 import kite1412.gatetik.ui.preview.DevicePreviews
 import kite1412.gatetik.ui.util.LoadState
 import kite1412.gatetik.ui.util.UiEvent
+import kite1412.gatetik.ui.util.navBarPadding
 import kite1412.gatetik.util.timeAgo
 import kotlinx.coroutines.delay
 import org.jetbrains.compose.resources.painterResource
@@ -176,13 +176,13 @@ private fun MobileHomeScreen(
                 onCloseGate = onCloseGate
             )
         }
-        item {
-            GateAccessButton(
-                isLocked = true,
-                onLockChange = {},
-                modifier = Modifier.fillMaxWidth()
-            )
-        }
+//        item {
+//            GateAccessButton(
+//                isLocked = true,
+//                onLockChange = {},
+//                modifier = Modifier.fillMaxWidth()
+//            )
+//        }
         item { CctvCard(cctv = cctv) }
         item {
             ParkingQuotaCard(
@@ -247,7 +247,7 @@ private fun GateControlCard(
     latestAccessLog: AccessLog?,
     onOpenGate: () -> Unit,
     onCloseGate: () -> Unit,
-    isLocked: Boolean = true
+    isLocked: Boolean = false
 ) {
     val isGateSuccess = gate is LoadState.Success && gate.data != null
 

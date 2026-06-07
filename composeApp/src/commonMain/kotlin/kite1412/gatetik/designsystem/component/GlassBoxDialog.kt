@@ -17,6 +17,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
@@ -30,6 +31,7 @@ fun GlassBoxDialog(
     onDismissRequest: () -> Unit,
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(24.dp),
+    titleStyle: TextStyle = MaterialTheme.typography.titleMedium,
     content: @Composable ColumnScope.() -> Unit
 ) {
     Dialog(
@@ -57,7 +59,7 @@ fun GlassBoxDialog(
                     ) {
                         Text(
                             text = title,
-                            style = MaterialTheme.typography.titleMedium
+                            style = titleStyle
                         )
                         Text(
                             text = desc,
