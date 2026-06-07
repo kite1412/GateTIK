@@ -39,14 +39,15 @@ class DesktopUserManagementViewModel(
 ) : DesktopBaseViewModel(authentication, dataStore) {
     private val _uiEvent = MutableSharedFlow<UiEvent>()
     val uiEvent = _uiEvent.asSharedFlow()
+
     private val userStore = mutableStateMapOf<UserRepository.GetParams, PaginatedListResult<User>>()
+    private var currentPage by mutableIntStateOf(1)
+    private var perPage by mutableIntStateOf(15)
     var searchText by mutableStateOf("")
         private set
     var selectedRole by mutableStateOf<UserRole?>(null)
         private set
     var selectedStatus by mutableStateOf<UserStatus?>(null)
-        private set
-    var perPage by mutableIntStateOf(15)
         private set
     var users by mutableStateOf<LoadState<List<User>>>(LoadState.Loading("Memuat daftar pengguna"))
         private set
@@ -56,7 +57,8 @@ class DesktopUserManagementViewModel(
             role = selectedRole,
             status = selectedStatus,
             search = searchText,
-            perPage = perPage
+            perPage = perPage,
+            page = currentPage
         )
     }
         .distinctUntilChanged()
@@ -105,6 +107,10 @@ class DesktopUserManagementViewModel(
 
     fun updatePerPage(perPage: Int) {
         this.perPage = perPage
+    }
+
+    fun updateCurrentPage(page: Int) {
+        this.currentPage = page
     }
 
     fun editUser(data: UserUpdate) {

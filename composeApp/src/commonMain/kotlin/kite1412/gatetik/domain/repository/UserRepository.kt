@@ -27,9 +27,11 @@ interface UserRepository {
         val role: UserRole? = null,
         val status: UserStatus? = null,
         val search: String? = null,
-        val perPage: Int? = null
+        val perPage: Int? = null,
+        val page: Int? = null
     ) {
         fun toMap() = mutableMapOf<String, String>().apply {
+            includeIfNotNull("page", page?.toString())
             includeIfNotNull(
                 key = "role",
                 value = role?.toIdString()?.lowercase()

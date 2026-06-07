@@ -138,7 +138,7 @@ fun DesktopUserManagementScreen(
                 selectedStatus = viewModel.selectedStatus,
                 onStatusFilterChange = viewModel::onStatusFilterChange,
                 onThemeToggle = viewModel::updateDarkMode,
-                onPageChange = {},
+                onPageChange = viewModel::updateCurrentPage,
                 onItemsPerPageChange = viewModel::updatePerPage,
                 onEditUser = viewModel::editUser,
                 onAddUser = viewModel::addUser,
@@ -341,7 +341,7 @@ private fun DesktopUserManagementScreen(
 
                         Pagination(
                             currentPage = currentPage,
-                            totalPages = totalPages,
+                            lastPage = totalPages,
                             onPageChange = onPageChange,
                             itemsPerPage = itemsPerPage,
                             onItemsPerPageChange = { itemsPerPage = it },

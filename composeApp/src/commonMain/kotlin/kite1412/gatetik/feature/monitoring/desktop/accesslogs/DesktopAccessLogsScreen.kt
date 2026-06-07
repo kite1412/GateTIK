@@ -439,7 +439,7 @@ private fun AccessLogsTableSection(
 
             Pagination(
                 currentPage = currentPage,
-                totalPages = 1,
+                lastPage = 1,
                 onPageChange = onPageChange,
                 itemsPerPage = itemsPerPage,
                 onItemsPerPageChange = onItemsPerPageChange
