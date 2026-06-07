@@ -144,6 +144,7 @@ fun DesktopUserManagementScreen(
                 onAddUser = viewModel::addUser,
                 onDeleteUser = viewModel::deleteUser,
                 onActivateUser = viewModel::activateUser,
+                onRefreshClick = viewModel::refreshUsers,
                 modifier = modifier
             )
         }
@@ -171,6 +172,7 @@ private fun DesktopUserManagementScreen(
     onAddUser: (data: UserCreate) -> Unit,
     onDeleteUser: (User) -> Unit,
     onActivateUser: (User) -> Unit,
+    onRefreshClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val windowBlurRequester = LocalWindowBlurRequester.current
@@ -195,7 +197,8 @@ private fun DesktopUserManagementScreen(
         title = "Manajemen Pengguna",
         userRole = userRole,
         onThemeToggle = onThemeToggle,
-        modifier = modifier.desktopBaseModifier()
+        modifier = modifier.desktopBaseModifier(),
+        onRefreshClick = onRefreshClick
     ) {
         Column(
             modifier = Modifier.padding(
@@ -1009,7 +1012,8 @@ private fun DesktopUserManagementScreenPreview() {
                     onEditUser = {},
                     onAddUser = {},
                     onDeleteUser = {},
-                    onActivateUser = {}
+                    onActivateUser = {},
+                    onRefreshClick = {}
                 )
             }
         }

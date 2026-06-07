@@ -117,6 +117,7 @@ fun DesktopAccessLogsScreen(
                 viewModel.exportCsv(csvExporter)
             },
             onThemeToggle = viewModel::updateDarkMode,
+            onRefreshClick = viewModel::refreshAccessLogs,
             modifier = modifier
         )
     }
@@ -146,13 +147,15 @@ private fun DesktopAccessLogsScreen(
     onItemsPerPageChange: (Int) -> Unit,
     onExportCsv: () -> Unit,
     onThemeToggle: (Boolean) -> Unit,
+    onRefreshClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     DesktopLayout(
         title = "Log Akses",
         userRole = userRole,
         onThemeToggle = onThemeToggle,
-        modifier = modifier.desktopBaseModifier()
+        modifier = modifier.desktopBaseModifier(),
+        onRefreshClick = onRefreshClick
     ) {
         LazyColumn(
             modifier = Modifier.fillMaxSize(),
@@ -496,6 +499,7 @@ private fun DesktopAccessLogsScreenPreview() {
                     onExportCsv = {},
                     contentPadding = PaddingValues(24.dp),
                     onThemeToggle = {},
+                    onRefreshClick = {},
                     modifier = Modifier
                         .fillMaxSize()
                         .radialBackground()

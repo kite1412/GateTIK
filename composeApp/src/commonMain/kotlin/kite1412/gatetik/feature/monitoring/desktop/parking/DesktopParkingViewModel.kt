@@ -17,12 +17,13 @@ import kite1412.gatetik.util.onError
 import kite1412.gatetik.util.onSuccess
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
 class DesktopParkingViewModel(
     authentication: Authentication,
     dataStore: GateTikDataStore,
-    getMainParkingQuotaUseCase: GetMainParkingQuotaUseCase,
+    private val getMainParkingQuotaUseCase: GetMainParkingQuotaUseCase,
     getMainGateUseCase: GetMainGateUseCase,
     private val updateMainGateUseCase: UpdateMainGateUseCase,
     private val updateMainParkingQuotaUseCase: UpdateMainParkingQuotaUseCase
@@ -31,6 +32,17 @@ class DesktopParkingViewModel(
     val uiEvent = _uiEvent.asSharedFlow()
     val mainParkingQuota = getMainParkingQuotaUseCase.observeAsLoadStateFlow().stateIn(viewModelScope)
     val mainGate = getMainGateUseCase.observeAsLoadStateFlow().stateIn(viewModelScope)
+
+    fun refreshParkingQuota() {
+        viewModelScope.launch {
+            getMainParkingQuotaUseCase
+                .observeAsLoadStateFlow()
+                .first()
+            _uiEvent.emit(
+                UiEvent.ShowSnackbar("Data dimuat ulang")
+            )
+        }
+    }
 
     fun updateParkingCapacity(capacity: Int) {
         viewModelScope.launch {

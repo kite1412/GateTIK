@@ -115,6 +115,18 @@ class DesktopUserManagementViewModel(
         this.currentPage = page
     }
 
+    fun refreshUsers() {
+        viewModelScope.launch {
+            params.first()?.let { params ->
+                updateUsersOnParamsChange(
+                    params = params,
+                    useCached = false
+                )
+                showSnackbar("Data dimuat ulang")
+            }
+        }
+    }
+
     fun editUser(data: UserUpdate) {
         viewModelScope.launch {
             updateUser(
@@ -235,8 +247,8 @@ class DesktopUserManagementViewModel(
             }
     }
 
-    private suspend fun updateUsersOnParamsChange(params: UserRepository.GetParams) {
-        if (userStore[params] != null)
+    private suspend fun updateUsersOnParamsChange(params: UserRepository.GetParams, useCached: Boolean = true) {
+        if (userStore[params] != null && useCached)
             users = LoadState.Success(userStore[params]!!.data)
         else {
             users = LoadState.Loading("Memuat daftar pengguna")
@@ -248,6 +260,20 @@ class DesktopUserManagementViewModel(
                     userStore[params] = it.copy(
                         data = sorted
                     )
+                    userStore.forEach { (params, res) ->
+                        val sortedIds = sorted.map { u -> u.id }.toSet()
+                        val intersects = res.data.filter { u -> u.id in sortedIds }
+
+                        if (intersects.isNotEmpty()) {
+                            val updates = sorted.associateBy { u -> u.id }
+
+                            userStore[params] = res.copy(
+                                data = res.data.map { user ->
+                                    updates[user.id] ?: user
+                                }
+                            )
+                        }
+                    }
                 }
                 .onError {
                     users = LoadState.Error("Gagal memuat daftar pengguna")

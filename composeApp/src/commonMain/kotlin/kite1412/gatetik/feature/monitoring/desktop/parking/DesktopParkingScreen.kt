@@ -60,6 +60,7 @@ import kite1412.gatetik.designsystem.theme.Blue500
 import kite1412.gatetik.designsystem.theme.Emerald600
 import kite1412.gatetik.designsystem.theme.GateTikTheme
 import kite1412.gatetik.designsystem.theme.Gray900
+import kite1412.gatetik.designsystem.theme.Red600
 import kite1412.gatetik.designsystem.theme.Sky300
 import kite1412.gatetik.designsystem.theme.White
 import kite1412.gatetik.designsystem.theme.White15
@@ -112,6 +113,7 @@ fun DesktopParkingScreen(
             onSaveParkingCapacity = viewModel::updateParkingCapacity,
             onAutoRestrictStudentsChange = viewModel::updateAutoRestrictStudent,
             onAllowedRadiusMeterChange = viewModel::updateAllowedRadiusMeter,
+            onRefreshClick = viewModel::refreshParkingQuota,
             modifier = modifier
         )
     }
@@ -127,6 +129,7 @@ private fun DesktopParkingScreen(
     onSaveParkingCapacity: (Int) -> Unit,
     onAutoRestrictStudentsChange: (Boolean) -> Unit,
     onAllowedRadiusMeterChange: (Int) -> Unit,
+    onRefreshClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val snackbarHostStateWrapper = LocalSnackbarHostStateWrapper.current
@@ -135,7 +138,8 @@ private fun DesktopParkingScreen(
         title = "Manajemen Parkir",
         userRole = userRole,
         onThemeToggle = onThemeToggle,
-        modifier = modifier.desktopBaseModifier()
+        modifier = modifier.desktopBaseModifier(),
+        onRefreshClick = onRefreshClick
     ) {
         Box(
             modifier = Modifier.fillMaxSize(),
@@ -274,6 +278,7 @@ private fun Occupancy(
     val trackColor by animateColorAsState(
         targetValue = if (isDarkMode) White15 else Gray900.copy(alpha = 0.1f)
     )
+    val usedPercentage = ((usedSlots.toFloat() / totalSlots) * 100).roundToInt()
 
     Section(
         title = "Parkir Mahasiswa",
@@ -282,11 +287,12 @@ private fun Occupancy(
         titleTrailing = {
             Text(
                 text = if (totalSlots > 0)
-                        "$usedSlots / $totalSlots (${((usedSlots.toFloat() / totalSlots) * 100).roundToInt()}%)"
+                        "$usedSlots / $totalSlots ($usedPercentage%)"
                     else "0",
                 style = MaterialTheme.typography.bodySmall,
                 maxLines = 1,
-                overflow = TextOverflow.Ellipsis
+                overflow = TextOverflow.Ellipsis,
+                color = if (usedPercentage > 100) Red600 else LocalContentColor.current
             )
         }
     ) {
@@ -610,7 +616,8 @@ private fun DesktopParkingScreenPreview() {
                     onThemeToggle = {},
                     onSaveParkingCapacity = {},
                     onAutoRestrictStudentsChange = {},
-                    onAllowedRadiusMeterChange = {}
+                    onAllowedRadiusMeterChange = {},
+                    onRefreshClick = {}
                 )
             }
         }

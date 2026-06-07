@@ -18,7 +18,7 @@ data class SnackbarHostStateWrapper(
     fun showSnackbar(
         message: String,
         actionLabel: String? = null,
-        withDismissAction: Boolean = false,
+        withDismissAction: Boolean = true,
         duration: SnackbarDuration =
             if (actionLabel == null) SnackbarDuration.Short else SnackbarDuration.Indefinite,
         result: ((SnackbarResult) -> Unit)? = null

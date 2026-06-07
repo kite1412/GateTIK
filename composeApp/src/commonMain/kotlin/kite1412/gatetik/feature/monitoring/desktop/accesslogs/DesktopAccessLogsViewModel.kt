@@ -31,6 +31,7 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
@@ -100,20 +101,7 @@ class DesktopAccessLogsViewModel(
 
     init {
         viewModelScope.launch {
-            accessLogRepository.getAll(
-                params = AccessLogRepository.GetParams(
-                    page = 1,
-                    perPage = 100,
-                    isDescending = true
-                )
-            )
-                .onSuccess {
-                    trendAccessLogStore = it.data
-                    trendAccessLogs = LoadState.Success(it.data)
-                }
-                .onError {
-                    trendAccessLogs = LoadState.Error("Gagal memuat log akses")
-                }
+            updateTrendLogs()
 
             snapshotFlow { selectedTrendStatusFilter }
                 .onEach { status ->
@@ -160,6 +148,21 @@ class DesktopAccessLogsViewModel(
         updateCurrentPage(1)
     }
 
+    fun refreshAccessLogs() {
+        viewModelScope.launch {
+            params.first()?.let { params ->
+                updateLogsOnParamsChange(
+                    params = params,
+                    useCached = false
+                )
+                updateTrendLogs()
+                _uiEvent.emit(
+                    UiEvent.ShowSnackbar("Data dimuat ulang")
+                )
+            }
+        }
+    }
+
     fun exportCsv(exporter: CsvExporter) {
         viewModelScope.launch {
             logStore
@@ -193,15 +196,48 @@ class DesktopAccessLogsViewModel(
         }
     }
 
-    private suspend fun updateLogsOnParamsChange(params: AccessLogRepository.GetParams) {
-        if (logStore[params] != null)
+    private suspend fun updateTrendLogs() {
+        accessLogRepository.getAll(
+            params = AccessLogRepository.GetParams(
+                page = 1,
+                perPage = 100,
+                isDescending = true
+            )
+        )
+            .onSuccess {
+                trendAccessLogStore = it.data
+                trendAccessLogs = LoadState.Success(it.data)
+            }
+            .onError {
+                trendAccessLogs = LoadState.Error("Gagal memuat log akses")
+            }
+    }
+
+    private suspend fun updateLogsOnParamsChange(params: AccessLogRepository.GetParams, useCached: Boolean = true) {
+        if (logStore[params] != null && useCached)
             accessLogs = LoadState.Success(logStore[params]!!.data)
         else {
             accessLogs = LoadState.Loading("Memuat log akses")
             accessLogRepository.getAll(params)
                 .onSuccess {
-                    accessLogs = LoadState.Success(it.data)
+                    val logs = it.data
+                    accessLogs = LoadState.Success(logs)
                     logStore[params] = it
+
+                    logStore.forEach { (params, res) ->
+                        val ids = logs.map { l -> l.id }.toSet()
+                        val intersects = res.data.filter { l -> l.id in ids }
+
+                        if (intersects.isNotEmpty()) {
+                            val updates = logs.associateBy { l -> l.id }
+
+                            logStore[params] = res.copy(
+                                data = res.data.map { log ->
+                                    updates[log.id] ?: log
+                                }
+                            )
+                        }
+                    }
                 }
                 .onError {
                     accessLogs = LoadState.Error("Gagal memuat log akses")

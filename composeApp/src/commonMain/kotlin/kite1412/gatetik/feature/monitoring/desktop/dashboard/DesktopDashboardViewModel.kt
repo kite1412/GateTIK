@@ -90,7 +90,7 @@ class DesktopDashboardViewModel(
     fun refreshData() {
         loadData()
         viewModelScope.launch {
-            _uiEvent.emit(UiEvent.ShowSnackbar("Data diperbarui"))
+            _uiEvent.emit(UiEvent.ShowSnackbar("Data dimuat ulang"))
         }
     }
 
