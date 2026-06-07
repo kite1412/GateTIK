@@ -102,18 +102,18 @@ fun DesktopAccessLogsScreen(
             methodFilter = viewModel.selectedMethodFilter,
             actionFilter = viewModel.selectedActionFilter,
             sort = viewModel.selectedSort,
-            currentPage = pagination?.currentPage ?: 1,
+            currentPage = pagination?.currentPage ?: viewModel.currentPage,
             totalPages = pagination?.lastPage ?: 1,
-            itemsPerPage = (pagination?.perPage ?: 15).toString(),
+            itemsPerPage = pagination?.perPage ?: viewModel.perPage,
             contentPadding = contentPadding,
-            onPageChange = {},
+            onPageChange = viewModel::updateCurrentPage,
             onSearchTextChange = viewModel::updateSearchText,
             onStatusFilterChange = viewModel::updateStatusFilter,
             onTrendStatusFilterChange = viewModel::updateTrendStatusFilter,
             onMethodFilterChange = viewModel::updateMethodFilter,
             onActionFilterChange = viewModel::updateActionFilter,
             onSortChange = viewModel::updateSort,
-            onItemsPerPageChange = {},
+            onItemsPerPageChange = viewModel::updatePerPage,
             onExportCsv = {
                 viewModel.exportCsv(csvExporter)
             },
@@ -135,7 +135,7 @@ private fun DesktopAccessLogsScreen(
     sort: Sort,
     currentPage: Int,
     totalPages: Int,
-    itemsPerPage: String,
+    itemsPerPage: Int,
     contentPadding: PaddingValues,
     onStatusFilterChange: (AccessStatus?) -> Unit,
     onTrendStatusFilterChange: (AccessStatus?) -> Unit,
@@ -144,7 +144,7 @@ private fun DesktopAccessLogsScreen(
     onSearchTextChange: (String) -> Unit,
     onSortChange: (Sort) -> Unit,
     onPageChange: (Int) -> Unit,
-    onItemsPerPageChange: (String) -> Unit,
+    onItemsPerPageChange: (Int) -> Unit,
     onExportCsv: () -> Unit,
     onThemeToggle: (Boolean) -> Unit,
     modifier: Modifier = Modifier
@@ -232,6 +232,11 @@ private fun DesktopAccessLogsScreen(
             }
 
             item {
+                val snackbarHostStateWrapper = LocalSnackbarHostStateWrapper.current
+                var itemsPerPage by retain(itemsPerPage) {
+                    mutableStateOf("$itemsPerPage")
+                }
+
                 AccessLogsTableSection(
                     accessLogs = tableAccessLogs,
                     sort = sort,
@@ -239,7 +244,20 @@ private fun DesktopAccessLogsScreen(
                     totalPages = totalPages,
                     onPageChange = onPageChange,
                     itemsPerPage = itemsPerPage,
-                    onItemsPerPageChange = onItemsPerPageChange
+                    onItemsPerPageChange = { itemsPerPage = it },
+                    modifier = Modifier.onPreviewKeyEvent {
+                        if (it.type == KeyEventType.KeyUp && it.key == Key.Enter) {
+                            (runCatching {
+                                itemsPerPage.toInt()
+                            }
+                                .getOrNull()
+                                ?.let(onItemsPerPageChange) != null)
+                                .also { success ->
+                                    if (!success) snackbarHostStateWrapper
+                                        .showSnackbar("Masukkan angka untuk item per halaman")
+                                }
+                        } else false
+                    }
                 )
             }
         }
@@ -439,7 +457,7 @@ private fun AccessLogsTableSection(
 
             Pagination(
                 currentPage = currentPage,
-                lastPage = 1,
+                lastPage = totalPages,
                 onPageChange = onPageChange,
                 itemsPerPage = itemsPerPage,
                 onItemsPerPageChange = onItemsPerPageChange
@@ -474,7 +492,7 @@ private fun DesktopAccessLogsScreenPreview() {
                     currentPage = 1,
                     totalPages = 1,
                     onPageChange = {},
-                    itemsPerPage = "15",
+                    itemsPerPage = 15,
                     onItemsPerPageChange = {},
                     onExportCsv = {},
                     contentPadding = PaddingValues(24.dp),

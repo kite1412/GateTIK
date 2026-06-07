@@ -20,7 +20,9 @@ interface AccessLogRepository {
         val status: AccessStatus? = null,
         val method: AccessMethod? = null,
         val action: AccessAction? = null,
-        val search: String? = null
+        val search: String? = null,
+        val page: Int? = null,
+        val perPage: Int? = null
     ) {
         fun toMap() = mutableMapOf<String, String>().apply {
             includeIfNotNull(
@@ -39,6 +41,8 @@ interface AccessLogRepository {
                 key = "search",
                 value = search?.takeIf { it.isNotBlank() }
             )
+            includeIfNotNull("page", page?.toString())
+            includeIfNotNull("per_page", perPage?.toString())
         }
     }
 }

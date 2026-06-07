@@ -130,7 +130,7 @@ fun DesktopUserManagementScreen(
                 users = viewModel.users,
                 currentPage = pagination?.currentPage ?: 1,
                 totalPages = pagination?.lastPage ?: 1,
-                itemsPerPage = pagination?.perPage ?: 15,
+                itemsPerPage = pagination?.perPage ?: viewModel.perPage,
                 contentPadding = contentPadding,
                 onSearchTextChange = viewModel::onSearchTextChange,
                 selectedRole = viewModel.selectedRole,

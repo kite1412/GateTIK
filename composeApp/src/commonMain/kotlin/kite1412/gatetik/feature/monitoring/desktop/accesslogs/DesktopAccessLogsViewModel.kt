@@ -1,6 +1,7 @@
 package kite1412.gatetik.feature.monitoring.desktop.accesslogs
 
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -42,6 +43,11 @@ class DesktopAccessLogsViewModel(
     private val logStore = mutableStateMapOf<AccessLogRepository.GetParams, PaginatedListResult<AccessLog>>()
     private val _uiEvent = MutableSharedFlow<UiEvent>()
     val uiEvent = _uiEvent.asSharedFlow()
+
+    var currentPage by mutableIntStateOf(1)
+        private set
+    var perPage by mutableIntStateOf(15)
+        private set
     var searchText by mutableStateOf<String?>(null)
         private set
     var selectedStatusFilter by mutableStateOf<AccessStatus?>(null)
@@ -57,12 +63,14 @@ class DesktopAccessLogsViewModel(
     var accessLogs by mutableStateOf<LoadState<List<AccessLog>>>(LoadState.Loading("Memuat log akses"))
         private set
 
-    val params = snapshotFlow {
+    private val params = snapshotFlow {
         AccessLogRepository.GetParams(
             status = selectedStatusFilter,
             method = selectedMethodFilter,
             action = selectedActionFilter,
-            search = searchText
+            search = searchText,
+            page = currentPage,
+            perPage = perPage
         )
     }
         .distinctUntilChanged()
@@ -86,7 +94,12 @@ class DesktopAccessLogsViewModel(
         )
 
     val trendAccessLogs = snapshotFlow {
-        val logs = logStore[AccessLogRepository.GetParams()]?.data
+        val logs = logStore[
+            AccessLogRepository.GetParams(
+                page = currentPage,
+                perPage = perPage
+            )
+        ]?.data
         val filter = selectedTrendStatusFilter
 
         logs?.let {
@@ -125,6 +138,15 @@ class DesktopAccessLogsViewModel(
 
     fun updateSort(sort: Sort) {
         selectedSort = sort
+    }
+
+    fun updateCurrentPage(page: Int) {
+        currentPage = page
+    }
+
+    fun updatePerPage(perPage: Int) {
+        this.perPage = perPage
+        updateCurrentPage(1)
     }
 
     fun exportCsv(exporter: CsvExporter) {

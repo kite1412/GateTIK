@@ -42,7 +42,8 @@ class DesktopUserManagementViewModel(
 
     private val userStore = mutableStateMapOf<UserRepository.GetParams, PaginatedListResult<User>>()
     private var currentPage by mutableIntStateOf(1)
-    private var perPage by mutableIntStateOf(15)
+    var perPage by mutableIntStateOf(15)
+        private set
     var searchText by mutableStateOf("")
         private set
     var selectedRole by mutableStateOf<UserRole?>(null)
@@ -107,6 +108,7 @@ class DesktopUserManagementViewModel(
 
     fun updatePerPage(perPage: Int) {
         this.perPage = perPage
+        updateCurrentPage(1)
     }
 
     fun updateCurrentPage(page: Int) {
