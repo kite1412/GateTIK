@@ -112,6 +112,7 @@ fun DesktopDashboardScreen(
             onCloseGate = viewModel::closeGate,
             onCctvFullScreenClick = navigateToCctv,
             onSeeAllAccessLogClick = navigateToAccessLogs,
+            onRefreshClick = viewModel::refreshData,
             modifier = modifier
         )
     }
@@ -131,6 +132,7 @@ private fun DesktopDashboardScreen(
     onCloseGate: () -> Unit,
     onCctvFullScreenClick: () -> Unit,
     onSeeAllAccessLogClick: () -> Unit,
+    onRefreshClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val windowWidthSize = rememberWindowWidthSize()
@@ -140,7 +142,8 @@ private fun DesktopDashboardScreen(
         title = "Dashboard",
         userRole = userRole,
         onThemeToggle = onThemeToggle,
-        modifier = modifier.desktopBaseModifier()
+        modifier = modifier.desktopBaseModifier(),
+        onRefreshClick = onRefreshClick
     ) {
         LazyColumn(
             modifier = Modifier.fillMaxSize(),
@@ -251,7 +254,7 @@ private fun SummaryCardsRow(
             iconContainerColor = Emerald500.copy(alpha = 0.1f),
             iconTint = Emerald500,
             value = accessLogs.map { it.size.toString() },
-            label = "Akses Gate",
+            label = "Akses Gate\n24 Jam Terakhir",
             topRightText = "${
                 accessLogs.data?.let { logs ->
                     if (logs.isEmpty()) "~" 

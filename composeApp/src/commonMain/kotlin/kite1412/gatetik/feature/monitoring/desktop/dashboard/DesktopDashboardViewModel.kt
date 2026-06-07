@@ -46,8 +46,7 @@ class DesktopDashboardViewModel(
         private set
 
     init {
-        initTotalUsers()
-        initAccessLogs()
+        loadData()
     }
 
     fun openGate() {
@@ -88,11 +87,23 @@ class DesktopDashboardViewModel(
         }
     }
 
-    private fun initTotalUsers() {
+    fun refreshData() {
+        loadData()
+        viewModelScope.launch {
+            _uiEvent.emit(UiEvent.ShowSnackbar("Data diperbarui"))
+        }
+    }
+
+    private fun loadData() {
+        updateTotalUsers()
+        updateAccessLogs()
+    }
+
+    private fun updateTotalUsers() {
         viewModelScope.launch {
             userRepository.getAll()
                 .onSuccess {
-                    totalUsers = LoadState.Success(it.data.size)
+                    totalUsers = LoadState.Success(it.pagination.total)
                 }
                 .onError {
                     totalUsers = LoadState.Error("Gagal memuat informasi pengguna")
@@ -100,9 +111,14 @@ class DesktopDashboardViewModel(
         }
     }
 
-    private fun initAccessLogs() {
+    private fun updateAccessLogs() {
         viewModelScope.launch {
-            accessLogRepository.getAll()
+            accessLogRepository.getAll(
+                params = AccessLogRepository.GetParams(
+                    period = AccessLogRepository.LogPeriod.DAY,
+                    perPage = 100
+                )
+            )
                 .onSuccess {
                     accessLogs = LoadState.Success(it.data)
                 }

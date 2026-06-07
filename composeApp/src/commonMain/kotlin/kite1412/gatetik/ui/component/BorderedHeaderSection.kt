@@ -40,7 +40,8 @@ fun BorderedHeaderSection(
     onThemeToggle: (darkMode: Boolean) -> Unit,
     modifier: Modifier = Modifier,
     isDarkMode: Boolean = LocalDarkMode.current,
-    leading: (@Composable RowScope.() -> Unit)? = null
+    leading: (@Composable RowScope.() -> Unit)? = null,
+    actions: (@Composable RowScope.() -> Unit)? = null
 ) {
     val background by animateColorAsState(
         targetValue = if (isDarkMode) Slate900.copy(alpha = 0.2f) else White30
@@ -78,12 +79,18 @@ fun BorderedHeaderSection(
                 horizontalArrangement = Arrangement.spacedBy(16.dp)
             ) {
                 val isDarkMode = LocalDarkMode.current
-                ThemeToggle(
-                    onToggle = { onThemeToggle(!isDarkMode) },
-                    isDarkMode = isDarkMode,
-                    iconSize = 16.dp,
-                    clip = RoundedCornerShape(12.dp)
-                )
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    actions?.invoke(this)
+                    ThemeToggle(
+                        onToggle = { onThemeToggle(!isDarkMode) },
+                        isDarkMode = isDarkMode,
+                        iconSize = 16.dp,
+                        clip = RoundedCornerShape(12.dp)
+                    )
+                }
 
                 Badge(
                     text = badgeText.uppercase(),

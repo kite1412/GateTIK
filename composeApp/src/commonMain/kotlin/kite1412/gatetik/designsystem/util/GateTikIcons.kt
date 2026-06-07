@@ -31,6 +31,7 @@ import gatetik.composeapp.generated.resources.person
 import gatetik.composeapp.generated.resources.phone
 import gatetik.composeapp.generated.resources.phone_call
 import gatetik.composeapp.generated.resources.radio
+import gatetik.composeapp.generated.resources.rotate
 import gatetik.composeapp.generated.resources.scroll_text
 import gatetik.composeapp.generated.resources.search
 import gatetik.composeapp.generated.resources.settings
@@ -95,4 +96,5 @@ object GateTikIcons {
     val chevronLast = Res.drawable.chevron_last
     val download = Res.drawable.download
     val userX = Res.drawable.user_x
+    val rotate = Res.drawable.rotate
 }

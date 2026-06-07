@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
@@ -27,6 +28,7 @@ fun DesktopLayout(
     userRole: UserRole,
     onThemeToggle: (Boolean) -> Unit,
     modifier: Modifier = Modifier,
+    onRefreshClick: (() -> Unit)? = null,
     content: @Composable ColumnScope.() -> Unit
 ) {
     val scaffoldComponentsController = LocalScaffoldComponentsController.current
@@ -58,7 +60,30 @@ fun DesktopLayout(
                         )
                     }
                 }
-            }
+            },
+            actions = if (onRefreshClick != null) {
+                {
+                    val iconSize = 16.dp
+
+                    GlassBox(
+                        modifier = Modifier
+                            .size(iconSize * 2)
+                            .clip(CircleShape)
+                            .clickable(onClick = onRefreshClick),
+                        contentPadding = PaddingValues(0.dp),
+                        shape = CircleShape
+                    ) {
+                        Icon(
+                            painter = painterResource(GateTikIcons.rotate),
+                            contentDescription = "refresh",
+                            modifier = Modifier
+                                .align(Alignment.Center)
+                                .size(iconSize),
+                            tint = LocalContentColor.current
+                        )
+                    }
+                }
+            } else null
         )
         content()
     }

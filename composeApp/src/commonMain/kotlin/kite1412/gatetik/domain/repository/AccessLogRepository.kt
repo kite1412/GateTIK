@@ -23,7 +23,8 @@ interface AccessLogRepository {
         val search: String? = null,
         val page: Int? = null,
         val perPage: Int? = null,
-        val isDescending: Boolean = true
+        val isDescending: Boolean = true,
+        val period: LogPeriod? = null
     ) {
         fun toMap() = mutableMapOf<String, String>().apply {
             includeIfNotNull(
@@ -45,6 +46,11 @@ interface AccessLogRepository {
             includeIfNotNull("page", page?.toString())
             includeIfNotNull("per_page", perPage?.toString())
             includeIfNotNull("sort_order", if (isDescending) "desc" else "asc")
+            includeIfNotNull("period", period?.string)
         }
+    }
+
+    enum class LogPeriod(val string: String) {
+        DAY("24h"), WEEK("7d"), MONTH("30d")
     }
 }
