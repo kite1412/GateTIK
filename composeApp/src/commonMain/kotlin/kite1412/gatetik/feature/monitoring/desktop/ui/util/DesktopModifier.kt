@@ -1,4 +1,4 @@
-package kite1412.gatetik.feature.monitoring.desktop.util
+package kite1412.gatetik.feature.monitoring.desktop.ui.util
 
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable

@@ -1,4 +1,4 @@
-package kite1412.gatetik.feature.monitoring.desktop.component
+package kite1412.gatetik.feature.monitoring.desktop.ui.component
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement

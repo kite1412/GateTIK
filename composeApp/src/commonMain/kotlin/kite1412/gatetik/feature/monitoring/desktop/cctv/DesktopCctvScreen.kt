@@ -9,9 +9,9 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kite1412.gatetik.designsystem.theme.GateTikTheme
-import kite1412.gatetik.feature.monitoring.desktop.component.DesktopLayout
-import kite1412.gatetik.feature.monitoring.desktop.component.LiveCameraSection
-import kite1412.gatetik.feature.monitoring.desktop.util.desktopBaseModifier
+import kite1412.gatetik.feature.monitoring.desktop.ui.component.DesktopLayout
+import kite1412.gatetik.feature.monitoring.desktop.ui.component.LiveCameraSection
+import kite1412.gatetik.feature.monitoring.desktop.ui.util.desktopBaseModifier
 import kite1412.gatetik.ui.preview.DevicePreviews
 import org.koin.compose.viewmodel.koinViewModel
 

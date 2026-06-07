@@ -83,9 +83,9 @@ import kite1412.gatetik.designsystem.theme.Yellow500
 import kite1412.gatetik.designsystem.util.GateTikIcons
 import kite1412.gatetik.domain.model.UserCreate
 import kite1412.gatetik.domain.model.UserUpdate
-import kite1412.gatetik.feature.monitoring.desktop.component.DesktopLayout
+import kite1412.gatetik.feature.monitoring.desktop.ui.component.DesktopLayout
 import kite1412.gatetik.feature.monitoring.desktop.usermanagement.compositionlocal.LocalRemoteImageResolver
-import kite1412.gatetik.feature.monitoring.desktop.util.desktopBaseModifier
+import kite1412.gatetik.feature.monitoring.desktop.ui.util.desktopBaseModifier
 import kite1412.gatetik.model.User
 import kite1412.gatetik.model.UserRole
 import kite1412.gatetik.model.UserStatus

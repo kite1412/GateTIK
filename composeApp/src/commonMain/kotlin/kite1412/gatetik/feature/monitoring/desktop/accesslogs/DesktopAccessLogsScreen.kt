@@ -53,9 +53,9 @@ import kite1412.gatetik.designsystem.theme.Red500
 import kite1412.gatetik.designsystem.theme.Yellow500
 import kite1412.gatetik.designsystem.util.GateTikIcons
 import kite1412.gatetik.feature.monitoring.desktop.accesslogs.util.Sort
-import kite1412.gatetik.feature.monitoring.desktop.component.AccessLogTrend
-import kite1412.gatetik.feature.monitoring.desktop.component.DesktopLayout
-import kite1412.gatetik.feature.monitoring.desktop.util.desktopBaseModifier
+import kite1412.gatetik.feature.monitoring.desktop.ui.component.AccessLogTrend
+import kite1412.gatetik.feature.monitoring.desktop.ui.component.DesktopLayout
+import kite1412.gatetik.feature.monitoring.desktop.ui.util.desktopBaseModifier
 import kite1412.gatetik.model.AccessAction
 import kite1412.gatetik.model.AccessLog
 import kite1412.gatetik.model.AccessMethod

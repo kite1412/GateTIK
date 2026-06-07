@@ -18,8 +18,10 @@ import kite1412.gatetik.ui.util.LoadState
 import kite1412.gatetik.ui.util.UiEvent
 import kite1412.gatetik.ui.util.data
 import kite1412.gatetik.ui.util.stateIn
+import kite1412.gatetik.util.Result
 import kite1412.gatetik.util.onError
 import kite1412.gatetik.util.onSuccess
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.first
@@ -34,7 +36,10 @@ class DesktopDashboardViewModel(
     private val userRepository: UserRepository,
     private val accessLogRepository: AccessLogRepository,
     private val accessGateUseCase: AccessGateUseCase
-) : DesktopBaseViewModel(authentication, dataStore) {
+) : DesktopBaseViewModel(authentication, dataStore, onPolling = {
+    delay(5000L)
+    Result.Success(Unit)
+}) {
     private val _uiEvent = MutableSharedFlow<UiEvent>()
     val uiEvent = _uiEvent.asSharedFlow()
     val gate = getMainGateUseCase.observeAsLoadStateFlow().stateIn(viewModelScope)

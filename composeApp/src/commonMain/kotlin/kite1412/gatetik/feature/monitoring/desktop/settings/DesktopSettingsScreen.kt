@@ -46,8 +46,8 @@ import kite1412.gatetik.designsystem.theme.GateTikTheme
 import kite1412.gatetik.designsystem.theme.Gray200
 import kite1412.gatetik.designsystem.theme.Red600
 import kite1412.gatetik.designsystem.theme.Slate900
-import kite1412.gatetik.feature.monitoring.desktop.component.DesktopLayout
-import kite1412.gatetik.feature.monitoring.desktop.util.desktopBaseModifier
+import kite1412.gatetik.feature.monitoring.desktop.ui.component.DesktopLayout
+import kite1412.gatetik.feature.monitoring.desktop.ui.util.desktopBaseModifier
 import kite1412.gatetik.model.UserRole
 import kite1412.gatetik.ui.compositionlocal.LocalDarkMode
 import kite1412.gatetik.ui.compositionlocal.LocalScaffoldComponentsController
