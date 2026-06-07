@@ -22,7 +22,8 @@ interface AccessLogRepository {
         val action: AccessAction? = null,
         val search: String? = null,
         val page: Int? = null,
-        val perPage: Int? = null
+        val perPage: Int? = null,
+        val isDescending: Boolean = true
     ) {
         fun toMap() = mutableMapOf<String, String>().apply {
             includeIfNotNull(
@@ -43,6 +44,7 @@ interface AccessLogRepository {
             )
             includeIfNotNull("page", page?.toString())
             includeIfNotNull("per_page", perPage?.toString())
+            includeIfNotNull("sort_order", if (isDescending) "desc" else "asc")
         }
     }
 }

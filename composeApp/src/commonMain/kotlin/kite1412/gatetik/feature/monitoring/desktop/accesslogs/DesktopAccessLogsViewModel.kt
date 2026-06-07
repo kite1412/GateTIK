@@ -31,6 +31,7 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -41,6 +42,7 @@ class DesktopAccessLogsViewModel(
     private val accessLogRepository: AccessLogRepository
 ) : DesktopBaseViewModel(authentication, dataStore) {
     private val logStore = mutableStateMapOf<AccessLogRepository.GetParams, PaginatedListResult<AccessLog>>()
+    private var trendAccessLogStore: List<AccessLog> = emptyList()
     private val _uiEvent = MutableSharedFlow<UiEvent>()
     val uiEvent = _uiEvent.asSharedFlow()
 
@@ -62,6 +64,8 @@ class DesktopAccessLogsViewModel(
         private set
     var accessLogs by mutableStateOf<LoadState<List<AccessLog>>>(LoadState.Loading("Memuat log akses"))
         private set
+    var trendAccessLogs by mutableStateOf<LoadState<List<AccessLog>>>(LoadState.Loading("Memuat log akses"))
+        private set
 
     private val params = snapshotFlow {
         AccessLogRepository.GetParams(
@@ -70,7 +74,8 @@ class DesktopAccessLogsViewModel(
             action = selectedActionFilter,
             search = searchText,
             page = currentPage,
-            perPage = perPage
+            perPage = perPage,
+            isDescending = selectedSort == Sort.DESC
         )
     }
         .distinctUntilChanged()
@@ -93,28 +98,34 @@ class DesktopAccessLogsViewModel(
             initialValue = null
         )
 
-    val trendAccessLogs = snapshotFlow {
-        val logs = logStore[
-            AccessLogRepository.GetParams(
-                page = currentPage,
-                perPage = perPage
+    init {
+        viewModelScope.launch {
+            accessLogRepository.getAll(
+                params = AccessLogRepository.GetParams(
+                    page = 1,
+                    perPage = 100,
+                    isDescending = true
+                )
             )
-        ]?.data
-        val filter = selectedTrendStatusFilter
+                .onSuccess {
+                    trendAccessLogStore = it.data
+                    trendAccessLogs = LoadState.Success(it.data)
+                }
+                .onError {
+                    trendAccessLogs = LoadState.Error("Gagal memuat log akses")
+                }
 
-        logs?.let {
-            LoadState.Success(
-                filter?.let { status ->
-                    it.filter { log -> log.status == status }
-                } ?: it
-            )
-        } ?: LoadState.Loading("Memuat log akses")
+            snapshotFlow { selectedTrendStatusFilter }
+                .onEach { status ->
+                    trendAccessLogs = LoadState.Success(
+                        if (status != null) trendAccessLogStore.filter { log ->
+                            log.status == status
+                        } else trendAccessLogStore
+                    )
+                }
+                .launchIn(this)
+        }
     }
-        .stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5000),
-            initialValue = LoadState.Loading("Memuat log akses")
-        )
 
     fun updateSearchText(text: String) {
         searchText = text

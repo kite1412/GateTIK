@@ -49,17 +49,22 @@ import kite1412.gatetik.ui.util.data
 import kite1412.gatetik.util.now
 import kite1412.gatetik.util.toLocalDateTime
 import kotlinx.coroutines.runBlocking
+import kotlinx.datetime.DateTimeUnit
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.minus
 import kotlin.math.roundToInt
 
 private val StartAxisValueFormatter = CartesianValueFormatter { _, value, _ ->
     value.roundToInt().toString()
 }
 
-private val BottomAxisLabelKey = ExtraStore.Key<List<String>>()
+private val BottomAxisLabelKey = ExtraStore.Key<List<AccessLogTrend>>()
 
 private val BottomAxisValueFormatter = CartesianValueFormatter { context, value, _ ->
     val labels = context.model.extraStore[BottomAxisLabelKey]
-    labels[value.toInt()]
+    labels[value.toInt()].run {
+        (if (isYesterday) "Kemarin, " else "") + hour
+    }
 }
 
 @Composable
@@ -77,7 +82,7 @@ fun AccessLogTrend(
         }
     }
     AccessLogTrend(
-        totalLogGroups = trends?.size ?: 0,
+        totalLogGroups = trends?.distinctBy { it.count }?.size ?: 0,
         trends = trends,
         accessLogs = accessLogs,
         modelProducer = modelProducer,
@@ -169,6 +174,7 @@ private fun AccessLogTrend(
 }
 
 data class AccessLogTrend(
+    val isYesterday: Boolean,
     val hour: String,
     val count: Int
 )
@@ -182,7 +188,9 @@ private fun Chart(
     val labelStyle = MaterialTheme.typography.bodySmall
     val axisLabelComponent = rememberAxisLabelComponent(
         style = labelStyle.copy(
-            color = LocalContentColor.current
+            color = LocalContentColor.current,
+            fontSize = 10.sp,
+            fontWeight = FontWeight.Bold
         )
     )
 
@@ -205,10 +213,7 @@ private fun Chart(
                 valueFormatter = StartAxisValueFormatter,
                 itemPlacer = remember {
                     count(
-                        count = {
-                            if (totalLogGroups == 1) totalLogGroups + 1
-                            else totalLogGroups
-                        }
+                        count = { totalLogGroups + 1 }
                     )
                 },
                 label = axisLabelComponent
@@ -230,29 +235,39 @@ private suspend fun CartesianChartModelProducer.runTransaction(trends: List<Acce
             series(trends.map { it.count })
         }
         extras {
-            it[BottomAxisLabelKey] = trends.map { trend ->
-                trend.hour
-            }
+            it[BottomAxisLabelKey] = trends
         }
     }
 }
 
 private fun List<AccessLog>.toTrends(): List<AccessLogTrend> {
-    val today = now().toLocalDateTime().date
+    val now = now()
+    val nowDate = now.toLocalDateTime().date
 
-    return filter {
-        it.createdAt.toLocalDateTime().date == today
-    }
+    val last24Hours = now.minus(
+        value = 24,
+        unit = DateTimeUnit.HOUR,
+        timeZone = TimeZone.currentSystemDefault()
+    )
+
+    return filter { it.createdAt >= last24Hours }
         .groupBy {
-            it.createdAt.toLocalDateTime().time.hour
+            val dateTime = it.createdAt.toLocalDateTime()
+            dateTime.date to dateTime.hour
         }
-        .map { (hour, accessLogs) ->
+        .map { (key, accessLogs) ->
+            val (date, hour) = key
+
             AccessLogTrend(
-                hour = "$hour:00",
+                isYesterday = date < nowDate,
+                hour = "%02d:00".format(hour),
                 count = accessLogs.size
             )
         }
-        .sortedBy { it.hour }
+        .sortedWith(
+            compareByDescending<AccessLogTrend> { it.isYesterday }
+                .thenBy { it.hour }
+        )
 }
 
 @PreviewDesktopDark

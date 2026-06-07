@@ -81,7 +81,6 @@ fun DesktopAccessLogsScreen(
 ) {
     val user by viewModel.signedInUser.collectAsStateWithLifecycle()
     val pagination by viewModel.pagination.collectAsStateWithLifecycle()
-    val trendAccessLogs by viewModel.trendAccessLogs.collectAsStateWithLifecycle()
     val accessLogs = viewModel.accessLogs
     val csvExporter = LocalCsvExporter.current
     val snackbarHostStateWrapper = LocalSnackbarHostStateWrapper.current
@@ -96,7 +95,7 @@ fun DesktopAccessLogsScreen(
         DesktopAccessLogsScreen(
             userRole = user.role,
             tableAccessLogs = accessLogs,
-            trendAccessLogs = trendAccessLogs,
+            trendAccessLogs = viewModel.trendAccessLogs,
             statusFilter = viewModel.selectedStatusFilter,
             trendStatusFilter = viewModel.selectedTrendStatusFilter,
             methodFilter = viewModel.selectedMethodFilter,
