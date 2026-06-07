@@ -85,12 +85,12 @@ import kite1412.gatetik.domain.model.UserCreate
 import kite1412.gatetik.domain.model.UserUpdate
 import kite1412.gatetik.feature.monitoring.desktop.component.DesktopLayout
 import kite1412.gatetik.feature.monitoring.desktop.usermanagement.compositionlocal.LocalRemoteImageResolver
-import kite1412.gatetik.feature.monitoring.desktop.usermanagement.compositionlocal.rememberRemoteImageLoader
 import kite1412.gatetik.feature.monitoring.desktop.util.desktopBaseModifier
 import kite1412.gatetik.model.User
 import kite1412.gatetik.model.UserRole
 import kite1412.gatetik.model.UserStatus
 import kite1412.gatetik.network.mock.mockUser
+import kite1412.gatetik.rememberRemoteImageLoader
 import kite1412.gatetik.ui.component.ActionIconButton
 import kite1412.gatetik.ui.compositionlocal.LocalDarkMode
 import kite1412.gatetik.ui.compositionlocal.LocalScaffoldComponentsController
@@ -880,7 +880,7 @@ private fun UserDetailDialog(
 
                                 LaunchedEffect(Unit) {
                                     if (imageBitmap == null)
-                                        imageBitmap = remoteImageLoader.resolveWith(remoteImageResolver)
+                                        imageBitmap = remoteImageLoader.loadWith(remoteImageResolver)
                                 }
                                 imageBitmap?.let { imageBitmap ->
                                     Box {
