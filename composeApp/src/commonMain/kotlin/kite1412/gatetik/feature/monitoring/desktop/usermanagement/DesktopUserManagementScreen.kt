@@ -36,6 +36,7 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.retain.retain
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -84,8 +85,9 @@ import kite1412.gatetik.designsystem.util.GateTikIcons
 import kite1412.gatetik.domain.model.UserCreate
 import kite1412.gatetik.domain.model.UserUpdate
 import kite1412.gatetik.feature.monitoring.desktop.ui.component.DesktopLayout
-import kite1412.gatetik.feature.monitoring.desktop.usermanagement.compositionlocal.LocalRemoteImageResolver
+import kite1412.gatetik.feature.monitoring.desktop.ui.util.SideNotificationManager
 import kite1412.gatetik.feature.monitoring.desktop.ui.util.desktopBaseModifier
+import kite1412.gatetik.feature.monitoring.desktop.usermanagement.compositionlocal.LocalRemoteImageResolver
 import kite1412.gatetik.model.User
 import kite1412.gatetik.model.UserRole
 import kite1412.gatetik.model.UserStatus
@@ -131,6 +133,7 @@ fun DesktopUserManagementScreen(
                 currentPage = pagination?.currentPage ?: 1,
                 totalPages = pagination?.lastPage ?: 1,
                 itemsPerPage = pagination?.perPage ?: viewModel.perPage,
+                sideNotificationManager = viewModel.sideNotificationManager,
                 contentPadding = contentPadding,
                 onSearchTextChange = viewModel::onSearchTextChange,
                 selectedRole = viewModel.selectedRole,
@@ -159,6 +162,7 @@ private fun DesktopUserManagementScreen(
     currentPage: Int,
     totalPages: Int,
     itemsPerPage: Int,
+    sideNotificationManager: SideNotificationManager,
     contentPadding: PaddingValues,
     onSearchTextChange: (String) -> Unit,
     selectedRole: UserRole?,
@@ -198,7 +202,8 @@ private fun DesktopUserManagementScreen(
         userRole = userRole,
         onThemeToggle = onThemeToggle,
         modifier = modifier.desktopBaseModifier(),
-        onRefreshClick = onRefreshClick
+        onRefreshClick = onRefreshClick,
+        sideNotificationManager = sideNotificationManager
     ) {
         Column(
             modifier = Modifier.padding(
@@ -997,6 +1002,7 @@ private fun DesktopUserManagementScreenPreview() {
                 DesktopUserManagementScreen(
                     userRole = UserRole.ADMIN,
                     users = LoadState.Success(listOf(mockUser, mockUser)),
+                    sideNotificationManager = SideNotificationManager(rememberCoroutineScope()),
                     contentPadding = p,
                     onSearchTextChange = {},
                     selectedRole = null,

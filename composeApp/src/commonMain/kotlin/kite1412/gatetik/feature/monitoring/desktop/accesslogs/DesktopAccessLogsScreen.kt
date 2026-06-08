@@ -24,6 +24,7 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.retain.retain
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -55,6 +56,7 @@ import kite1412.gatetik.designsystem.util.GateTikIcons
 import kite1412.gatetik.feature.monitoring.desktop.accesslogs.util.Sort
 import kite1412.gatetik.feature.monitoring.desktop.ui.component.AccessLogTrend
 import kite1412.gatetik.feature.monitoring.desktop.ui.component.DesktopLayout
+import kite1412.gatetik.feature.monitoring.desktop.ui.util.SideNotificationManager
 import kite1412.gatetik.feature.monitoring.desktop.ui.util.desktopBaseModifier
 import kite1412.gatetik.model.AccessAction
 import kite1412.gatetik.model.AccessLog
@@ -104,6 +106,7 @@ fun DesktopAccessLogsScreen(
             currentPage = pagination?.currentPage ?: viewModel.currentPage,
             totalPages = pagination?.lastPage ?: 1,
             itemsPerPage = pagination?.perPage ?: viewModel.perPage,
+            sideNotificationManager = viewModel.sideNotificationManager,
             contentPadding = contentPadding,
             onPageChange = viewModel::updateCurrentPage,
             onSearchTextChange = viewModel::updateSearchText,
@@ -136,6 +139,7 @@ private fun DesktopAccessLogsScreen(
     currentPage: Int,
     totalPages: Int,
     itemsPerPage: Int,
+    sideNotificationManager: SideNotificationManager,
     contentPadding: PaddingValues,
     onStatusFilterChange: (AccessStatus?) -> Unit,
     onTrendStatusFilterChange: (AccessStatus?) -> Unit,
@@ -155,7 +159,8 @@ private fun DesktopAccessLogsScreen(
         userRole = userRole,
         onThemeToggle = onThemeToggle,
         modifier = modifier.desktopBaseModifier(),
-        onRefreshClick = onRefreshClick
+        onRefreshClick = onRefreshClick,
+        sideNotificationManager = sideNotificationManager
     ) {
         LazyColumn(
             modifier = Modifier.fillMaxSize(),
@@ -481,6 +486,7 @@ private fun DesktopAccessLogsScreenPreview() {
                     onSearchTextChange = {},
                     statusFilter = null,
                     trendStatusFilter = null,
+                    sideNotificationManager = SideNotificationManager(rememberCoroutineScope()),
                     onStatusFilterChange = {},
                     onTrendStatusFilterChange = {},
                     methodFilter = null,

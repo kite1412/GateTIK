@@ -14,6 +14,7 @@ import kite1412.gatetik.domain.model.UserCreate
 import kite1412.gatetik.domain.model.UserUpdate
 import kite1412.gatetik.domain.repository.UserRepository
 import kite1412.gatetik.feature.monitoring.desktop.DesktopBaseViewModel
+import kite1412.gatetik.feature.monitoring.desktop.PollingResult
 import kite1412.gatetik.feature.monitoring.desktop.usermanagement.compositionlocal.RemoteImageResolver
 import kite1412.gatetik.model.User
 import kite1412.gatetik.model.UserRole
@@ -115,15 +116,23 @@ class DesktopUserManagementViewModel(
         this.currentPage = page
     }
 
+    init {
+        initPolling(::pollData)
+    }
+
+    suspend fun pollData() = params.first()?.let { params ->
+        updateUsersOnParamsChange(
+            params = params,
+            useCached = false,
+            restartState = false
+        )
+        PollingResult.Success
+    } ?: PollingResult.Error("Gagal memperbarui data pengguna")
+
     fun refreshUsers() {
         viewModelScope.launch {
-            params.first()?.let { params ->
-                updateUsersOnParamsChange(
-                    params = params,
-                    useCached = false
-                )
-                showSnackbar("Data dimuat ulang")
-            }
+            pollData()
+            showSnackbar("Data dimuat ulang")
         }
     }
 
@@ -247,11 +256,15 @@ class DesktopUserManagementViewModel(
             }
     }
 
-    private suspend fun updateUsersOnParamsChange(params: UserRepository.GetParams, useCached: Boolean = true) {
+    private suspend fun updateUsersOnParamsChange(
+        params: UserRepository.GetParams,
+        useCached: Boolean = true,
+        restartState: Boolean = true
+    ) {
         if (userStore[params] != null && useCached)
             users = LoadState.Success(userStore[params]!!.data)
         else {
-            users = LoadState.Loading("Memuat daftar pengguna")
+            if (restartState) users = LoadState.Loading("Memuat daftar pengguna")
             userRepository.getAll(params)
                 .onSuccess {
                     val sorted = it.data

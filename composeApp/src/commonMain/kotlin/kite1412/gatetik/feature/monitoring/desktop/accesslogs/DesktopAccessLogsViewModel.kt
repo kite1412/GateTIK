@@ -14,6 +14,7 @@ import kite1412.gatetik.domain.Authentication
 import kite1412.gatetik.domain.model.PaginatedListResult
 import kite1412.gatetik.domain.repository.AccessLogRepository
 import kite1412.gatetik.feature.monitoring.desktop.DesktopBaseViewModel
+import kite1412.gatetik.feature.monitoring.desktop.PollingResult
 import kite1412.gatetik.feature.monitoring.desktop.accesslogs.util.Sort
 import kite1412.gatetik.feature.monitoring.desktop.accesslogs.util.writeToCsv
 import kite1412.gatetik.model.AccessAction
@@ -112,6 +113,8 @@ class DesktopAccessLogsViewModel(
                     )
                 }
                 .launchIn(this)
+
+            initPolling(::pollData)
         }
     }
 
@@ -148,18 +151,22 @@ class DesktopAccessLogsViewModel(
         updateCurrentPage(1)
     }
 
+    suspend fun pollData() = params.first()?.let { params ->
+        updateLogsOnParamsChange(
+            params = params,
+            useCached = false,
+            restartState = false
+        )
+        updateTrendLogs()
+        PollingResult.Success
+    } ?: PollingResult.Error("Gagal memperbarui data log akses")
+
     fun refreshAccessLogs() {
         viewModelScope.launch {
-            params.first()?.let { params ->
-                updateLogsOnParamsChange(
-                    params = params,
-                    useCached = false
-                )
-                updateTrendLogs()
-                _uiEvent.emit(
-                    UiEvent.ShowSnackbar("Data dimuat ulang")
-                )
-            }
+            pollData()
+            _uiEvent.emit(
+                UiEvent.ShowSnackbar("Data dimuat ulang")
+            )
         }
     }
 
@@ -213,11 +220,15 @@ class DesktopAccessLogsViewModel(
             }
     }
 
-    private suspend fun updateLogsOnParamsChange(params: AccessLogRepository.GetParams, useCached: Boolean = true) {
+    private suspend fun updateLogsOnParamsChange(
+        params: AccessLogRepository.GetParams,
+        useCached: Boolean = true,
+        restartState: Boolean = true
+    ) {
         if (logStore[params] != null && useCached)
             accessLogs = LoadState.Success(logStore[params]!!.data)
         else {
-            accessLogs = LoadState.Loading("Memuat log akses")
+            if (restartState) accessLogs = LoadState.Loading("Memuat log akses")
             accessLogRepository.getAll(params)
                 .onSuccess {
                     val logs = it.data
