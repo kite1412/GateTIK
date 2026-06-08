@@ -13,15 +13,14 @@ import kite1412.gatetik.domain.usecase.GetMainCctvUseCase
 import kite1412.gatetik.domain.usecase.GetMainGateUseCase
 import kite1412.gatetik.domain.usecase.GetMainParkingQuotaUseCase
 import kite1412.gatetik.feature.monitoring.desktop.DesktopBaseViewModel
+import kite1412.gatetik.feature.monitoring.desktop.PollingResult
 import kite1412.gatetik.model.AccessLog
 import kite1412.gatetik.ui.util.LoadState
 import kite1412.gatetik.ui.util.UiEvent
 import kite1412.gatetik.ui.util.data
 import kite1412.gatetik.ui.util.stateIn
-import kite1412.gatetik.util.Result
 import kite1412.gatetik.util.onError
 import kite1412.gatetik.util.onSuccess
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.first
@@ -36,10 +35,7 @@ class DesktopDashboardViewModel(
     private val userRepository: UserRepository,
     private val accessLogRepository: AccessLogRepository,
     private val accessGateUseCase: AccessGateUseCase
-) : DesktopBaseViewModel(authentication, dataStore, onPolling = {
-    delay(5000L)
-    Result.Success(Unit)
-}) {
+) : DesktopBaseViewModel(authentication, dataStore) {
     private val _uiEvent = MutableSharedFlow<UiEvent>()
     val uiEvent = _uiEvent.asSharedFlow()
     val gate = getMainGateUseCase.observeAsLoadStateFlow().stateIn(viewModelScope)
@@ -51,7 +47,10 @@ class DesktopDashboardViewModel(
         private set
 
     init {
-        loadData()
+        viewModelScope.launch {
+            pollData()
+        }
+        initPolling(::pollData)
     }
 
     fun openGate() {
@@ -93,43 +92,37 @@ class DesktopDashboardViewModel(
     }
 
     fun refreshData() {
-        loadData()
         viewModelScope.launch {
+            pollData()
             _uiEvent.emit(UiEvent.ShowSnackbar("Data dimuat ulang"))
         }
     }
 
-    private fun loadData() {
-        updateTotalUsers()
-        updateAccessLogs()
-    }
+    private suspend fun pollData() = listOf(
+        updateTotalUsers().toPollingResult("Gagal memperbarui data pengguna"),
+        updateAccessLogs().toPollingResult("Gagal memperbarui data akses log")
+    )
+        .firstOrNull { it is PollingResult.Error }
+        ?: PollingResult.Success
 
-    private fun updateTotalUsers() {
-        viewModelScope.launch {
-            userRepository.getAll()
-                .onSuccess {
-                    totalUsers = LoadState.Success(it.pagination.total)
-                }
-                .onError {
-                    totalUsers = LoadState.Error("Gagal memuat informasi pengguna")
-                }
+    private suspend fun updateTotalUsers() = userRepository.getAll()
+        .onSuccess {
+            totalUsers = LoadState.Success(it.pagination.total)
         }
-    }
+        .onError {
+            totalUsers = LoadState.Error("Gagal memuat informasi pengguna")
+        }
 
-    private fun updateAccessLogs() {
-        viewModelScope.launch {
-            accessLogRepository.getAll(
-                params = AccessLogRepository.GetParams(
-                    period = AccessLogRepository.LogPeriod.DAY,
-                    perPage = 100
-                )
-            )
-                .onSuccess {
-                    accessLogs = LoadState.Success(it.data)
-                }
-                .onError {
-                    accessLogs = LoadState.Error("Gagal memuat log akses")
-                }
+    private suspend fun updateAccessLogs() = accessLogRepository.getAll(
+        params = AccessLogRepository.GetParams(
+            period = AccessLogRepository.LogPeriod.DAY,
+            perPage = 100
+        )
+    )
+        .onSuccess {
+            accessLogs = LoadState.Success(it.data)
         }
-    }
+        .onError {
+            accessLogs = LoadState.Error("Gagal memuat log akses")
+        }
 }
