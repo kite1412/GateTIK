@@ -23,8 +23,8 @@ import kotlinx.coroutines.launch
 class DesktopParkingViewModel(
     authentication: Authentication,
     dataStore: GateTikDataStore,
-    private val getMainParkingQuotaUseCase: GetMainParkingQuotaUseCase,
     getMainGateUseCase: GetMainGateUseCase,
+    private val getMainParkingQuotaUseCase: GetMainParkingQuotaUseCase,
     private val updateMainGateUseCase: UpdateMainGateUseCase,
     private val updateMainParkingQuotaUseCase: UpdateMainParkingQuotaUseCase
 ) : DesktopBaseViewModel(authentication, dataStore) {
@@ -33,11 +33,13 @@ class DesktopParkingViewModel(
     val mainParkingQuota = getMainParkingQuotaUseCase.observeAsLoadStateFlow().stateIn(viewModelScope)
     val mainGate = getMainGateUseCase.observeAsLoadStateFlow().stateIn(viewModelScope)
 
+    init {
+        initPolling(::pollData)
+    }
+
     fun refreshParkingQuota() {
         viewModelScope.launch {
-            getMainParkingQuotaUseCase
-                .observeAsLoadStateFlow()
-                .first()
+            pollData()
             _uiEvent.emit(
                 UiEvent.ShowSnackbar("Data dimuat ulang")
             )
@@ -82,6 +84,12 @@ class DesktopParkingViewModel(
             }
         }
     }
+
+    private suspend fun pollData() =
+        getMainParkingQuotaUseCase
+            .observeAsResultFlow()
+            .first { it !is Result.Loading }
+            .toPollingResult("Gagal memperbarui data parkir")
 
     private suspend fun <T, E : Error> update(
         newValue: T,

@@ -1,6 +1,7 @@
 package kite1412.gatetik.domain.usecase
 
 import kite1412.gatetik.domain.repository.ParkingQuotaRepository
+import kite1412.gatetik.domain.repository.ParkingQuotaResult
 import kite1412.gatetik.model.ParkingQuota
 import kite1412.gatetik.ui.util.LoadState
 import kite1412.gatetik.util.Result
@@ -9,6 +10,9 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.mapLatest
 
 class GetMainParkingQuotaUseCase(private val parkingQuotaRepository: ParkingQuotaRepository) {
+    fun observeAsResultFlow(): Flow<ParkingQuotaResult<ParkingQuota?>> = parkingQuotaRepository
+        .observeMainParkingQuota()
+
     @OptIn(ExperimentalCoroutinesApi::class)
     fun observeAsLoadStateFlow(): Flow<LoadState<ParkingQuota?>> = parkingQuotaRepository
         .observeMainParkingQuota()

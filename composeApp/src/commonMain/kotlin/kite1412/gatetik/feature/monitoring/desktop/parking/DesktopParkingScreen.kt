@@ -38,6 +38,7 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.retain.retain
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -68,6 +69,7 @@ import kite1412.gatetik.designsystem.util.GateTikIcons
 import kite1412.gatetik.designsystem.util.WindowWidthSize
 import kite1412.gatetik.designsystem.util.rememberWindowWidthSize
 import kite1412.gatetik.feature.monitoring.desktop.ui.component.DesktopLayout
+import kite1412.gatetik.feature.monitoring.desktop.ui.util.SideNotificationManager
 import kite1412.gatetik.feature.monitoring.desktop.ui.util.desktopBaseModifier
 import kite1412.gatetik.model.ParkingQuota
 import kite1412.gatetik.model.UserRole
@@ -108,6 +110,7 @@ fun DesktopParkingScreen(
             userRole = user.role,
             parkingQuota = mainParkingQuota,
             allowedRadiusMeter = mainGate.data?.allowedRadiusMeter ?: 0,
+            sideNotificationManager = viewModel.sideNotificationManager,
             contentPadding = contentPadding,
             onThemeToggle = viewModel::updateDarkMode,
             onSaveParkingCapacity = viewModel::updateParkingCapacity,
@@ -124,6 +127,7 @@ private fun DesktopParkingScreen(
     userRole: UserRole,
     parkingQuota: LoadState<ParkingQuota?>,
     allowedRadiusMeter: Int,
+    sideNotificationManager: SideNotificationManager,
     contentPadding: PaddingValues,
     onThemeToggle: (Boolean) -> Unit,
     onSaveParkingCapacity: (Int) -> Unit,
@@ -139,7 +143,8 @@ private fun DesktopParkingScreen(
         userRole = userRole,
         onThemeToggle = onThemeToggle,
         modifier = modifier.desktopBaseModifier(),
-        onRefreshClick = onRefreshClick
+        onRefreshClick = onRefreshClick,
+        sideNotificationManager = sideNotificationManager
     ) {
         Box(
             modifier = Modifier.fillMaxSize(),
@@ -613,6 +618,7 @@ private fun DesktopParkingScreenPreview() {
                     userRole = mockUser.role,
                     parkingQuota = LoadState.Success(mockParkingQuota),
                     allowedRadiusMeter = 50,
+                    sideNotificationManager = SideNotificationManager(rememberCoroutineScope()),
                     contentPadding = p,
                     onThemeToggle = {},
                     onSaveParkingCapacity = {},
