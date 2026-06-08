@@ -15,6 +15,8 @@ kotlin {
         freeCompilerArgs.add("-Xexpect-actual-classes")
     }
 
+    jvmToolchain(21)
+
     androidLibrary {
         namespace = "kite1412.gatetik"
         minSdk = libs.versions.android.minSdk.get().toInt()
@@ -83,13 +85,19 @@ compose.desktop {
     application {
         mainClass = "kite1412.gatetik.MainKt"
 
+        buildTypes.release.proguard {
+            isEnabled.set(false)
+        }
+
         jvmArgs(
             "-Dapple.awt.application.appearance=system"
         )
 
         nativeDistributions {
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
-            packageName = "kite1412.gatetik"
+            modules("jdk.unsupported")
+
+            packageName = "Gate TIK"
             packageVersion = "1.0.0"
 
             macOS {

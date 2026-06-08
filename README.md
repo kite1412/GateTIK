@@ -60,7 +60,7 @@ VERSION=<Application Version>
 7. In project's root directory, run the following command:
 
     ```bash
-    adb install composeApp/release/composeApp-release.apk
+    adb install androidApp/release/androidApp-release.apk
     ```
 
 ### 🖥️ Desktop
