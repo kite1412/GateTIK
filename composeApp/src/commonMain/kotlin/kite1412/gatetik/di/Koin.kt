@@ -19,7 +19,6 @@ import kite1412.gatetik.feature.shared.authentication.AuthenticationViewModel
 import kite1412.gatetik.feature.shared.profile.ProfileViewModel
 import kite1412.gatetik.feature.student.gateaccess.GateAccessViewModel
 import kite1412.gatetik.network.backend.backendModule
-import kite1412.gatetik.network.mock.mockRemoteModule
 import kite1412.gatetik.platformModule
 import org.koin.core.KoinApplication
 import org.koin.core.context.startKoin
@@ -146,7 +145,6 @@ private val appModule = platformModule +
         dataStoreModule +
         domainModule +
         viewModelModule +
-        mockRemoteModule +
         dataModule +
         backendModule +
         commonModule
