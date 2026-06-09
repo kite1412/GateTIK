@@ -64,7 +64,7 @@ VERSION=<Application Version>
 
 ### 🖥️ Desktop
 #### 🔹 Requirements
-- Android Studio / IntelliJ IDEA.
+- JDK 21
 
 #### 🔹 Launch from Gradle
 1. Clone the repository
@@ -84,3 +84,38 @@ VERSION=<Application Version>
    ```bash
    gradlew.bat :composeApp:run
    ```
+
+#### 🔹 Release Package
+1. Clone the repository
+
+    ```bash
+    git clone https://github.com/kite1412/GateTIK.git
+    ```
+2. Ensure Gradle is using JDK 21 by checking the JVM used by the Gradle Daemon:
+
+   ```bash
+   ./gradlew --version
+   ```
+   
+   or specifically define the JDK installation path in `<project root>/gradle.properties`:
+
+   ```properties
+   org.gradle.java.home=<path to JDK 21>
+   ```
+3. Depending on the platform used for building the release package:
+
+   **macOS**
+   ```bash
+   ./gradlew packageReleaseDmg
+   ```
+
+   **Linux**
+   ```bash
+   ./gradlew packageReleaseDeb
+   ```
+
+   **Windows**
+   ```bash
+   ./gradlew packageReleaseMsi
+   ```
+4. Install the application using the generated installer located in `composeApp/build/compose/binaries/main-release/<installer type>`
