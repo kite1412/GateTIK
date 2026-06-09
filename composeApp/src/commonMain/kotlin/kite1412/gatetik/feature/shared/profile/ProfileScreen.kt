@@ -12,6 +12,8 @@ import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.calculateEndPadding
+import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -41,6 +43,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.withStyle
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kite1412.gatetik.designsystem.component.GlassBox
@@ -94,25 +97,40 @@ fun ProfileScreen(
 }
 
 @Composable
-private fun ProfileScreen(
+fun ProfileScreen(
     userLoadState: LoadState<User>,
     useDefaultHeader: Boolean,
     contentPadding: PaddingValues,
     onDarkModeToggle: (Boolean) -> Unit,
     onLogout: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    consumeNavBarSize: Boolean = true,
+    applyContentPaddingOnScrollableContainer: Boolean = false
 ) {
     val windowSize = rememberWindowWidthSize()
     val darkMode = LocalDarkMode.current
 
     Box(
-        modifier = modifier.fillMaxSize()
+        modifier = modifier
+            .fillMaxSize()
+            .run {
+                if (!applyContentPaddingOnScrollableContainer) padding(contentPadding)
+                else this
+            }
     ) {
         LazyColumn(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(contentPadding),
-            contentPadding = navBarPadding(),
+            modifier = Modifier.fillMaxSize(),
+            contentPadding = with(if (consumeNavBarSize) navBarPadding() else PaddingValues(0.dp)) {
+                if (!applyContentPaddingOnScrollableContainer) this
+                else PaddingValues(
+                    start = calculateStartPadding(LayoutDirection.Ltr) +
+                        contentPadding.calculateStartPadding(LayoutDirection.Ltr),
+                    end = calculateEndPadding(LayoutDirection.Ltr) +
+                        contentPadding.calculateEndPadding(LayoutDirection.Ltr),
+                    top = calculateTopPadding() + contentPadding.calculateTopPadding(),
+                    bottom = calculateBottomPadding() + contentPadding.calculateBottomPadding()
+                )
+            },
             verticalArrangement = Arrangement.spacedBy(24.dp)
         ) {
             if (useDefaultHeader) item {
@@ -376,10 +394,12 @@ private fun ChangePasswordSection() {
     var currentPassword by remember { mutableStateOf("") }
     var newPassword by remember { mutableStateOf("") }
     var confirmPassword by remember { mutableStateOf("") }
-
     var currentPasswordVisible by remember { mutableStateOf(false) }
     var newPasswordVisible by remember { mutableStateOf(false) }
     var confirmPasswordVisible by remember { mutableStateOf(false) }
+    val enabled = currentPassword.isNotBlank() &&
+            newPassword.length >= 8 &&
+            newPassword == confirmPassword
 
     ProfileSection(
         title = "Ubah Kata Sandi",
@@ -441,13 +461,11 @@ private fun ChangePasswordSection() {
                     Icon(
                         painter = painterResource(GateTikIcons.lock),
                         contentDescription = null,
-                        tint = Color.White,
+                        tint = if (enabled) Color.White else Gray400.copy(alpha = 0.6f),
                         modifier = Modifier.size(20.dp)
                     )
                 },
-                enabled = currentPassword.isNotBlank() &&
-                        newPassword.length >= 8 &&
-                        newPassword == confirmPassword
+                enabled = enabled
             )
         }
     }

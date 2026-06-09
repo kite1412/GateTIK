@@ -13,6 +13,7 @@ import kite1412.gatetik.feature.monitoring.desktop.accesslogs.desktopAccessLogsS
 import kite1412.gatetik.feature.monitoring.desktop.cctv.desktopCctvScreen
 import kite1412.gatetik.feature.monitoring.desktop.dashboard.desktopDashboardScreen
 import kite1412.gatetik.feature.monitoring.desktop.parking.desktopParkingScreen
+import kite1412.gatetik.feature.monitoring.desktop.profile.desktopProfileScreen
 import kite1412.gatetik.feature.monitoring.desktop.settings.desktopSettingsScreen
 import kite1412.gatetik.feature.monitoring.desktop.usermanagement.desktopUserManagementScreen
 import kite1412.gatetik.feature.monitoring.mobile.cctv.mobileCctvScreen
@@ -52,7 +53,7 @@ object MonitoringGraph : Graph {
 
     object Desktop : RootDestinationsProvider {
         override val rootDestinations: List<RootDestination> = listOf(
-            Dashboard, Cctv, Parking, UserManagement, AccessLogs, Settings
+            Dashboard, Cctv, Parking, UserManagement, AccessLogs, Settings, Profile
         )
 
         object Dashboard : RootDestination, Route("desktop_monitoring_dashboard") {
@@ -89,6 +90,12 @@ object MonitoringGraph : Graph {
             override val route: String = name
             override val icon: DrawableResource = GateTikIcons.settings
             override val label: String = "Pengaturan"
+        }
+
+        object Profile : RootDestination, Route("desktop_profile") {
+            override val route: String = name
+            override val icon: DrawableResource = GateTikIcons.person
+            override val label: String = "Profil"
         }
     }
 
@@ -137,6 +144,7 @@ private fun NavGraphBuilder.desktopMonitoringGraph(
     desktopUserManagementScreen(contentPadding = normalContentPadding(scaffoldPadding))
     desktopAccessLogsScreen(contentPadding = normalContentPadding(scaffoldPadding))
     desktopSettingsScreen(contentPadding = normalContentPadding(scaffoldPadding))
+    desktopProfileScreen(contentPadding = normalContentPadding(scaffoldPadding))
 }
 
 private fun NavGraphBuilder.mobileMonitoringGraph(

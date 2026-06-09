@@ -9,6 +9,7 @@ import kite1412.gatetik.feature.monitoring.desktop.accesslogs.DesktopAccessLogsV
 import kite1412.gatetik.feature.monitoring.desktop.cctv.DesktopCctvViewModel
 import kite1412.gatetik.feature.monitoring.desktop.dashboard.DesktopDashboardViewModel
 import kite1412.gatetik.feature.monitoring.desktop.parking.DesktopParkingViewModel
+import kite1412.gatetik.feature.monitoring.desktop.profile.DesktopProfileViewModel
 import kite1412.gatetik.feature.monitoring.desktop.settings.DesktopSettingsViewModel
 import kite1412.gatetik.feature.monitoring.desktop.usermanagement.DesktopUserManagementViewModel
 import kite1412.gatetik.feature.monitoring.mobile.cctv.MobileCctvViewModel
@@ -118,6 +119,12 @@ private val desktopMonitoringViewModel = module {
     }
     viewModel {
         DesktopSettingsViewModel(
+            authentication = get(),
+            dataStore = get()
+        )
+    }
+    viewModel {
+        DesktopProfileViewModel(
             authentication = get(),
             dataStore = get()
         )
