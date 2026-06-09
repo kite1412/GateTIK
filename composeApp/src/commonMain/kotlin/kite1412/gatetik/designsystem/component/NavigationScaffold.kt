@@ -54,6 +54,7 @@ import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import kite1412.gatetik.PlatformType
 import kite1412.gatetik.designsystem.extension.radialBackground
 import kite1412.gatetik.designsystem.theme.Blue100
 import kite1412.gatetik.designsystem.theme.Blue500
@@ -72,6 +73,7 @@ import kite1412.gatetik.designsystem.theme.White95
 import kite1412.gatetik.designsystem.util.GateTikIcons
 import kite1412.gatetik.designsystem.util.WindowWidthSize
 import kite1412.gatetik.designsystem.util.rememberWindowWidthSize
+import kite1412.gatetik.getPlatform
 import kite1412.gatetik.ui.preview.DevicePreviews
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.painterResource
@@ -318,7 +320,7 @@ private fun SideNavigationDrawer(
                         )
                     }
                 }
-                GlassBox(
+                if (getPlatform().type == PlatformType.DESKTOP) GlassBox(
                     modifier = Modifier
                         .clip(CircleShape)
                         .clickable(onClick = onDismissRequest),

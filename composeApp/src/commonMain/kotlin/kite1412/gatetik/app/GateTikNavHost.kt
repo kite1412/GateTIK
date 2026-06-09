@@ -46,7 +46,8 @@ fun GateTikNavHost(
     ) {
         sharedGraph(
             scaffoldPadding = scaffoldPadding,
-            rootDestinationsProvider = rootDestinationsProvider
+            rootDestinationsProvider = rootDestinationsProvider,
+            profileUseDefaultHeader = getPlatform().type == PlatformType.MOBILE
         )
         monitoringGraph(
             scaffoldPadding = scaffoldPadding,

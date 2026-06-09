@@ -24,6 +24,7 @@ fun BasicTextField(
     value: String,
     onValueChange: (String) -> Unit,
     modifier: Modifier = Modifier,
+    enabled: Boolean = true,
     placeholder: String? = null,
     singleLine: Boolean = false,
     visualTransformation: VisualTransformation = VisualTransformation.None,
@@ -58,6 +59,7 @@ fun BasicTextField(
             keyboardType = keyboardType,
             imeAction = imeAction
         ),
-        keyboardActions = keyboardActions
+        keyboardActions = keyboardActions,
+        enabled = enabled
     )
 }

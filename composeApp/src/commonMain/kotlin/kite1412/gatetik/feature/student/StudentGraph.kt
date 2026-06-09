@@ -20,7 +20,7 @@ fun NavGraphBuilder.studentGraph(scaffoldPadding: PaddingValues) {
         route = StudentGraph.route
     ) {
         gateAccessScreen(contentPadding = smallContentPadding(scaffoldPadding))
-        profileScreen(contentPadding = smallContentPadding(scaffoldPadding))
+        profileScreen(useDefaultHeader = true, contentPadding = smallContentPadding(scaffoldPadding))
     }
 }
 

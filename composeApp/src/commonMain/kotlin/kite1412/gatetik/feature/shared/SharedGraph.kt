@@ -13,6 +13,7 @@ import kite1412.gatetik.ui.navigation.RootDestination
 import kite1412.gatetik.ui.navigation.RootDestinationsProvider
 
 fun NavGraphBuilder.sharedGraph(
+    profileUseDefaultHeader: Boolean,
     scaffoldPadding: PaddingValues,
     rootDestinationsProvider: RootDestinationsProvider?
 ) {
@@ -25,7 +26,10 @@ fun NavGraphBuilder.sharedGraph(
             route = SharedGraph.ProfileRoute,
             rootDestinationsProvider = rootDestinationsProvider
         ) {
-            profileScreen(contentPadding = smallContentPadding(scaffoldPadding))
+            profileScreen(
+                useDefaultHeader = profileUseDefaultHeader,
+                contentPadding = smallContentPadding(scaffoldPadding)
+            )
         }
     }
 }

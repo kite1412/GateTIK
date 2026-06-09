@@ -12,5 +12,6 @@ data class User(
     val phoneNumber: String? = null,
     val ktmPath: String? = null,
     val createdAt: Instant,
+    val updatedAt: Instant? = null,
     val lastLoginAt: Instant? = null
 )

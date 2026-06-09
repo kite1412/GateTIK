@@ -38,6 +38,7 @@ data class BackendUser(
         phoneNumber = phoneNumber,
         ktmPath = ktmPath,
         createdAt = createdAt,
+        updatedAt = updatedAt,
         lastLoginAt = lastLoginAt
     )
 }

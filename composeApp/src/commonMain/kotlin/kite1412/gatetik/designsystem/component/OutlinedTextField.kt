@@ -13,16 +13,19 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
@@ -52,9 +55,12 @@ fun OutlinedTextField(
         vertical = 12.dp,
         horizontal = 16.dp
     ),
+    enabled: Boolean = true,
     placeholder: String? = null,
     label: AnnotatedString? = null,
     singleLine: Boolean = false,
+    textColor: Color = LocalContentColor.current,
+    disabledBackgroundColor: Color = Color.Transparent,
     visualTransformation: VisualTransformation = VisualTransformation.None,
     keyboardType: KeyboardType = KeyboardType.Text,
     imeAction: ImeAction = ImeAction.Unspecified,
@@ -65,58 +71,65 @@ fun OutlinedTextField(
     val isDarkMode = LocalDarkMode.current
     val labelColor by animateColorAsState(if (!isDarkMode) RoyalBlue800_50 else White50)
     val borderColor by animateColorAsState(if (!isDarkMode) Blue200_60 else White15)
-    val backgroundColor by animateColorAsState(White.copy(if (!isDarkMode) 0.5f else 0.04f))
+    val backgroundColor by animateColorAsState(
+        targetValue = if (enabled) White.copy(if (!isDarkMode) 0.5f else 0.04f) else disabledBackgroundColor
+    )
     val shape = RoundedCornerShape(16.dp)
 
-    Column(
-        modifier = modifier,
-        verticalArrangement = Arrangement.spacedBy(8.dp)
+    CompositionLocalProvider(
+        LocalContentColor provides textColor
     ) {
-        label?.let {
-            Text(
-                text = it,
-                style = MaterialTheme.typography.bodySmall,
-                fontWeight = FontWeight.Bold,
-                color = labelColor
-            )
-        }
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .border(
-                    width = 1.dp,
-                    color = borderColor,
-                    shape = shape
-                )
-                .background(
-                    color = backgroundColor,
-                    shape = shape
-                )
-                .padding(contentPadding),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween
+        Column(
+            modifier = modifier,
+            verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            Row(
-                modifier = Modifier.weight(1f),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(
-                    contentPadding.calculateStartPadding(LayoutDirection.Ltr)
-                )
-            ) {
-                leading?.invoke()
-                BasicTextField(
-                    value = value,
-                    onValueChange = onValueChange,
-                    modifier = Modifier.fillMaxWidth(),
-                    placeholder = placeholder,
-                    singleLine = singleLine,
-                    visualTransformation = visualTransformation,
-                    keyboardType = keyboardType,
-                    imeAction = imeAction,
-                    keyboardActions = keyboardActions,
+            label?.let {
+                Text(
+                    text = it,
+                    style = MaterialTheme.typography.bodySmall,
+                    fontWeight = FontWeight.Bold,
+                    color = labelColor
                 )
             }
-            actions?.invoke()
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .border(
+                        width = 1.dp,
+                        color = borderColor,
+                        shape = shape
+                    )
+                    .background(
+                        color = backgroundColor,
+                        shape = shape
+                    )
+                    .padding(contentPadding),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Row(
+                    modifier = Modifier.weight(1f),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(
+                        contentPadding.calculateStartPadding(LayoutDirection.Ltr)
+                    )
+                ) {
+                    leading?.invoke()
+                    BasicTextField(
+                        value = value,
+                        onValueChange = onValueChange,
+                        modifier = Modifier.fillMaxWidth(),
+                        placeholder = placeholder,
+                        singleLine = singleLine,
+                        visualTransformation = visualTransformation,
+                        keyboardType = keyboardType,
+                        imeAction = imeAction,
+                        keyboardActions = keyboardActions,
+                        enabled = enabled
+                    )
+                }
+                actions?.invoke()
+            }
         }
     }
 }

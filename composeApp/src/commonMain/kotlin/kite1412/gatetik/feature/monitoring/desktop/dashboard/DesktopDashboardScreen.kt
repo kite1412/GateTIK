@@ -162,6 +162,13 @@ private fun DesktopDashboardScreen(
                     accessLogs = accessLogs
                 )
             }
+            if (!isLargeWindow) item {
+                LiveCameraSection(
+                    cameraName = cctv.data?.cameraName ?: "~",
+                    showFullScreenButton = true,
+                    onFullScreenClick = onCctvFullScreenClick
+                )
+            }
             item {
                 Row(
                     modifier = Modifier
@@ -169,6 +176,14 @@ private fun DesktopDashboardScreen(
                         .height(IntrinsicSize.Max),
                     horizontalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
+                    if (isLargeWindow) LiveCameraSection(
+                        cameraName = cctv.data?.cameraName ?: "~",
+                        modifier = Modifier
+                            .weight(2f)
+                            .fillMaxHeight(),
+                        showFullScreenButton = true,
+                        onFullScreenClick = onCctvFullScreenClick
+                    )
                     if (isLargeWindow) Column(
                         modifier = Modifier.weight(1f),
                         verticalArrangement = Arrangement.spacedBy(24.dp)
@@ -200,22 +215,7 @@ private fun DesktopDashboardScreen(
                             .weight(1f)
                             .fillMaxHeight()
                     )
-                    if (isLargeWindow) LiveCameraSection(
-                        cameraName = cctv.data?.cameraName ?: "~",
-                        modifier = Modifier
-                            .weight(2f)
-                            .fillMaxHeight(),
-                        showFullScreenButton = true,
-                        onFullScreenClick = onCctvFullScreenClick
-                    )
                 }
-            }
-            if (!isLargeWindow) item {
-                LiveCameraSection(
-                    cameraName = cctv.data?.cameraName ?: "~",
-                    showFullScreenButton = true,
-                    onFullScreenClick = onCctvFullScreenClick
-                )
             }
             item {
                 AccessLogTrend(

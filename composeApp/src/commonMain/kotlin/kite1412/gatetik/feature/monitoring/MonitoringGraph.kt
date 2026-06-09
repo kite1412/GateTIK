@@ -150,5 +150,8 @@ private fun NavGraphBuilder.mobileMonitoringGraph(
     )
     mobileParkingScreen(contentPadding = smallContentPadding(scaffoldPadding))
     mobileCctvScreen(contentPadding = smallContentPadding(scaffoldPadding))
-    profileScreen(contentPadding = smallContentPadding(scaffoldPadding))
+    profileScreen(
+        useDefaultHeader = true,
+        contentPadding = smallContentPadding(scaffoldPadding)
+    )
 }
