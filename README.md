@@ -3,12 +3,11 @@ A multiplatform application for parking gate control and parking monitoring.
 
 ### Tested Platforms
 | Tested On | Android | macOS | Windows | Linux |
-|-----------|---------|-------|---------|-------|
-| Status    | ✅      | ✅     | ⚠️      | ⚠️    |
+|-----------|---------|-------|--------|-------|
+| Status    | ✅      | ✅     | ✅️      | ✅️    |
 
 Status:
 - ✅ = tested & works
-- ⚠️ = untested / expected to work
 
 ### Role Support Matrix
 | Role | Mobile | Desktop |

@@ -284,7 +284,8 @@ private fun Occupancy(
     val trackColor by animateColorAsState(
         targetValue = if (isDarkMode) White15 else Gray900.copy(alpha = 0.1f)
     )
-    val usedPercentage = ((usedSlots.toFloat() / totalSlots) * 100).roundToInt()
+    val usedPercentage = if (usedSlots != 0 && totalSlots != 0)
+        ((usedSlots.toFloat() / totalSlots) * 100).roundToInt() else 0
 
     Section(
         title = "Parkir Mahasiswa",
@@ -292,9 +293,7 @@ private fun Occupancy(
         titleColor = titleColor,
         titleTrailing = {
             Text(
-                text = if (totalSlots > 0)
-                        "$usedSlots / $totalSlots ($usedPercentage%)"
-                    else "0",
+                text = "$usedSlots / $totalSlots ($usedPercentage%)",
                 style = MaterialTheme.typography.bodySmall,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
@@ -306,7 +305,7 @@ private fun Occupancy(
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             LinearProgressIndicator(
-                progress = { usedSlots.toFloat() / totalSlots },
+                progress = { if (usedPercentage != 0) (usedPercentage / 100f) else 0f },
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(24.dp)
