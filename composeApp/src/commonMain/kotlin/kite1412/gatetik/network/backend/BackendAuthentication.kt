@@ -16,6 +16,7 @@ import kite1412.gatetik.domain.AuthResult
 import kite1412.gatetik.domain.Authentication
 import kite1412.gatetik.domain.SessionStatus
 import kite1412.gatetik.model.User
+import kite1412.gatetik.model.UserStatus
 import kite1412.gatetik.network.backend.dto.model.BackendUser
 import kite1412.gatetik.network.backend.dto.request.BackendSignInRequest
 import kite1412.gatetik.network.backend.dto.response.BackendLoginResponse
@@ -68,7 +69,8 @@ class BackendAuthentication(
                         user = user.toDataStoreUser()
                     )
                 )
-                Success(user)
+                if (user.status != UserStatus.ACTIVE) Error(Authentication.AuthError.AccountNotValidated())
+                else Success(user)
             } ?: Error(ServerError())
             401 -> return Error(Authentication.AuthError.InvalidCredentials())
         }
@@ -125,9 +127,9 @@ class BackendAuthentication(
         if (res.errors != null) {
             val errors = res.errors
             when {
-                errors.contains("email") -> return Error(Authentication.AuthError.BadRequest("Email sudah digunakan"))
-                errors.contains("npm_nip") -> return Error(Authentication.AuthError.BadRequest("NPM/NIP sudah digunakan"))
-                errors.contains("password") -> return Error(Authentication.AuthError.BadRequest("Password dan konfirmasi password tidak sesuai"))
+                errors.contains("email") -> return Error(Authentication.AuthError.UserAlreadyExists("Email sudah digunakan"))
+                errors.contains("npm_nip") -> return Error(Authentication.AuthError.UserAlreadyExists("NPM/NIP sudah digunakan"))
+                errors.contains("password") -> return Error(Authentication.AuthError.UserAlreadyExists("Password dan konfirmasi password tidak sesuai"))
             }
         }
 
