@@ -39,7 +39,6 @@ import kite1412.gatetik.designsystem.theme.GateTikTheme
 import kite1412.gatetik.designsystem.theme.Slate900
 import kite1412.gatetik.designsystem.theme.White
 import kite1412.gatetik.designsystem.util.GateTikIcons
-import kite1412.gatetik.ui.util.navBarPadding
 import kite1412.gatetik.model.ParkingQuota
 import kite1412.gatetik.ui.component.InfoCard
 import kite1412.gatetik.ui.component.StatCard
@@ -49,6 +48,7 @@ import kite1412.gatetik.ui.preview.DevicePreviews
 import kite1412.gatetik.ui.util.LoadState
 import kite1412.gatetik.ui.util.LoadingState
 import kite1412.gatetik.ui.util.MockScaffoldComponentController
+import kite1412.gatetik.ui.util.navBarPadding
 import org.jetbrains.compose.resources.painterResource
 import org.koin.compose.viewmodel.koinViewModel
 import kotlin.math.max
@@ -183,7 +183,8 @@ private fun OccupancyChartCard(
     total: Int,
     modifier: Modifier = Modifier
 ) {
-    val occupancyPercent = (used.toFloat() / total.toFloat() * 100).toInt()
+    val occupancyPercentage = if (used != 0 && total != 0) (used.toFloat() / total.toFloat() * 100).toInt()
+        else 0
     val isDarkMode = LocalDarkMode.current
 
     GlassBox(
@@ -206,7 +207,7 @@ private fun OccupancyChartCard(
                 val trackColor = if (isDarkMode) Slate900.copy(alpha = 0.5f) else Color(0xFFE2E8F0)
                 
                 CircularProgressIndicator(
-                    progress = { used.toFloat() / total.toFloat() },
+                    progress = { if (occupancyPercentage != 0) (occupancyPercentage / 100f) else 0f },
                     modifier = Modifier.fillMaxSize(),
                     color = Emerald500,
                     strokeWidth = 14.dp,
@@ -224,7 +225,7 @@ private fun OccupancyChartCard(
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                     Text(
-                        text = "$occupancyPercent%",
+                        text = "$occupancyPercentage%",
                         style = MaterialTheme.typography.titleLarge.copy(
                             fontSize = 48.sp,
                             fontWeight = FontWeight.Bold

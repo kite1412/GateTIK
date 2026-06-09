@@ -65,25 +65,27 @@ class GateTikApplication : Application() {
                         val res = gateRepository.getMainGate()
 
                         if (res is Result.Success) res.data?.let { gate ->
-                            geofencingClient.addGeofences(
-                                /*p0 = */createGeofencingRequest(
-                                    latitude = gate.latitude,
-                                    longitude = gate.longitude,
-                                    radiusInMeters = gate.allowedRadiusMeter
-                                ),
-                                /*p1 = */geofencePendingIntent
-                            ).run {
-                                addOnSuccessListener {
-                                    Logger.i(
-                                        tag = logTag,
-                                        message = "Success adding geofencing request"
-                                    )
-                                }
-                                addOnFailureListener {
-                                    Logger.i(
-                                        tag = logTag,
-                                        message = "Failed to add geofencing request"
-                                    )
+                            if (gate.allowedRadiusMeter > 0) {
+                                geofencingClient.addGeofences(
+                                    /*p0 = */createGeofencingRequest(
+                                        latitude = gate.latitude,
+                                        longitude = gate.longitude,
+                                        radiusInMeters = gate.allowedRadiusMeter
+                                    ),
+                                    /*p1 = */geofencePendingIntent
+                                ).run {
+                                    addOnSuccessListener {
+                                        Logger.i(
+                                            tag = logTag,
+                                            message = "Success adding geofencing request"
+                                        )
+                                    }
+                                    addOnFailureListener {
+                                        Logger.i(
+                                            tag = logTag,
+                                            message = "Failed to add geofencing request"
+                                        )
+                                    }
                                 }
                             }
                         }
