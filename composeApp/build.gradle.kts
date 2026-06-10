@@ -86,7 +86,7 @@ buildConfig {
     packageName = "kite1412.gatetik"
 
     buildConfigField("BACKEND_URL")
-    buildConfigField("CCTV_URL")
+    buildConfigField("RTSP_CCTV_URL")
     buildConfigField("WEB_RTC_PLAYER_CCTV_URL")
     buildConfigField("VERSION")
     buildConfigField("ANDROID_INSTALLATION_URL")

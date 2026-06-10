@@ -1,16 +1,27 @@
+
 import kite1412.gatetik.BuildConfigExtension
 import kite1412.gatetik.task.GenerateBuildConfigTask
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.kotlin.dsl.getByType
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
+import java.util.Properties
 
 class BuildConfigConventionPlugin : Plugin<Project> {
     override fun apply(target: Project) {
+        val propertiesFileName = target.providers
+            .gradleProperty("propertiesFile")
+            .orElse("local.properties")
+        val properties = Properties()
+        val propertiesFile = target.rootProject.file(propertiesFileName)
+        if (propertiesFile.exists()) {
+            propertiesFile.inputStream().use { properties.load(it) }
+        }
+
         val ext = target.extensions.create(
             /*name = */"buildConfig",
             /*type = */BuildConfigExtension::class.java,
-            target
+            properties
         )
 
         target.plugins.withId("org.jetbrains.kotlin.multiplatform") {

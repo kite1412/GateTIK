@@ -17,7 +17,7 @@ actual fun RtspCctvPlayer(
         factory = {
             VLCVideoLayout(it).also { layout ->
                 val mediaPlayer = VlcProvider.createMediaPlayer()
-                mediaPlayer.media = VlcProvider.getMedia(BuildConfig.CCTV_URL)
+                mediaPlayer.media = VlcProvider.getMedia(BuildConfig.RTSP_CCTV_URL)
                 mediaPlayer.setEventListener { event ->
                     when (event.type) {
                         MediaPlayer.Event.Buffering -> state(LoadState.Loading())

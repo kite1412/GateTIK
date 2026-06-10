@@ -26,7 +26,8 @@ Support Status:
 Inside `<project root>/local.properties` file, add the following properties:
 ```properties
 BACKEND_URL=<Backend base URL>
-CCTV_URL=<CCTV URL>
+RTSP_CCTV_URL=<CCTV RTSP Stream URL>
+WEB_RTC_PLAYER_CCTV_URL=<CCTV WebRTC Player Stream URL>
 ANDROID_INSTALLATION_URL=<Android APK Distribution URL>
 VERSION=<Application Version>
 ```

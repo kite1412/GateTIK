@@ -31,7 +31,7 @@ actual fun RtspCctvPlayer(
 
                     SwingUtilities.invokeLater {
                         mediaPlayerComponent.mediaPlayer().media().play(
-                            /*mrl = */BuildConfig.CCTV_URL,
+                            /*mrl = */BuildConfig.RTSP_CCTV_URL,
                             /* ...options = */":rtsp-tcp"
                         )
                     }
