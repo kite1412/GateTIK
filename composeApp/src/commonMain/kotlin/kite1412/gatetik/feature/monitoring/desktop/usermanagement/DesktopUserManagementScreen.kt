@@ -581,7 +581,7 @@ private fun UserFormDialog(
                 }
 
                 OutlinedTextField(
-                    value = password ?: "",
+                    value = password,
                     onValueChange = { password = it },
                     modifier = Modifier.fillMaxWidth(),
                     label = buildAnnotatedString { append("PASSWORD") },
