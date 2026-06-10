@@ -1,4 +1,4 @@
-package kite1412.gatetik
+package kite1412.gatetik.desktop
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
@@ -46,6 +46,9 @@ import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.WindowPlacement
 import androidx.compose.ui.window.application
 import androidx.compose.ui.window.rememberWindowState
+import kite1412.gatetik.BuildConfig
+import kite1412.gatetik.JvmCsvExporter
+import kite1412.gatetik.LocalCsvExporter
 import kite1412.gatetik.app.GateTikApp
 import kite1412.gatetik.datastore.GateTikDataStore
 import kite1412.gatetik.designsystem.component.GlassBox
@@ -61,6 +64,7 @@ import kite1412.gatetik.designsystem.util.GateTikIcons
 import kite1412.gatetik.di.initKoin
 import kite1412.gatetik.domain.Authentication
 import kite1412.gatetik.domain.SessionStatus
+import kite1412.gatetik.isVlcInstalled
 import kite1412.gatetik.model.UserRole
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.painterResource

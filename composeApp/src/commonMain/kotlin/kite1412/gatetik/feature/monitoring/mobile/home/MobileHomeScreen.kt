@@ -389,7 +389,7 @@ private fun CctvCard(
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .aspectRatio(16f / 10f)
+                .aspectRatio(16f / 9f)
                 .clip(RoundedCornerShape(24.dp))
                 .background(
                     Brush.radialGradient(

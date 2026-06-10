@@ -1,4 +1,3 @@
-import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
@@ -81,70 +80,6 @@ kotlin {
 
 dependencies {
     androidRuntimeClasspath(libs.compose.uiTooling)
-}
-
-compose.desktop {
-    application {
-        mainClass = "kite1412.gatetik.MainKt"
-
-        buildTypes.release.proguard {
-            isEnabled.set(false)
-        }
-
-        run {
-            jvmArgs(
-                "--add-opens=java.base/java.lang=ALL-UNNAMED",
-                "--add-opens=java.desktop/sun.awt=ALL-UNNAMED",
-                "--add-opens=java.desktop/sun.java2d=ALL-UNNAMED",
-                "--add-opens=java.desktop/java.awt.peer=ALL-UNNAMED"
-            )
-            if (System.getProperty("os.name").contains("Mac")) {
-                jvmArgs(
-                    "--add-opens=java.desktop/sun.lwawt=ALL-UNNAMED",
-                    "--add-opens=java.desktop/sun.lwawt.macosx=ALL-UNNAMED"
-                )
-            }
-        }
-
-        jvmArgs(
-            "-Dapple.awt.application.appearance=system"
-        )
-
-        nativeDistributions {
-            targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
-            modules("jdk.unsupported")
-
-            packageName = "Gate TIK"
-            packageVersion = "1.0.0"
-
-            macOS {
-                iconFile.set(project.file("resource/desktop_icon.icns"))
-            }
-            windows {
-                iconFile.set(project.file("resource/desktop_icon.ico"))
-            }
-            linux {
-                iconFile.set(project.file("resource/desktop_icon.png"))
-            }
-        }
-    }
-}
-
-afterEvaluate {
-    tasks.withType<JavaExec> {
-        jvmArgs(
-            "--add-opens=java.base/java.lang=ALL-UNNAMED",
-            "--add-opens=java.desktop/sun.awt=ALL-UNNAMED",
-            "--add-opens=java.desktop/sun.java2d=ALL-UNNAMED",
-            "--add-opens=java.desktop/java.awt.peer=ALL-UNNAMED"
-        )
-        if (System.getProperty("os.name").contains("Mac")) {
-            jvmArgs(
-                "--add-opens=java.desktop/sun.lwawt=ALL-UNNAMED",
-                "--add-opens=java.desktop/sun.lwawt.macosx=ALL-UNNAMED"
-            )
-        }
-    }
 }
 
 buildConfig {
