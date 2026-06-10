@@ -28,6 +28,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -46,6 +47,7 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import kite1412.gatetik.BuildConfig
 import kite1412.gatetik.designsystem.component.GlassBox
 import kite1412.gatetik.designsystem.component.GradientTextButton
 import kite1412.gatetik.designsystem.component.Icon
@@ -61,17 +63,21 @@ import kite1412.gatetik.designsystem.theme.Red600
 import kite1412.gatetik.designsystem.util.GateTikIcons
 import kite1412.gatetik.designsystem.util.WindowWidthSize
 import kite1412.gatetik.designsystem.util.rememberWindowWidthSize
+import kite1412.gatetik.domain.model.PasswordReset
 import kite1412.gatetik.model.User
 import kite1412.gatetik.model.UserRole
 import kite1412.gatetik.model.UserStatus
 import kite1412.gatetik.ui.component.ThemeToggle
 import kite1412.gatetik.ui.compositionlocal.LocalDarkMode
 import kite1412.gatetik.ui.compositionlocal.LocalScaffoldComponentsController
+import kite1412.gatetik.ui.compositionlocal.LocalSnackbarHostStateWrapper
 import kite1412.gatetik.ui.preview.DevicePreviews
 import kite1412.gatetik.ui.util.LoadState
 import kite1412.gatetik.ui.util.LoadingState
 import kite1412.gatetik.ui.util.MockScaffoldComponentController
+import kite1412.gatetik.ui.util.UiEvent
 import kite1412.gatetik.ui.util.navBarPadding
+import kite1412.gatetik.util.now
 import kite1412.gatetik.util.timestampString
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.painterResource
@@ -84,14 +90,23 @@ fun ProfileScreen(
     modifier: Modifier = Modifier,
     viewModel: ProfileViewModel = koinViewModel()
 ) {
+    val snackbarHostStateWrapper = LocalSnackbarHostStateWrapper.current
     val userLoadState by viewModel.user.collectAsStateWithLifecycle(LoadState.Loading())
 
+    LaunchedEffect(Unit) {
+        viewModel.uiEvent.collect { event ->
+            if (event is UiEvent.ShowSnackbar)
+                snackbarHostStateWrapper.showSnackbar(event.message)
+        }
+    }
     ProfileScreen(
         userLoadState = userLoadState,
         useDefaultHeader = useDefaultHeader,
         contentPadding = contentPadding,
         onDarkModeToggle = viewModel::setDarkMode,
         onLogout = viewModel::logout,
+        onSaveChanges = viewModel::updateProfile,
+        onResetPassword = viewModel::resetPassword,
         modifier = modifier
     )
 }
@@ -103,6 +118,8 @@ fun ProfileScreen(
     contentPadding: PaddingValues,
     onDarkModeToggle: (Boolean) -> Unit,
     onLogout: () -> Unit,
+    onSaveChanges: (User) -> Unit,
+    onResetPassword: (PasswordReset) -> Unit,
     modifier: Modifier = Modifier,
     consumeNavBarSize: Boolean = true,
     applyContentPaddingOnScrollableContainer: Boolean = false
@@ -156,9 +173,19 @@ fun ProfileScreen(
 
                 item {
                     if (windowSize == WindowWidthSize.COMPACT) {
-                        ProfileCompactLayout(user, onLogout)
+                        ProfileCompactLayout(
+                            user = user,
+                            onLogout = onLogout,
+                            onSaveChanges = onSaveChanges,
+                            onResetPassword = onResetPassword
+                        )
                     } else {
-                        ProfileWideLayout(user, onLogout)
+                        ProfileWideLayout(
+                            user = user,
+                            onLogout = onLogout,
+                            onSaveChanges = onSaveChanges,
+                            onResetPassword = onResetPassword
+                        )
                     }
                 }
             }
@@ -173,11 +200,22 @@ fun ProfileScreen(
 @Composable
 private fun ProfileCompactLayout(
     user: User,
-    onLogout: () -> Unit
+    onLogout: () -> Unit,
+    onSaveChanges: (User) -> Unit,
+    onResetPassword: (PasswordReset) -> Unit,
+    modifier: Modifier = Modifier
 ) {
-    Column(verticalArrangement = Arrangement.spacedBy(24.dp)) {
-        BaseInfoSection(user)
-        ChangePasswordSection()
+    Column(
+        modifier = modifier,
+        verticalArrangement = Arrangement.spacedBy(24.dp)
+    ) {
+        BaseInfoSection(
+            user = user,
+            onSaveChanges = onSaveChanges
+        )
+        ChangePasswordSection(
+            onResetPassword = onResetPassword
+        )
         AccountInfoSection(user)
         LogoutButton(onLogout)
     }
@@ -186,18 +224,26 @@ private fun ProfileCompactLayout(
 @Composable
 private fun ProfileWideLayout(
     user: User,
-    onLogout: () -> Unit
+    onLogout: () -> Unit,
+    onSaveChanges: (User) -> Unit,
+    onResetPassword: (PasswordReset) -> Unit,
+    modifier: Modifier = Modifier
 ) {
     Row(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.spacedBy(24.dp)
     ) {
         Column(
             modifier = Modifier.weight(1.8f),
             verticalArrangement = Arrangement.spacedBy(24.dp)
         ) {
-            BaseInfoSection(user)
-            ChangePasswordSection()
+            BaseInfoSection(
+                user = user,
+                onSaveChanges = onSaveChanges
+            )
+            ChangePasswordSection(
+                onResetPassword = onResetPassword
+            )
         }
         Column(
             modifier = Modifier.weight(1f),
@@ -265,7 +311,11 @@ private fun ProfileSection(
 }
 
 @Composable
-private fun BaseInfoSection(user: User) {
+private fun BaseInfoSection(
+    user: User,
+    onSaveChanges: (User) -> Unit,
+    modifier: Modifier = Modifier
+) {
     var isEditing by remember { mutableStateOf(false) }
     var fullName by remember(user) { mutableStateOf(user.fullName) }
     var email by remember(user) { mutableStateOf(user.email) }
@@ -277,6 +327,7 @@ private fun BaseInfoSection(user: User) {
         subtitle = "Detail data pribadi",
         icon = painterResource(GateTikIcons.person),
         iconColor = Blue500,
+        modifier = modifier,
         trailing = {
             if (!isEditing) {
                 Text(
@@ -370,7 +421,17 @@ private fun BaseInfoSection(user: User) {
             AnimatedVisibility(visible = isEditing) {
                 PrimaryButton(
                     text = "Simpan Perubahan",
-                    onClick = { isEditing = false },
+                    onClick = {
+                        onSaveChanges(
+                            user.copy(
+                                fullName = fullName,
+                                email = email,
+                                institutionNumber = institutionNumber,
+                                phoneNumber = phoneNumber.takeIf { it.isNotBlank() }
+                            )
+                        )
+                        isEditing = false
+                    },
                     containerColor = Indigo600,
                     leading = {
                         Icon(
@@ -390,7 +451,10 @@ private fun BaseInfoSection(user: User) {
 }
 
 @Composable
-private fun ChangePasswordSection() {
+private fun ChangePasswordSection(
+    onResetPassword: (PasswordReset) -> Unit,
+    modifier: Modifier = Modifier
+) {
     var currentPassword by remember { mutableStateOf("") }
     var newPassword by remember { mutableStateOf("") }
     var confirmPassword by remember { mutableStateOf("") }
@@ -405,7 +469,8 @@ private fun ChangePasswordSection() {
         title = "Ubah Kata Sandi",
         subtitle = "Perbarui kata sandi untuk menjaga keamanan akun",
         icon = painterResource(GateTikIcons.lock),
-        iconColor = Indigo600
+        iconColor = Indigo600,
+        modifier = modifier
     ) {
         Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
             ProfileTextField(
@@ -455,7 +520,18 @@ private fun ChangePasswordSection() {
             )
             GradientTextButton(
                 text = "Perbarui Kata Sandi",
-                onClick = {},
+                onClick = {
+                    onResetPassword(
+                        PasswordReset(
+                            currentPassword = currentPassword,
+                            newPassword = newPassword,
+                            newPasswordConfirmation = confirmPassword
+                        )
+                    )
+                    currentPassword = ""
+                    newPassword = ""
+                    confirmPassword = ""
+                },
                 modifier = Modifier.fillMaxWidth(),
                 leading = {
                     Icon(
@@ -588,20 +664,34 @@ private fun PasswordVisibilityToggle(
 }
 
 @Composable
-private fun LogoutButton(onLogout: () -> Unit) {
-    PrimaryButton(
-        text = "Keluar",
-        onClick = onLogout,
-        containerColor = Red600,
-        leading = {
-            Icon(
-                painter = painterResource(GateTikIcons.logout),
-                contentDescription = null,
-                tint = Color.White,
-                modifier = Modifier.size(20.dp)
-            )
-        }
-    )
+private fun LogoutButton(
+    onLogout: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Column(
+        modifier = modifier,
+        verticalArrangement = Arrangement.spacedBy(16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        PrimaryButton(
+            text = "Keluar",
+            onClick = onLogout,
+            containerColor = Red600,
+            leading = {
+                Icon(
+                    painter = painterResource(GateTikIcons.logout),
+                    contentDescription = null,
+                    tint = Color.White,
+                    modifier = Modifier.size(20.dp)
+                )
+            }
+        )
+        Text(
+            text = "Gate TIK - v${BuildConfig.VERSION}",
+            color = LocalContentColor.current.copy(alpha = 0.6f),
+            style = MaterialTheme.typography.bodySmall
+        )
+    }
 }
 
 @DevicePreviews
@@ -615,9 +705,9 @@ private fun ProfileScreenPreview() {
         status = UserStatus.ACTIVE,
         institutionNumber = "ADM001",
         phoneNumber = "081234567890",
-        createdAt = kite1412.gatetik.util.now(),
-        updatedAt = kite1412.gatetik.util.now(),
-        lastLoginAt = kite1412.gatetik.util.now()
+        createdAt = now(),
+        updatedAt = now(),
+        lastLoginAt = now()
     )
 
     GateTikTheme(darkMode = isSystemInDarkTheme()) {
@@ -631,7 +721,9 @@ private fun ProfileScreenPreview() {
                     userLoadState = LoadState.Success(mockUser),
                     contentPadding = p,
                     onDarkModeToggle = {},
-                    onLogout = {}
+                    onLogout = {},
+                    onSaveChanges = {},
+                    onResetPassword = {}
                 )
             }
         }

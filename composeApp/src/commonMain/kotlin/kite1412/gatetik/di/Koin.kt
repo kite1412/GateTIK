@@ -36,7 +36,9 @@ private val sharedViewModelModule = module {
     viewModel {
         ProfileViewModel(
             authentication = get(),
-            dataStore = get()
+            dataStore = get(),
+            updateProfileUseCase = get(),
+            resetPasswordUseCase = get()
         )
     }
     viewModel {
@@ -124,8 +126,10 @@ private val desktopMonitoringViewModel = module {
     }
     viewModel {
         DesktopProfileViewModel(
+            dataStore = get(),
             authentication = get(),
-            dataStore = get()
+            updateProfileUseCase = get(),
+            resetPasswordUseCase = get()
         )
     }
 }

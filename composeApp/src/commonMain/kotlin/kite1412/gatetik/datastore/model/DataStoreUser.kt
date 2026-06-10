@@ -14,8 +14,11 @@ data class DataStoreUser(
     val role: String,
     val status: String,
     val instituteNumber: String,
+    val phoneNumber: String?,
+    val ktmPath: String?,
     val createdAt: Instant,
-    val updatedAt: Instant?
+    val updatedAt: Instant?,
+    val lastLoginAt: Instant?
 ) {
     fun toModel() = User(
         id = id,
@@ -24,7 +27,10 @@ data class DataStoreUser(
         role = UserRole.valueOf(role),
         status = UserStatus.valueOf(status),
         institutionNumber = instituteNumber,
+        phoneNumber = phoneNumber,
+        ktmPath = ktmPath,
         createdAt = createdAt,
-        updatedAt = updatedAt
+        updatedAt = updatedAt,
+        lastLoginAt = lastLoginAt
     )
 }

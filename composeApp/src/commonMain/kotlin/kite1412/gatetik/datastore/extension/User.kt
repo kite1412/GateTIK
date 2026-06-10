@@ -10,6 +10,9 @@ fun User.toDataStoreUser() = DataStoreUser(
     role = role.name,
     status = status.name,
     instituteNumber = institutionNumber,
+    phoneNumber = phoneNumber,
+    ktmPath = ktmPath,
     createdAt = createdAt,
-    updatedAt = updatedAt
+    updatedAt = updatedAt,
+    lastLoginAt = lastLoginAt
 )
