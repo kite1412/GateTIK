@@ -24,7 +24,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import kite1412.gatetik.CctvPlayer
+import kite1412.gatetik.BuildConfig
+import kite1412.gatetik.WebRtcPlayer
 import kite1412.gatetik.designsystem.component.Badge
 import kite1412.gatetik.designsystem.component.GlassBox
 import kite1412.gatetik.designsystem.component.Icon
@@ -51,9 +52,10 @@ fun LiveCameraSection(
                     .aspectRatio(16f / 9f)
                     .background(Color.Black)
             ) {
-                CctvPlayer(
+                WebRtcPlayer(
+                    url = BuildConfig.WEB_RTC_PLAYER_CCTV_URL,
                     modifier = Modifier.fillMaxSize()
-                ) {}
+                )
 
                 Badge(
                     text = "LIVE",

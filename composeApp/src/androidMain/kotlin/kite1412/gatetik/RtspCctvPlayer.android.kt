@@ -9,7 +9,7 @@ import org.videolan.libvlc.MediaPlayer
 import org.videolan.libvlc.util.VLCVideoLayout
 
 @Composable
-actual fun CctvPlayer(
+actual fun RtspCctvPlayer(
     modifier: Modifier,
     state: (LoadState<Unit>) -> Unit
 ) {

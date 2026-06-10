@@ -39,6 +39,7 @@ kotlin {
             implementation(libs.androidx.activity.compose)
             implementation(libs.libvlc.android)
             implementation(libs.play.services.location)
+            implementation(libs.compose.webview)
         }
         commonMain.dependencies {
             implementation(libs.compose.runtime)
@@ -73,6 +74,7 @@ kotlin {
             implementation(libs.kotlin.logging.jvm)
             implementation(libs.vlcj)
             implementation(libs.logback)
+            implementation(libs.jcefmaven)
         }
     }
 }
@@ -87,6 +89,21 @@ compose.desktop {
 
         buildTypes.release.proguard {
             isEnabled.set(false)
+        }
+
+        run {
+            jvmArgs(
+                "--add-opens=java.base/java.lang=ALL-UNNAMED",
+                "--add-opens=java.desktop/sun.awt=ALL-UNNAMED",
+                "--add-opens=java.desktop/sun.java2d=ALL-UNNAMED",
+                "--add-opens=java.desktop/java.awt.peer=ALL-UNNAMED"
+            )
+            if (System.getProperty("os.name").contains("Mac")) {
+                jvmArgs(
+                    "--add-opens=java.desktop/sun.lwawt=ALL-UNNAMED",
+                    "--add-opens=java.desktop/sun.lwawt.macosx=ALL-UNNAMED"
+                )
+            }
         }
 
         jvmArgs(
@@ -113,11 +130,29 @@ compose.desktop {
     }
 }
 
+afterEvaluate {
+    tasks.withType<JavaExec> {
+        jvmArgs(
+            "--add-opens=java.base/java.lang=ALL-UNNAMED",
+            "--add-opens=java.desktop/sun.awt=ALL-UNNAMED",
+            "--add-opens=java.desktop/sun.java2d=ALL-UNNAMED",
+            "--add-opens=java.desktop/java.awt.peer=ALL-UNNAMED"
+        )
+        if (System.getProperty("os.name").contains("Mac")) {
+            jvmArgs(
+                "--add-opens=java.desktop/sun.lwawt=ALL-UNNAMED",
+                "--add-opens=java.desktop/sun.lwawt.macosx=ALL-UNNAMED"
+            )
+        }
+    }
+}
+
 buildConfig {
     packageName = "kite1412.gatetik"
 
     buildConfigField("BACKEND_URL")
     buildConfigField("CCTV_URL")
+    buildConfigField("WEB_RTC_PLAYER_CCTV_URL")
     buildConfigField("VERSION")
     buildConfigField("ANDROID_INSTALLATION_URL")
 }

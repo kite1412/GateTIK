@@ -15,7 +15,7 @@ import javax.swing.JPanel
 import javax.swing.SwingUtilities
 
 @Composable
-actual fun CctvPlayer(
+actual fun RtspCctvPlayer(
     modifier: Modifier,
     state: (LoadState<Unit>) -> Unit
 ) {

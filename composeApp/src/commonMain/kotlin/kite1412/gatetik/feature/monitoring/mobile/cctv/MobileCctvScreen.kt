@@ -32,7 +32,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import kite1412.gatetik.CctvPlayer
+import kite1412.gatetik.BuildConfig
+import kite1412.gatetik.WebRtcPlayer
 import kite1412.gatetik.designsystem.component.Badge
 import kite1412.gatetik.designsystem.component.GlassBox
 import kite1412.gatetik.designsystem.component.Icon
@@ -43,15 +44,16 @@ import kite1412.gatetik.designsystem.theme.Red600
 import kite1412.gatetik.designsystem.theme.White
 import kite1412.gatetik.designsystem.theme.White20
 import kite1412.gatetik.designsystem.util.GateTikIcons
-import kite1412.gatetik.ui.util.navBarPadding
 import kite1412.gatetik.model.Cctv
 import kite1412.gatetik.ui.component.InfoCard
 import kite1412.gatetik.ui.compositionlocal.LocalDarkMode
 import kite1412.gatetik.ui.preview.DevicePreviews
 import kite1412.gatetik.ui.util.LoadState
+import kite1412.gatetik.ui.util.navBarPadding
 import kotlinx.coroutines.delay
 import org.jetbrains.compose.resources.painterResource
 import org.koin.compose.viewmodel.koinViewModel
+import kotlin.time.Duration.Companion.seconds
 
 @Composable
 fun MobileCctvScreen(
@@ -128,11 +130,12 @@ private fun MobileCctvScreen(
                         contentDescription = null
                     )
                 }
-                CctvPlayer(
+                WebRtcPlayer(
+                    url = BuildConfig.WEB_RTC_PLAYER_CCTV_URL,
                     modifier = Modifier
                         .fillMaxWidth()
                         .aspectRatio(16f / 9f)
-                ) {}
+                )
             }
         }
     }
@@ -159,13 +162,14 @@ private fun CctvPlayer(
 
                 LaunchedEffect(Unit) {
                     if (showMessage) {
-                        delay(3000)
+                        delay(3.seconds)
                         showMessage = false
                     }
                 }
-                CctvPlayer(
+                WebRtcPlayer(
+                    url = BuildConfig.WEB_RTC_PLAYER_CCTV_URL,
                     modifier = Modifier.fillMaxSize()
-                ) {}
+                )
                 Badge(
                     text = "LIVE",
                     containerColor = Red600,

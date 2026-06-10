@@ -25,6 +25,8 @@ vlcj = "4.12.1"
 playServicesLocation = "21.3.0"
 vico = "3.2.1"
 logback = "1.5.34"
+composeWebView = "2.0.3"
+jcefmaven = "146.0.10"
 
 [libraries]
 kotlin-gp = { group = "org.jetbrains.kotlin", name = "kotlin-gradle-plugin", version.ref = "kotlin" }
@@ -64,6 +66,8 @@ vlcj = { group = "uk.co.caprica", name = "vlcj", version.ref = "vlcj" }
 play-services-location = { group = "com.google.android.gms", name = "play-services-location", version.ref = "playServicesLocation" }
 vico-compose = { group = "com.patrykandpatrick.vico", name = "compose", version.ref = "vico" }
 logback = { group = "ch.qos.logback", name = "logback-classic", version.ref = "logback" }
+compose-webview = { group = "io.github.kevinnzou", name = "compose-webview-multiplatform", version.ref = "composeWebView" }
+jcefmaven = { group = "me.friwi", name = "jcefmaven", version.ref = "jcefmaven" }
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }

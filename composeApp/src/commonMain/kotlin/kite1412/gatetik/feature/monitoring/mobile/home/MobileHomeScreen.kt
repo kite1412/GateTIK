@@ -43,7 +43,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import kite1412.gatetik.CctvPlayer
+import kite1412.gatetik.BuildConfig
+import kite1412.gatetik.WebRtcPlayer
 import kite1412.gatetik.designsystem.component.Badge
 import kite1412.gatetik.designsystem.component.Icon
 import kite1412.gatetik.designsystem.theme.BlueIndigoGradient
@@ -78,6 +79,7 @@ import kite1412.gatetik.util.timeAgo
 import kotlinx.coroutines.delay
 import org.jetbrains.compose.resources.painterResource
 import org.koin.compose.viewmodel.koinViewModel
+import kotlin.time.Duration.Companion.seconds
 
 @Composable
 fun MobileHomeScreen(
@@ -433,11 +435,14 @@ private fun CctvCard(
 
                         LaunchedEffect(Unit) {
                             if (showMessage) {
-                                delay(3000)
+                                delay(3.seconds)
                                 showMessage = false
                             }
                         }
-                        CctvPlayer(Modifier.fillMaxSize()) {}
+                        WebRtcPlayer(
+                            url = BuildConfig.WEB_RTC_PLAYER_CCTV_URL,
+                            modifier = Modifier.fillMaxSize()
+                        )
                         this@Column.AnimatedVisibility(
                             visible = showMessage,
                             modifier = Modifier.align(Alignment.Center),
