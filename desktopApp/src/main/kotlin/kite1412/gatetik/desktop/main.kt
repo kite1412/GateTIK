@@ -10,13 +10,14 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.material.CircularProgressIndicator
-import androidx.compose.material.Icon
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Icon
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
@@ -37,6 +38,9 @@ import androidx.compose.ui.window.WindowPlacement
 import androidx.compose.ui.window.application
 import androidx.compose.ui.window.rememberWindowState
 import kite1412.gatetik.BuildConfig
+import kite1412.gatetik.CefBrowserLoadProgress
+import kite1412.gatetik.CefBrowserProgressStatus
+import kite1412.gatetik.CefBrowserProvider
 import kite1412.gatetik.JvmCsvExporter
 import kite1412.gatetik.LocalCsvExporter
 import kite1412.gatetik.app.GateTikApp
@@ -70,6 +74,9 @@ fun main() {
         val darkMode by dataStore
             .observeDarkMode()
             .collectAsState(null)
+        val cefLoadProgress by CefBrowserProvider
+            .loadProgress
+            .collectAsState()
         val isDarkMode = darkMode ?: isSystemInDarkTheme()
         val coroutineScope = rememberCoroutineScope()
         val state = rememberWindowState()
@@ -84,6 +91,9 @@ fun main() {
         ) {
             window.minimumSize = Dimension(800, 600)
 
+            LaunchedEffect(Unit) {
+                CefBrowserProvider.initApp()
+            }
             Box(
                 modifier = Modifier
                     .fillMaxSize()
@@ -132,7 +142,12 @@ fun main() {
                                 ) else CompositionLocalProvider(
                                     LocalCsvExporter provides JvmCsvExporter(window)
                                 ) {
-                                    GateTikApp()
+                                    if (
+                                        sessionStatus is SessionStatus.SignedIn &&
+                                        (sessionStatus as SessionStatus.SignedIn).user.role != UserRole.STUDENT &&
+                                        cefLoadProgress.status != CefBrowserProgressStatus.INITIALIZED
+                                    ) CefBrowserLoadProgress(cefLoadProgress)
+                                    else GateTikApp()
                                 }
                             }
                         }
@@ -140,6 +155,36 @@ fun main() {
                 }
             }
         }
+    }
+}
+
+@Composable
+private fun CefBrowserLoadProgress(
+    progress: CefBrowserLoadProgress,
+    modifier: Modifier = Modifier
+) {
+    Column(
+        modifier = modifier
+            .fillMaxSize()
+            .background(MaterialTheme.colorScheme.background),
+        verticalArrangement = Arrangement.spacedBy(
+            space = 8.dp,
+            alignment = Alignment.CenterVertically
+        ),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        CircularProgressIndicator()
+        Text(
+            text = when (progress.status) {
+                CefBrowserProgressStatus.LOCATING -> "Memeriksa komponen browser..."
+                CefBrowserProgressStatus.DOWNLOADING -> "Mengunduh komponen browser (${progress.percent}%)"
+                CefBrowserProgressStatus.INSTALL -> "Memasang komponen browser..."
+                CefBrowserProgressStatus.INITIALIZING -> "Menjalankan browser..."
+                CefBrowserProgressStatus.INITIALIZED -> "Komponen browser berhasil dipasang"
+            },
+            style = MaterialTheme.typography.labelSmall,
+            color = MaterialTheme.colorScheme.onBackground
+        )
     }
 }
 
