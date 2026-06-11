@@ -62,6 +62,7 @@ import kite1412.gatetik.model.UserRole
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.painterResource
 import java.awt.Dimension
+import kotlin.math.roundToInt
 
 fun main() {
     val koinApp = initKoin()
@@ -184,7 +185,7 @@ private fun CefBrowserLoadProgress(
         Text(
             text = when (progress.status) {
                 CefBrowserProgressStatus.LOCATING -> "Memeriksa komponen browser..."
-                CefBrowserProgressStatus.DOWNLOADING -> "Mengunduh komponen browser (${progress.percent}%)"
+                CefBrowserProgressStatus.DOWNLOADING -> "Mengunduh komponen browser (${progress.percent.roundToInt()}%)"
                 CefBrowserProgressStatus.INSTALL -> "Memasang komponen browser..."
                 CefBrowserProgressStatus.INITIALIZING -> "Menjalankan browser..."
                 CefBrowserProgressStatus.INITIALIZED -> "Komponen browser berhasil dipasang"

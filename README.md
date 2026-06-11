@@ -74,16 +74,11 @@ VERSION=<Application Version>
     git clone https://github.com/kite1412/GateTIK.git
     ```
 2. Open the downloaded repository in Android Studio / IntelliJ IDEA.
-3. Run the following gradle command:
+3. Run the following Gradle command:
 
-   **macOS / Linux**
+   **macOS / Linux / Windows (PowerShell)**
    ```bash
-   ./gradlew :composeApp:run
-   ```
-
-   **Windows**
-   ```bash
-   gradlew.bat :composeApp:run
+   ./gradlew :desktopApp:run
    ```
 
 #### 🔹 Release Package
@@ -92,31 +87,43 @@ VERSION=<Application Version>
     ```bash
     git clone https://github.com/kite1412/GateTIK.git
     ```
-2. Ensure Gradle is using JDK 21 by checking the JVM used by the Gradle Daemon:
+2. Ensure Gradle is using JDK 21 by checking the JVM used by Gradle Daemon:
 
    ```bash
    ./gradlew --version
    ```
    
-   or specifically define the JDK installation path in `<project root>/gradle.properties`:
-
+3. To force Gradle to use JDK 21, add to `gradle.properties`:
+   
    ```properties
    org.gradle.java.home=<path to JDK 21>
    ```
-3. Depending on the platform used for building the release package:
+
+4. Alternatively, set `JAVA_HOME` before starting Gradle:
+
+   **macOS / Linux**
+   ```bash
+   export JAVA_HOME=<path to JDK 21>
+   ```
+
+   **Windows (PowerShell)**
+   ```bash
+   $env:JAVA_HOME = "<path to JDK 21>"
+   ```
+5. Depending on the platform used for building the release package:
 
    **macOS**
    ```bash
-   ./gradlew packageReleaseDmg
+   ./gradlew :desktopApp:packageReleaseDmg
    ```
 
    **Linux**
    ```bash
-   ./gradlew packageReleaseDeb
+   ./gradlew :desktopApp:packageReleaseDeb
    ```
 
-   **Windows**
+   **Windows (PowerShell)**
    ```bash
-   ./gradlew packageReleaseMsi
+   ./gradlew :desktopApp:packageReleaseMsi
    ```
-4. Install the application using the generated installer located in `composeApp/build/compose/binaries/main-release/<installer type>`
+6. Install the application using the generated installer located in `desktopApp/build/compose/binaries/main-release/<installer type>`

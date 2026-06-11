@@ -70,7 +70,12 @@ object CefBrowserProvider {
         return withContext(Dispatchers.IO) {
             appMutex.withLock {
                 CefAppBuilder().apply {
-                    setInstallDir(File("jcef-bundle"))
+                    val installDir = File(
+                        System.getProperty("user.home"),
+                        ".gatetik/jcef"
+                    )
+                    installDir.mkdirs()
+                    setInstallDir(installDir)
                     setProgressHandler { status, progress ->
                         _loadProgress.value = CefBrowserLoadProgress(
                             when (status) {
