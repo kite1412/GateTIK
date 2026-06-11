@@ -50,6 +50,7 @@ compose.desktop {
         nativeDistributions {
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
             modules("jdk.unsupported")
+            javaHome = System.getenv("JAVA_HOME")
 
             packageName = "Gate TIK"
             packageVersion = "1.0.0"
