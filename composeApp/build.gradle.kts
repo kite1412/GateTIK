@@ -36,7 +36,6 @@ kotlin {
         androidMain.dependencies {
             implementation(libs.compose.uiToolingPreview)
             implementation(libs.androidx.activity.compose)
-            implementation(libs.libvlc.android)
             implementation(libs.play.services.location)
             implementation(libs.compose.webview)
         }
@@ -71,7 +70,6 @@ kotlin {
             implementation(compose.desktop.currentOs)
             implementation(libs.kotlinx.coroutinesSwing)
             implementation(libs.kotlin.logging.jvm)
-            implementation(libs.vlcj)
             implementation(libs.logback)
             implementation(libs.jcefmaven)
         }

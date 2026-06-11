@@ -10,15 +10,10 @@ import kite1412.gatetik.datastore.dataStoreFileName
 import org.koin.core.module.Module
 import org.koin.dsl.bind
 import org.koin.dsl.module
-import org.videolan.libvlc.LibVLC
 
 actual val platformModule: Module = module {
     single<DataStore<Preferences>> {
         createDataStore(context = get())
-    }
-
-    single {
-        LibVLC(get())
     }
 
     single {
