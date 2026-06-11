@@ -49,6 +49,7 @@ import kite1412.gatetik.designsystem.component.GlassBox
 import kite1412.gatetik.designsystem.extension.linkStyle
 import kite1412.gatetik.designsystem.extension.radialBackground
 import kite1412.gatetik.designsystem.theme.Black
+import kite1412.gatetik.designsystem.theme.Blue500Alt
 import kite1412.gatetik.designsystem.theme.GateTikTheme
 import kite1412.gatetik.designsystem.theme.Red500
 import kite1412.gatetik.designsystem.theme.Red600_90
@@ -146,8 +147,10 @@ fun main() {
                                         sessionStatus is SessionStatus.SignedIn &&
                                         (sessionStatus as SessionStatus.SignedIn).user.role != UserRole.STUDENT &&
                                         cefLoadProgress.status != CefBrowserProgressStatus.INITIALIZED
-                                    ) CefBrowserLoadProgress(cefLoadProgress)
-                                    else GateTikApp()
+                                    ) CefBrowserLoadProgress(
+                                        progress = cefLoadProgress,
+                                        isDarkMode = isDarkMode
+                                    ) else GateTikApp()
                                 }
                             }
                         }
@@ -161,19 +164,23 @@ fun main() {
 @Composable
 private fun CefBrowserLoadProgress(
     progress: CefBrowserLoadProgress,
+    isDarkMode: Boolean,
     modifier: Modifier = Modifier
 ) {
     Column(
         modifier = modifier
             .fillMaxSize()
-            .background(MaterialTheme.colorScheme.background),
+            .background(MaterialTheme.colorScheme.background)
+            .radialBackground(isDarkMode = isDarkMode),
         verticalArrangement = Arrangement.spacedBy(
             space = 8.dp,
             alignment = Alignment.CenterVertically
         ),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        CircularProgressIndicator()
+        CircularProgressIndicator(
+            color = Blue500Alt
+        )
         Text(
             text = when (progress.status) {
                 CefBrowserProgressStatus.LOCATING -> "Memeriksa komponen browser..."
