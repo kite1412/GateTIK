@@ -73,7 +73,17 @@ VERSION=<Application Version>
     ```bash
     git clone https://github.com/kite1412/GateTIK.git
     ```
-2. Open the downloaded repository in Android Studio / IntelliJ IDEA.
+2. Set `JAVA_HOME` before starting Gradle:
+
+   **macOS / Linux**
+   ```bash
+   export JAVA_HOME=<path to JDK 21>
+   ```
+
+   **Windows (PowerShell)**
+   ```bash
+   $env:JAVA_HOME = "<path to JDK 21>"
+   ```
 3. Run the following Gradle command:
 
    **macOS / Linux / Windows (PowerShell)**
@@ -86,20 +96,8 @@ VERSION=<Application Version>
 
     ```bash
     git clone https://github.com/kite1412/GateTIK.git
-    ```
-2. Ensure Gradle is using JDK 21 by checking the JVM used by Gradle Daemon:
-
-   ```bash
-   ./gradlew --version
    ```
-   
-3. To force Gradle to use JDK 21, add to `gradle.properties`:
-   
-   ```properties
-   org.gradle.java.home=<path to JDK 21>
-   ```
-
-4. Alternatively, set `JAVA_HOME` before starting Gradle:
+2. Set `JAVA_HOME` before starting Gradle:
 
    **macOS / Linux**
    ```bash
@@ -110,7 +108,7 @@ VERSION=<Application Version>
    ```bash
    $env:JAVA_HOME = "<path to JDK 21>"
    ```
-5. Depending on the platform used for building the release package:
+3. Depending on the platform used for building the release package:
 
    **macOS**
    ```bash
@@ -126,4 +124,4 @@ VERSION=<Application Version>
    ```bash
    ./gradlew :desktopApp:packageReleaseMsi
    ```
-6. Install the application using the generated installer located in `desktopApp/build/compose/binaries/main-release/<installer type>`
+4. Install the application using the generated installer located in `desktopApp/build/compose/binaries/main-release/<installer type>`
