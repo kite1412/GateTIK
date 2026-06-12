@@ -34,7 +34,7 @@ class DesktopParkingViewModel(
     val mainGate = getMainGateUseCase.observeAsLoadStateFlow().stateIn(viewModelScope)
 
     init {
-        initPolling(::pollData)
+        polling(::pollData)
     }
 
     fun refreshParkingQuota() {

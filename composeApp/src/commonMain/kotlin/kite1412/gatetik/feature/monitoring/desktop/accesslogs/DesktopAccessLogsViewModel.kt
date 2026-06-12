@@ -114,7 +114,7 @@ class DesktopAccessLogsViewModel(
                 }
                 .launchIn(this)
 
-            initPolling(::pollData)
+            polling(::pollData)
         }
     }
 

@@ -117,7 +117,7 @@ class DesktopUserManagementViewModel(
     }
 
     init {
-        initPolling(::pollData)
+        polling(::pollData)
     }
 
     suspend fun pollData() = params.first()?.let { params ->

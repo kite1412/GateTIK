@@ -50,7 +50,7 @@ class DesktopDashboardViewModel(
         viewModelScope.launch {
             pollData()
         }
-        initPolling(::pollData)
+        polling(::pollData)
     }
 
     fun openGate() {
