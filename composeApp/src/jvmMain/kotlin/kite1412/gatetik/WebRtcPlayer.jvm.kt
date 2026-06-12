@@ -4,7 +4,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -12,9 +12,14 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.awt.SwingPanel
+import kite1412.gatetik.util.SupportedOS
+import kite1412.gatetik.util.getSupportedOS
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.swing.Swing
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
@@ -32,8 +37,14 @@ import kotlin.math.max
 actual fun WebRtcPlayer(url: String, modifier: Modifier) {
     var browser by remember { mutableStateOf<CefBrowser?>(null) }
 
-    LaunchedEffect(url) {
-        browser = CefBrowserProvider.createBrowser(url)
+    DisposableEffect(url) {
+        CoroutineScope(Dispatchers.Swing).launch {
+            browser = CefBrowserProvider.createBrowser(url)
+        }
+
+        onDispose {
+            browser?.close(false)
+        }
     }
 
     if (browser == null) Box(
@@ -57,10 +68,8 @@ actual fun WebRtcPlayer(url: String, modifier: Modifier) {
 
 object CefBrowserProvider {
     private val appMutex = Mutex()
-    private val browsersMutex = Mutex()
     private val _loadProgress = MutableStateFlow(CefBrowserLoadProgress())
     val loadProgress = _loadProgress.asStateFlow()
-    private var browsers: MutableMap<String, CefBrowser> = mutableMapOf()
     private var app: CefApp? = null
     private var client: CefClient? = null
 
@@ -89,6 +98,12 @@ object CefBrowserProvider {
                         )
                     }
                     addJcefArgs("--disable-web-security")
+
+                    if (getSupportedOS() == SupportedOS.WINDOWS) {
+                        cefSettings.windowless_rendering_enabled = false
+
+                        addJcefArgs("--autoplay-policy=no-user-gesture-required")
+                    }
                 }.build().also {
                     app = it
                 }
@@ -105,18 +120,11 @@ object CefBrowserProvider {
     }
 
     suspend fun createBrowser(url: String): CefBrowser =
-        browsersMutex.withLock {
-            browsers[url]?.let { return it }
-
-            val browser = getClient().createBrowser(
-                url,
-                false,
-                false
-            )
-
-            browsers[url] = browser
-            browser
-        }
+        getClient().createBrowser(
+            url,
+            false,
+            false
+        )
 }
 
 data class CefBrowserLoadProgress(

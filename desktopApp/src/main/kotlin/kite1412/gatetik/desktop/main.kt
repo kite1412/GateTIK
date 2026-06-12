@@ -93,9 +93,6 @@ fun main() {
         ) {
             window.minimumSize = Dimension(800, 600)
 
-            LaunchedEffect(Unit) {
-                CefBrowserProvider.initApp()
-            }
             Box(
                 modifier = Modifier
                     .fillMaxSize()
@@ -144,14 +141,20 @@ fun main() {
                                 ) else CompositionLocalProvider(
                                     LocalCsvExporter provides JvmCsvExporter(window)
                                 ) {
-                                    if (
-                                        sessionStatus is SessionStatus.SignedIn &&
-                                        (sessionStatus as SessionStatus.SignedIn).user.role != UserRole.STUDENT &&
-                                        cefLoadProgress.status != CefBrowserProgressStatus.INITIALIZED
-                                    ) CefBrowserLoadProgress(
-                                        progress = cefLoadProgress,
-                                        isDarkMode = isDarkMode
-                                    ) else GateTikApp()
+                                    CompositionLocalProvider(
+                                        LocalCsvExporter provides JvmCsvExporter(window)
+                                    ) {
+                                        val isNotStudent = sessionStatus is SessionStatus.SignedIn &&
+                                            (sessionStatus as SessionStatus.SignedIn).user.role != UserRole.STUDENT
+
+                                        if (isNotStudent) LaunchedEffect(Unit) {
+                                            CefBrowserProvider.initApp()
+                                        }
+                                        if (isNotStudent && cefLoadProgress.status != CefBrowserProgressStatus.INITIALIZED) CefBrowserLoadProgress(
+                                            progress = cefLoadProgress,
+                                            isDarkMode = isDarkMode
+                                        ) else GateTikApp()
+                                    }
                                 }
                             }
                         }
