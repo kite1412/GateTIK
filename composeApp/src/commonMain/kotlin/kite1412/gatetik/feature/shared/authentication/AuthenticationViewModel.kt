@@ -88,9 +88,7 @@ class AuthenticationViewModel(
                     _uiEvent.emit(UiEvent.ShowSnackbar("Login berhasil"))
                 }
                 .onError {
-                    if (it is Authentication.AuthError) {
-                        _uiEvent.emit(UiEvent.ShowSnackbar(it.message))
-                    }
+                    _uiEvent.emit(UiEvent.ShowSnackbar(it.message))
                 }
             isInProgress = false
         }
@@ -128,9 +126,7 @@ class AuthenticationViewModel(
                     }
                 }
                 .onError {
-                    if (it is Authentication.AuthError) {
-                        _uiEvent.emit(UiEvent.ShowSnackbar(it.message))
-                    }
+                    _uiEvent.emit(UiEvent.ShowSnackbar(it.message))
                 }
             isInProgress = false
         }
