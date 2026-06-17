@@ -6,6 +6,7 @@ import kite1412.gatetik.data.repository.GateRepositoryImpl
 import kite1412.gatetik.data.repository.ParkingQuotaRepositoryImpl
 import kite1412.gatetik.data.repository.ProfileRepositoryImpl
 import kite1412.gatetik.data.repository.UserRepositoryImpl
+import kite1412.gatetik.domain.VersionChecker
 import kite1412.gatetik.domain.repository.AccessLogRepository
 import kite1412.gatetik.domain.repository.CctvRepository
 import kite1412.gatetik.domain.repository.GateRepository
@@ -52,4 +53,8 @@ val dataModule = module {
             remoteDataSource = get()
         )
     } bind ProfileRepository::class
+
+    single {
+        GitHubVersionChecker()
+    } bind VersionChecker::class
 }

@@ -30,6 +30,7 @@ RTSP_CCTV_URL=<CCTV RTSP Stream URL>
 WEB_RTC_PLAYER_CCTV_URL=<CCTV WebRTC Player Stream URL>
 ANDROID_INSTALLATION_URL=<Android APK Distribution URL>
 VERSION=<Application Version>
+GITHUB_LATEST_RELEASE_URL=<GitHub latest release info URL>
 ```
 
 ### 📱 Android

@@ -88,4 +88,5 @@ buildConfig {
     buildConfigField("WEB_RTC_PLAYER_CCTV_URL")
     buildConfigField("VERSION")
     buildConfigField("ANDROID_INSTALLATION_URL")
+    buildConfigField("GITHUB_LATEST_RELEASE_URL")
 }
