@@ -1,5 +1,7 @@
 package kite1412.gatetik.app
 
+import androidx.compose.animation.EnterTransition
+import androidx.compose.animation.ExitTransition
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
@@ -42,7 +44,11 @@ fun GateTikNavHost(
     NavHost(
         navController = navController,
         startDestination = startDestination,
-        modifier = modifier.fillMaxSize()
+        modifier = modifier.fillMaxSize(),
+        enterTransition = { EnterTransition.None },
+        exitTransition = { ExitTransition.None },
+        popEnterTransition = { EnterTransition.None },
+        popExitTransition = { ExitTransition.None }
     ) {
         sharedGraph(
             scaffoldPadding = scaffoldPadding,
