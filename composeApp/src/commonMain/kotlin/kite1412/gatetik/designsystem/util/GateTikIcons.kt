@@ -39,6 +39,7 @@ import gatetik.composeapp.generated.resources.shield
 import gatetik.composeapp.generated.resources.sound_up
 import gatetik.composeapp.generated.resources.sun
 import gatetik.composeapp.generated.resources.trash
+import gatetik.composeapp.generated.resources.triangle_alert
 import gatetik.composeapp.generated.resources.unila
 import gatetik.composeapp.generated.resources.user_check
 import gatetik.composeapp.generated.resources.user_pen
@@ -97,4 +98,5 @@ object GateTikIcons {
     val download = Res.drawable.download
     val userX = Res.drawable.user_x
     val rotate = Res.drawable.rotate
+    val triangleAlert = Res.drawable.triangle_alert
 }
