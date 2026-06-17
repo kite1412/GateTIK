@@ -62,7 +62,7 @@ class DesktopAccessLogsViewModel(
         private set
     var selectedActionFilter by mutableStateOf<AccessAction?>(null)
         private set
-    var selectedSort by mutableStateOf(Sort.ASC)
+    var selectedSort by mutableStateOf(Sort.DESC)
         private set
     var accessLogs by mutableStateOf<LoadState<List<AccessLog>>>(LoadState.Loading("Memuat log akses"))
         private set

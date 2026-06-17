@@ -442,8 +442,8 @@ private fun AccessLogsTableSection(
                         items = accessLogs
                             .run {
                                 when (sort) {
-                                    Sort.ASC -> sortedByDescending { it.createdAt }
-                                    Sort.DESC -> sortedBy { it.createdAt }
+                                    Sort.ASC -> sortedBy { it.createdAt }
+                                    Sort.DESC -> sortedByDescending { it.createdAt }
                                 }
                             }
                     ) else Text("Log akses tidak ditemukan")
