@@ -15,8 +15,10 @@ interface VersionChecker {
      * By default, this uses Semantic Versioning and treats a change in
      * the major version as a breaking change.
      */
-    fun isBreakingChange(latestVersion: AppVersion): Boolean =
+    fun hasBreakingChanges(latestVersion: AppVersion): Boolean =
         semVerBreakingChange(latestVersion.versionCode)
+
+    fun hasUpdate(latestVersion: AppVersion) = latestVersion.versionCode != BuildConfig.VERSION
 
     private fun semVerBreakingChange(code: String): Boolean {
         val latestMajor = code.substringBefore('.').toIntOrNull()
@@ -24,7 +26,7 @@ interface VersionChecker {
 
         return latestMajor != null &&
             currentMajor != null &&
-            latestMajor > currentMajor
+            latestMajor != currentMajor
     }
 }
 

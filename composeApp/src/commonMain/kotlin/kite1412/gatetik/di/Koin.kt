@@ -140,7 +140,8 @@ private val viewModelModule = module {
     viewModel {
         GateTikViewModel(
             dataStore = get(),
-            authentication = get()
+            authentication = get(),
+            versionChecker = get()
         )
     }
 }

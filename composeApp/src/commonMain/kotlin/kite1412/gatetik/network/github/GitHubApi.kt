@@ -9,7 +9,7 @@ import kite1412.gatetik.network.github.dto.response.GitHubRelease
 class GitHubApi {
     suspend fun getLatestRelease(): GitHubRelease =
         ktorHttpClient.get(
-            urlString = BuildConfig.GITHUB_LATEST_RELEASE_URL
+            urlString = BuildConfig.LATEST_RELEASE_INFO_URL
         )
             .body<GitHubRelease>()
 }
