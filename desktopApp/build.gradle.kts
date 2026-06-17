@@ -53,7 +53,7 @@ compose.desktop {
             javaHome = System.getenv("JAVA_HOME")
 
             packageName = "Gate TIK"
-            packageVersion = "1.0.0"
+            packageVersion = "1.0.1"
 
             macOS {
                 iconFile.set(project.file("resource/desktop_icon.icns"))
