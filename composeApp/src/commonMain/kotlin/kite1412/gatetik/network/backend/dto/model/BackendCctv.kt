@@ -12,6 +12,7 @@ data class BackendCctv(
     val cameraName: String,
     @SerialName("stream_url")
     val streamUrl: String,
+    val path: String = "",
     @SerialName("is_active")
     val isActive: Boolean,
     @SerialName("created_at")
@@ -23,6 +24,8 @@ data class BackendCctv(
         id = id,
         cameraName = cameraName,
         streamUrl = streamUrl,
-        isActive = isActive
+        path = path,
+        isActive = true,
+        createdAt = createdAt
     )
 }

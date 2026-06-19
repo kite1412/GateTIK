@@ -30,6 +30,7 @@ import gatetik.composeapp.generated.resources.people
 import gatetik.composeapp.generated.resources.person
 import gatetik.composeapp.generated.resources.phone
 import gatetik.composeapp.generated.resources.phone_call
+import gatetik.composeapp.generated.resources.plus
 import gatetik.composeapp.generated.resources.radio
 import gatetik.composeapp.generated.resources.rotate
 import gatetik.composeapp.generated.resources.scroll_text
@@ -99,4 +100,5 @@ object GateTikIcons {
     val userX = Res.drawable.user_x
     val rotate = Res.drawable.rotate
     val triangleAlert = Res.drawable.triangle_alert
+    val plus = Res.drawable.plus
 }

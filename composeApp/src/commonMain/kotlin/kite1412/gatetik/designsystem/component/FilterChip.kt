@@ -4,6 +4,7 @@ import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.MaterialTheme
@@ -13,6 +14,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import kite1412.gatetik.designsystem.theme.Blue500
@@ -28,7 +30,9 @@ fun FilterChip(
     selectedContainerColor: Color = Blue500,
     selectedContentColor: Color = White,
     unselectedContainerColor: Color = Color.Transparent,
-    unselectedContentColor: Color = MaterialTheme.colorScheme.onSurfaceVariant
+    unselectedContentColor: Color = MaterialTheme.colorScheme.onSurfaceVariant,
+    shape: Shape = CircleShape,
+    contentPadding: PaddingValues = PaddingValues(horizontal = 16.dp, vertical = 8.dp)
 ) {
     val isDarkMode = LocalDarkMode.current
     val backgroundColor by animateColorAsState(
@@ -42,10 +46,10 @@ fun FilterChip(
 
     Box(
         modifier = modifier
-            .clip(CircleShape)
+            .clip(shape)
             .background(backgroundColor)
             .clickable(onClick = onClick)
-            .padding(horizontal = 16.dp, vertical = 8.dp)
+            .padding(contentPadding)
     ) {
         Text(
             text = text,

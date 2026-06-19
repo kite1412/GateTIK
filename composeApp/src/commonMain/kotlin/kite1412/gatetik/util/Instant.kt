@@ -27,6 +27,14 @@ val Instant.timestampString: String
         return "$day $monthStr $year, $hour:$minute:$second"
     }
 
+fun Instant.toLocalDateString(): String {
+    val localDateTime = this.toLocalDateTime(TimeZone.currentSystemDefault())
+    val day = localDateTime.day.toString().padStart(2, '0')
+    val month = localDateTime.month.ordinal.plus(1).toString().padStart(2, '0')
+    val year = localDateTime.year
+    return "$year-$month-$day"
+}
+
 fun Instant.timeAgo(now: Instant = now()): String {
     val seconds = now.epochSeconds - this.epochSeconds
 

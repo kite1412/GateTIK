@@ -46,9 +46,23 @@ val mockGate = Gate(
 
 val mockCctv = Cctv(
     id = 1,
-    cameraName = "Lobby Camera",
+    cameraName = "Main Gate Camera",
     streamUrl = "rtsp://192.168.1.10:554/stream1",
-    isActive = true
+    path = "/gate1",
+    isActive = true,
+    createdAt = Instant.parse("2026-06-18T00:00:00Z")
+)
+
+val mockCctvs = listOf(
+    mockCctv,
+    Cctv(
+        id = 2,
+        cameraName = "Second Camera",
+        streamUrl = "rtsp://192.168.1.11:554/stream2",
+        path = "/gate2",
+        isActive = true,
+        createdAt = Instant.parse("2026-06-18T00:00:00Z")
+    )
 )
 
 val mockParkingQuota = ParkingQuota(
