@@ -48,6 +48,7 @@ import kite1412.gatetik.designsystem.theme.Red500
 import kite1412.gatetik.designsystem.theme.White
 import kite1412.gatetik.designsystem.util.GateTikIcons
 import kite1412.gatetik.domain.model.CctvCreate
+import kite1412.gatetik.domain.model.CctvUpdate
 import kite1412.gatetik.feature.monitoring.desktop.cctv.component.AddCctvDialog
 import kite1412.gatetik.feature.monitoring.desktop.cctv.component.CctvActionBar
 import kite1412.gatetik.feature.monitoring.desktop.cctv.component.CctvGridItem
@@ -191,7 +192,15 @@ fun DesktopCctvScreen(
                         )
                     )
                 } else {
-                    // TODO: Update camera logic if needed
+                    viewModel.updateCctv(
+                        CctvUpdate(
+                            id = selectedCameraForEdit!!.id,
+                            cameraName = name,
+                            path = path,
+                            streamUrl = url,
+                            type = type
+                        )
+                    )
                 }
                 dismissDialogs()
             }
