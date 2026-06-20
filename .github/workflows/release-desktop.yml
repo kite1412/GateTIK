@@ -2,7 +2,7 @@ name: Build & Release Installers
 
 env:
   APP_NAME: GateTIK
-  VERSION: 1.1.0
+  VERSION: 2.0.0
 
 on:
   push:
@@ -52,10 +52,9 @@ jobs:
         shell: bash
         run: | 
           echo "BACKEND_URL=${{ secrets.BACKEND_URL }}" >> local.properties
-          echo "RTSP_CCTV_URL=${{ secrets.RTSP_CCTV_URL }}" >> local.properties
-          echo "WEB_RTC_PLAYER_CCTV_URL=${{ secrets.WEB_RTC_PLAYER_CCTV_URL }}" >> local.properties
           echo "ANDROID_INSTALLATION_URL=${{ secrets.ANDROID_INSTALLATION_URL }}" >> local.properties
           echo "LATEST_RELEASE_INFO_URL=${{ secrets.LATEST_RELEASE_INFO_URL }}" >> local.properties
+          echo "WEB_RTC_PLAYER_BASE_URL=${{ secrets.WEB_RTC_PLAYER_BASE_URL }}" >> local.properties
           echo "VERSION=${{ env.VERSION }}" >> local.properties
 
       - name: Generate BuildConfig
