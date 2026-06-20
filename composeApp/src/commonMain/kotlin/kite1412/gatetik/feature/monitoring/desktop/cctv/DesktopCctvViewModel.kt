@@ -4,6 +4,7 @@ import kite1412.gatetik.datastore.GateTikDataStore
 import kite1412.gatetik.domain.Authentication
 import kite1412.gatetik.feature.monitoring.desktop.DesktopBaseViewModel
 import kite1412.gatetik.model.Cctv
+import kite1412.gatetik.model.CctvType
 import kite1412.gatetik.network.mock.mockCctvs
 import kite1412.gatetik.util.now
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -51,6 +52,7 @@ class DesktopCctvViewModel(
                 streamUrl = url,
                 path = path,
                 isActive = true,
+                type = CctvType.MONITOR,
                 createdAt = now()
             )
         }

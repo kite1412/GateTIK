@@ -12,9 +12,8 @@ data class BackendCctv(
     val cameraName: String,
     @SerialName("stream_url")
     val streamUrl: String,
-    val path: String = "",
-    @SerialName("is_active")
-    val isActive: Boolean,
+    val path: String,
+    val type: BackendCctvType,
     @SerialName("created_at")
     val createdAt: Instant,
     @SerialName("updated_at")
@@ -26,6 +25,7 @@ data class BackendCctv(
         streamUrl = streamUrl,
         path = path,
         isActive = true,
+        type = type.toModel(),
         createdAt = createdAt
     )
 }

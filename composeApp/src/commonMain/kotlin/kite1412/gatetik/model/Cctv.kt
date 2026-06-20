@@ -8,5 +8,6 @@ data class Cctv(
     val streamUrl: String,
     val path: String = "",
     val isActive: Boolean,
-    val createdAt: Instant = Instant.DISTANT_PAST
+    val createdAt: Instant = Instant.DISTANT_PAST,
+    val type: CctvType
 )

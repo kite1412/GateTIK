@@ -5,6 +5,7 @@ import kite1412.gatetik.model.AccessLog
 import kite1412.gatetik.model.AccessMethod
 import kite1412.gatetik.model.AccessStatus
 import kite1412.gatetik.model.Cctv
+import kite1412.gatetik.model.CctvType
 import kite1412.gatetik.model.Gate
 import kite1412.gatetik.model.IotDevice
 import kite1412.gatetik.model.IotDeviceStatus
@@ -50,6 +51,7 @@ val mockCctv = Cctv(
     streamUrl = "rtsp://192.168.1.10:554/stream1",
     path = "/gate1",
     isActive = true,
+    type = CctvType.MONITOR,
     createdAt = Instant.parse("2026-06-18T00:00:00Z")
 )
 
@@ -61,6 +63,7 @@ val mockCctvs = listOf(
         streamUrl = "rtsp://192.168.1.11:554/stream2",
         path = "/gate2",
         isActive = true,
+        type = CctvType.MONITOR,
         createdAt = Instant.parse("2026-06-18T00:00:00Z")
     )
 )
