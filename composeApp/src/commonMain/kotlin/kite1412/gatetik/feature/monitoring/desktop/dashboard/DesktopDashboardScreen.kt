@@ -166,7 +166,8 @@ private fun DesktopDashboardScreen(
                 LiveCameraSection(
                     cameraName = cctv.data?.cameraName ?: "~",
                     showFullScreenButton = true,
-                    onFullScreenClick = onCctvFullScreenClick
+                    onFullScreenClick = onCctvFullScreenClick,
+                    path = cctv.data?.path
                 )
             }
             item {
@@ -182,7 +183,8 @@ private fun DesktopDashboardScreen(
                             .weight(2f)
                             .fillMaxHeight(),
                         showFullScreenButton = true,
-                        onFullScreenClick = onCctvFullScreenClick
+                        onFullScreenClick = onCctvFullScreenClick,
+                        path = cctv.data?.path
                     )
                     if (isLargeWindow) Column(
                         modifier = Modifier.weight(1f),

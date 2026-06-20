@@ -32,7 +32,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import kite1412.gatetik.BuildConfig
 import kite1412.gatetik.WebRtcPlayer
 import kite1412.gatetik.designsystem.component.Badge
 import kite1412.gatetik.designsystem.component.GlassBox
@@ -44,11 +43,13 @@ import kite1412.gatetik.designsystem.theme.Red600
 import kite1412.gatetik.designsystem.theme.White
 import kite1412.gatetik.designsystem.theme.White20
 import kite1412.gatetik.designsystem.util.GateTikIcons
+import kite1412.gatetik.getWebRtcStreamUrl
 import kite1412.gatetik.model.Cctv
 import kite1412.gatetik.ui.component.InfoCard
 import kite1412.gatetik.ui.compositionlocal.LocalDarkMode
 import kite1412.gatetik.ui.preview.DevicePreviews
 import kite1412.gatetik.ui.util.LoadState
+import kite1412.gatetik.ui.util.data
 import kite1412.gatetik.ui.util.navBarPadding
 import kotlinx.coroutines.delay
 import org.jetbrains.compose.resources.painterResource
@@ -131,7 +132,7 @@ private fun MobileCctvScreen(
                     )
                 }
                 WebRtcPlayer(
-                    url = BuildConfig.WEB_RTC_PLAYER_CCTV_URL,
+                    url = cctv.data?.path?.let { getWebRtcStreamUrl(it) } ?: "",
                     modifier = Modifier
                         .fillMaxWidth()
                         .aspectRatio(16f / 9f)
@@ -167,7 +168,7 @@ private fun CctvPlayer(
                     }
                 }
                 WebRtcPlayer(
-                    url = BuildConfig.WEB_RTC_PLAYER_CCTV_URL,
+                    url = cctv.data?.path?.let { getWebRtcStreamUrl(it) } ?: "",
                     modifier = Modifier.fillMaxSize()
                 )
                 Badge(

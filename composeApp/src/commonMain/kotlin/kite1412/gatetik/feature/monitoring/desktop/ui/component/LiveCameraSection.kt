@@ -24,7 +24,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import kite1412.gatetik.BuildConfig
 import kite1412.gatetik.WebRtcPlayer
 import kite1412.gatetik.designsystem.component.Badge
 import kite1412.gatetik.designsystem.component.GlassBox
@@ -32,6 +31,7 @@ import kite1412.gatetik.designsystem.component.Icon
 import kite1412.gatetik.designsystem.theme.Blue500
 import kite1412.gatetik.designsystem.theme.Red500
 import kite1412.gatetik.designsystem.util.GateTikIcons
+import kite1412.gatetik.getWebRtcStreamUrl
 import org.jetbrains.compose.resources.painterResource
 
 @Composable
@@ -40,6 +40,7 @@ fun LiveCameraSection(
     modifier: Modifier = Modifier,
     showFullScreenButton: Boolean = false,
     onFullScreenClick: () -> Unit = {},
+    path: String? = null
 ) {
     GlassBox(
         modifier = modifier,
@@ -52,10 +53,12 @@ fun LiveCameraSection(
                     .aspectRatio(16f / 9f)
                     .background(Color.Black)
             ) {
-                WebRtcPlayer(
-                    url = BuildConfig.WEB_RTC_PLAYER_CCTV_URL,
-                    modifier = Modifier.fillMaxSize()
-                )
+                path?.let { path ->
+                    WebRtcPlayer(
+                        url = getWebRtcStreamUrl(path),
+                        modifier = Modifier.fillMaxSize()
+                    )
+                }
 
                 Badge(
                     text = "LIVE",

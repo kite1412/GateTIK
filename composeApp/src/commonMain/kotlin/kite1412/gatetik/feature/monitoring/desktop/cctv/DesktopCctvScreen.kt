@@ -293,12 +293,12 @@ private fun CctvGridView(
         verticalArrangement = Arrangement.spacedBy(16.dp),
         modifier = modifier
     ) {
-        items(cameras) { camera ->
+        items(cameras) { cctv ->
             CctvGridItem(
-                camera = camera,
+                cctv = cctv,
                 onFullscreenClick = { /* TODO */ },
-                onSettingsClick = { onEditClick(camera) },
-                onDeleteClick = { onDeleteClick(camera) }
+                onSettingsClick = { onEditClick(cctv) },
+                onDeleteClick = { onDeleteClick(cctv) }
             )
         }
     }

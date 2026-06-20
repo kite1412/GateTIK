@@ -5,3 +5,5 @@ import androidx.compose.ui.Modifier
 
 @Composable
 expect fun WebRtcPlayer(url: String, modifier: Modifier)
+
+fun getWebRtcStreamUrl(path: String) = BuildConfig.WEB_RTC_PLAYER_BASE_URL + path

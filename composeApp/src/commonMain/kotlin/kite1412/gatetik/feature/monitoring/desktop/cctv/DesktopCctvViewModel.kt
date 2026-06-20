@@ -78,8 +78,17 @@ class DesktopCctvViewModel(
         viewModelScope.launch {
             cctvRepository
                 .updateCctv(data)
-                .onSuccess {
-                    cctvs = LoadState.Success((cctvs.data ?: emptyList()) + listOf(it))
+                .onSuccess { cctv ->
+                    cctvs.data?.indexOfFirst { it.id == cctv.id }
+                        ?.takeIf { it != -1 }
+                        ?.let { index ->
+                            cctvs.data?.toMutableList()?.apply {
+                                set(index, cctv)
+                            }
+                                ?.let {
+                                    cctvs = LoadState.Success(it)
+                                }
+                        }
                 }
         }
     }

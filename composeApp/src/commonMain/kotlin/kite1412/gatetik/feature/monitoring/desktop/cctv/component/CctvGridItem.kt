@@ -40,13 +40,14 @@ import kite1412.gatetik.designsystem.theme.Red500
 import kite1412.gatetik.designsystem.theme.Slate500
 import kite1412.gatetik.designsystem.theme.White
 import kite1412.gatetik.designsystem.util.GateTikIcons
+import kite1412.gatetik.getWebRtcStreamUrl
 import kite1412.gatetik.model.Cctv
 import kite1412.gatetik.model.CctvType
 import org.jetbrains.compose.resources.painterResource
 
 @Composable
 fun CctvGridItem(
-    camera: Cctv,
+    cctv: Cctv,
     onFullscreenClick: () -> Unit,
     onSettingsClick: () -> Unit,
     onDeleteClick: () -> Unit,
@@ -68,7 +69,7 @@ fun CctvGridItem(
                     .background(Color.Black)
             ) {
                 WebRtcPlayer(
-                    url = camera.streamUrl,
+                    url = getWebRtcStreamUrl(cctv.path),
                     modifier = Modifier.fillMaxSize()
                 )
 
@@ -130,12 +131,12 @@ fun CctvGridItem(
                             horizontalArrangement = Arrangement.spacedBy(8.dp)
                         ) {
                             Text(
-                                text = camera.cameraName,
+                                text = cctv.cameraName,
                                 style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold),
                                 color = MaterialTheme.colorScheme.onSurface
                             )
                             Badge(
-                                text = when (camera.type) {
+                                text = when (cctv.type) {
                                     CctvType.MONITOR -> "Monitor"
                                     CctvType.INTERCOM -> "Interkom"
                                 },
@@ -144,7 +145,7 @@ fun CctvGridItem(
                             )
                         }
                         Text(
-                            text = camera.path,
+                            text = cctv.path,
                             style = MaterialTheme.typography.labelSmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
