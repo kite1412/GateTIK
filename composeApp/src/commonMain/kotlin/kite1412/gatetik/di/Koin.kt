@@ -91,7 +91,8 @@ private val desktopMonitoringViewModel = module {
     viewModel {
         DesktopCctvViewModel(
             authentication = get(),
-            dataStore = get()
+            dataStore = get(),
+            cctvRepository = get()
         )
     }
     viewModel {

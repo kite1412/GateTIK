@@ -35,14 +35,13 @@ import kite1412.gatetik.WebRtcPlayer
 import kite1412.gatetik.designsystem.component.Badge
 import kite1412.gatetik.designsystem.component.GlassBox
 import kite1412.gatetik.designsystem.component.Icon
-import kite1412.gatetik.designsystem.component.StatusIndicator
 import kite1412.gatetik.designsystem.theme.Blue500
-import kite1412.gatetik.designsystem.theme.Emerald500
 import kite1412.gatetik.designsystem.theme.Red500
 import kite1412.gatetik.designsystem.theme.Slate500
 import kite1412.gatetik.designsystem.theme.White
 import kite1412.gatetik.designsystem.util.GateTikIcons
 import kite1412.gatetik.model.Cctv
+import kite1412.gatetik.model.CctvType
 import org.jetbrains.compose.resources.painterResource
 
 @Composable
@@ -126,11 +125,24 @@ fun CctvGridItem(
                         tint = Blue500
                     )
                     Column {
-                        Text(
-                            text = camera.cameraName,
-                            style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold),
-                            color = MaterialTheme.colorScheme.onSurface
-                        )
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            Text(
+                                text = camera.cameraName,
+                                style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold),
+                                color = MaterialTheme.colorScheme.onSurface
+                            )
+                            Badge(
+                                text = when (camera.type) {
+                                    CctvType.MONITOR -> "Monitor"
+                                    CctvType.INTERCOM -> "Interkom"
+                                },
+                                containerColor = Blue500.copy(alpha = 0.1f),
+                                contentColor = Blue500
+                            )
+                        }
                         Text(
                             text = camera.path,
                             style = MaterialTheme.typography.labelSmall,
@@ -138,15 +150,6 @@ fun CctvGridItem(
                         )
                     }
                 }
-
-                Badge(
-                    text = if (camera.isActive) "online" else "offline",
-                    containerColor = (if (camera.isActive) Emerald500 else Red500).copy(alpha = 0.1f),
-                    contentColor = if (camera.isActive) Emerald500 else Red500,
-                    leadingIcon = {
-                        StatusIndicator(color = if (camera.isActive) Emerald500 else Red500)
-                    }
-                )
             }
         }
     }

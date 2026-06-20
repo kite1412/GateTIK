@@ -1,15 +1,26 @@
 package kite1412.gatetik.feature.monitoring.desktop.cctv
 
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
+import androidx.lifecycle.viewModelScope
 import kite1412.gatetik.datastore.GateTikDataStore
 import kite1412.gatetik.domain.Authentication
+import kite1412.gatetik.domain.model.CctvCreate
+import kite1412.gatetik.domain.model.CctvUpdate
+import kite1412.gatetik.domain.repository.CctvRepository
 import kite1412.gatetik.feature.monitoring.desktop.DesktopBaseViewModel
 import kite1412.gatetik.model.Cctv
-import kite1412.gatetik.model.CctvType
-import kite1412.gatetik.network.mock.mockCctvs
-import kite1412.gatetik.util.now
+import kite1412.gatetik.ui.util.LoadState
+import kite1412.gatetik.ui.util.UiEvent
+import kite1412.gatetik.ui.util.data
+import kite1412.gatetik.util.onError
+import kite1412.gatetik.util.onSuccess
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 
 enum class CctvTab {
     MONITOR, KELOLA
@@ -17,8 +28,11 @@ enum class CctvTab {
 
 class DesktopCctvViewModel(
     authentication: Authentication,
-    dataStore: GateTikDataStore
+    dataStore: GateTikDataStore,
+    private val cctvRepository: CctvRepository
 ) : DesktopBaseViewModel(authentication, dataStore) {
+    private val _uiEvent = MutableSharedFlow<UiEvent>()
+    val uiEvent = _uiEvent.asSharedFlow()
 
     private val _searchQuery = MutableStateFlow("")
     val searchQuery = _searchQuery.asStateFlow()
@@ -29,8 +43,14 @@ class DesktopCctvViewModel(
     private val _gridColumns = MutableStateFlow(2)
     val gridColumns = _gridColumns.asStateFlow()
 
-    private val _cameras = MutableStateFlow(mockCctvs)
-    val cameras = _cameras.asStateFlow()
+    var cctvs by mutableStateOf<LoadState<List<Cctv>>>(LoadState.Loading("Memuat Cctv"))
+        private set
+
+    init {
+        viewModelScope.launch {
+            updateCctvs()
+        }
+    }
 
     fun updateSearchQuery(query: String) {
         _searchQuery.value = query
@@ -44,21 +64,61 @@ class DesktopCctvViewModel(
         _gridColumns.value = columns
     }
 
-    fun addCamera(name: String, path: String, url: String) {
-        _cameras.update {
-            it + Cctv(
-                id = (it.maxOfOrNull { c -> c.id } ?: 0) + 1,
-                cameraName = name,
-                streamUrl = url,
-                path = path,
-                isActive = true,
-                type = CctvType.MONITOR,
-                createdAt = now()
-            )
+    fun addCctv(data: CctvCreate) {
+        viewModelScope.launch {
+            cctvRepository
+                .addCctv(data)
+                .onSuccess {
+                    cctvs = LoadState.Success((cctvs.data ?: emptyList()) + listOf(it))
+                }
         }
     }
 
-    fun deleteCamera(camera: Cctv) {
-        _cameras.update { it.filter { c -> c.id != camera.id } }
+    fun updateCctv(data: CctvUpdate) {
+        viewModelScope.launch {
+            cctvRepository
+                .updateCctv(data)
+                .onSuccess {
+                    cctvs = LoadState.Success((cctvs.data ?: emptyList()) + listOf(it))
+                }
+        }
+    }
+
+    fun deleteCctv(id: Int) {
+        viewModelScope.launch {
+            cctvRepository
+                .deleteCctv(id)
+                .onSuccess {
+                    cctvs.data?.let { cctvs ->
+                        cctvs.indexOfFirst { it.id == id }
+                            .takeIf { it != -1 }
+                            ?.let { index ->
+                                this@DesktopCctvViewModel.cctvs = LoadState.Success(
+                                    cctvs.toMutableList().apply {
+                                        removeAt(index)
+                                    }
+                                )
+                            }
+                    }
+                }
+        }
+    }
+
+    fun refreshCctvs() {
+        viewModelScope.launch {
+            updateCctvs()
+            _uiEvent.emit(UiEvent.ShowSnackbar("Data dimuat ulang"))
+        }
+    }
+
+    private suspend fun updateCctvs() {
+        cctvRepository
+            .getAll()
+            .onSuccess {
+                cctvs = LoadState.Success(it)
+            }
+            .onError {
+                cctvs = LoadState.Error("Gagal memuat cctv")
+            }
     }
 }

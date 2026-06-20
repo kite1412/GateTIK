@@ -4,9 +4,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -16,11 +14,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import kite1412.gatetik.designsystem.component.GlassBox
+import kite1412.gatetik.designsystem.component.FilterChip
 import kite1412.gatetik.designsystem.component.GlassBoxDialog
 import kite1412.gatetik.designsystem.component.Icon
 import kite1412.gatetik.designsystem.component.OutlinedTextField
@@ -30,17 +27,19 @@ import kite1412.gatetik.designsystem.theme.Slate500
 import kite1412.gatetik.designsystem.theme.White
 import kite1412.gatetik.designsystem.util.GateTikIcons
 import kite1412.gatetik.model.Cctv
+import kite1412.gatetik.model.CctvType
 import org.jetbrains.compose.resources.painterResource
 
 @Composable
 fun AddCctvDialog(
     camera: Cctv?,
     onDismiss: () -> Unit,
-    onConfirm: (name: String, path: String, url: String) -> Unit
+    onConfirm: (name: String, path: String, url: String, type: CctvType) -> Unit
 ) {
     var name by remember { mutableStateOf(camera?.cameraName ?: "") }
     var path by remember { mutableStateOf(camera?.path ?: "") }
     var url by remember { mutableStateOf(camera?.streamUrl ?: "") }
+    var type by remember { mutableStateOf(camera?.type ?: CctvType.MONITOR) }
 
     GlassBoxDialog(
         title = if (camera == null) "Tambah Kamera" else "Edit Kamera",
@@ -76,9 +75,34 @@ fun AddCctvDialog(
                 }
             )
 
+            Column(
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                Text(
+                    text = "TIPE",
+                    style = MaterialTheme.typography.labelSmall,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    FilterChip(
+                        text = "Monitor",
+                        isSelected = type == CctvType.MONITOR,
+                        onClick = { type = CctvType.MONITOR }
+                    )
+                    FilterChip(
+                        text = "Interkom",
+                        isSelected = type == CctvType.INTERCOM,
+                        onClick = { type = CctvType.INTERCOM }
+                    )
+                }
+            }
+
             PrimaryButton(
                 text = if (camera == null) "Tambah Kamera" else "Simpan Perubahan",
-                onClick = { onConfirm(name, path, url) },
+                onClick = { onConfirm(name, path, url, type) },
                 leading = {
                     Icon(
                         painter = painterResource(GateTikIcons.userCheck), // Reusing check icon

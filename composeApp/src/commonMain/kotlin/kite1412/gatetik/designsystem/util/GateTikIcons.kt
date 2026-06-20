@@ -16,8 +16,10 @@ import gatetik.composeapp.generated.resources.email
 import gatetik.composeapp.generated.resources.eye_close
 import gatetik.composeapp.generated.resources.eye_open
 import gatetik.composeapp.generated.resources.funnel
+import gatetik.composeapp.generated.resources.grid2x2
 import gatetik.composeapp.generated.resources.house
 import gatetik.composeapp.generated.resources.id_card
+import gatetik.composeapp.generated.resources.layout_panel_left
 import gatetik.composeapp.generated.resources.locate_fixed
 import gatetik.composeapp.generated.resources.location_mark
 import gatetik.composeapp.generated.resources.lock
@@ -101,4 +103,6 @@ object GateTikIcons {
     val rotate = Res.drawable.rotate
     val triangleAlert = Res.drawable.triangle_alert
     val plus = Res.drawable.plus
+    val grid2x2 = Res.drawable.grid2x2
+    val layoutPanelLeft = Res.drawable.layout_panel_left
 }

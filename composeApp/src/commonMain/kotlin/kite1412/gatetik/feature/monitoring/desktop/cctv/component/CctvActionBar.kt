@@ -13,6 +13,7 @@ import kite1412.gatetik.designsystem.component.FilterChip
 import kite1412.gatetik.designsystem.component.GlassBox
 import kite1412.gatetik.designsystem.component.SearchField
 import kite1412.gatetik.feature.monitoring.desktop.cctv.CctvTab
+import kite1412.gatetik.feature.monitoring.desktop.cctv.CctvTabSelector
 
 @Composable
 fun CctvActionBar(
@@ -34,21 +35,10 @@ fun CctvActionBar(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                FilterChip(
-                    text = "Monitor",
-                    isSelected = selectedTab == CctvTab.MONITOR,
-                    onClick = { onTabSelected(CctvTab.MONITOR) }
-                )
-                FilterChip(
-                    text = "Kelola",
-                    isSelected = selectedTab == CctvTab.KELOLA,
-                    onClick = { onTabSelected(CctvTab.KELOLA) }
-                )
-            }
+            CctvTabSelector(
+                selectedTab = selectedTab,
+                onTabSelected = onTabSelected
+            )
 
             SearchField(
                 value = searchQuery,
