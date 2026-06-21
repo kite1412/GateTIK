@@ -37,8 +37,6 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import kite1412.gatetik.AppWindow
-import kite1412.gatetik.WebRtcPlayer
 import kite1412.gatetik.designsystem.component.Badge
 import kite1412.gatetik.designsystem.component.GlassBox
 import kite1412.gatetik.designsystem.component.Icon
@@ -54,12 +52,12 @@ import kite1412.gatetik.designsystem.util.GateTikIcons
 import kite1412.gatetik.designsystem.util.WindowWidthSize
 import kite1412.gatetik.designsystem.util.rememberWindowWidthSize
 import kite1412.gatetik.feature.monitoring.desktop.ui.component.AccessLogTrend
+import kite1412.gatetik.feature.monitoring.desktop.ui.component.CctvWindow
 import kite1412.gatetik.feature.monitoring.desktop.ui.component.DashboardSummaryCard
 import kite1412.gatetik.feature.monitoring.desktop.ui.component.DesktopLayout
 import kite1412.gatetik.feature.monitoring.desktop.ui.component.LiveCameraSection
 import kite1412.gatetik.feature.monitoring.desktop.ui.util.SideNotificationManager
 import kite1412.gatetik.feature.monitoring.desktop.ui.util.desktopBaseModifier
-import kite1412.gatetik.getWebRtcStreamUrl
 import kite1412.gatetik.model.AccessLog
 import kite1412.gatetik.model.AccessStatus
 import kite1412.gatetik.model.Cctv
@@ -240,15 +238,10 @@ private fun DesktopDashboardScreen(
     }
 
     if (isMainCctvFullScreen) cctv.data?.let { cctv ->
-        AppWindow(
-            title = cctv.cameraName,
+        CctvWindow(
+            cctv = cctv,
             onClose = { onExitCctvFullScreen() }
-        ) {
-            WebRtcPlayer(
-                url = getWebRtcStreamUrl(cctv.path),
-                modifier = Modifier.fillMaxSize()
-            )
-        }
+        )
     }
 }
 

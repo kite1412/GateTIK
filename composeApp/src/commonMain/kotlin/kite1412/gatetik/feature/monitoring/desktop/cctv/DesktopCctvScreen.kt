@@ -40,8 +40,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import kite1412.gatetik.AppWindow
-import kite1412.gatetik.WebRtcPlayer
 import kite1412.gatetik.designsystem.component.GradientTextButton
 import kite1412.gatetik.designsystem.component.Icon
 import kite1412.gatetik.designsystem.component.Table
@@ -60,9 +58,9 @@ import kite1412.gatetik.feature.monitoring.desktop.cctv.component.CctvActionBar
 import kite1412.gatetik.feature.monitoring.desktop.cctv.component.CctvGridItem
 import kite1412.gatetik.feature.monitoring.desktop.cctv.component.CctvStatsCard
 import kite1412.gatetik.feature.monitoring.desktop.cctv.component.DeleteCctvDialog
+import kite1412.gatetik.feature.monitoring.desktop.ui.component.CctvWindow
 import kite1412.gatetik.feature.monitoring.desktop.ui.component.DesktopLayout
 import kite1412.gatetik.feature.monitoring.desktop.ui.util.desktopBaseModifier
-import kite1412.gatetik.getWebRtcStreamUrl
 import kite1412.gatetik.model.Cctv
 import kite1412.gatetik.model.CctvType
 import kite1412.gatetik.ui.component.SmallCircularProgressIndicator
@@ -345,16 +343,10 @@ private fun CctvGridView(
                 onSettingsClick = { onEditClick(cctv) },
                 onDeleteClick = { onDeleteClick(cctv) }
             )
-
-            if (isFullScreen(cctv)) AppWindow(
-                title = cctv.cameraName,
+            if (isFullScreen(cctv)) CctvWindow(
+                cctv = cctv,
                 onClose = { onExitFullScreen(cctv) }
-            ) {
-                WebRtcPlayer(
-                    url = getWebRtcStreamUrl(cctv.path),
-                    modifier = Modifier.fillMaxSize()
-                )
-            }
+            )
         }
     }
 }

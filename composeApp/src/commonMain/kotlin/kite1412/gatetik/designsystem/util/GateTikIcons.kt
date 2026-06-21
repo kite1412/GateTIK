@@ -26,6 +26,8 @@ import gatetik.composeapp.generated.resources.location_mark
 import gatetik.composeapp.generated.resources.lock
 import gatetik.composeapp.generated.resources.lock_open
 import gatetik.composeapp.generated.resources.logout
+import gatetik.composeapp.generated.resources.mic
+import gatetik.composeapp.generated.resources.mic_off
 import gatetik.composeapp.generated.resources.moon
 import gatetik.composeapp.generated.resources.numbers
 import gatetik.composeapp.generated.resources.parking_off
@@ -109,4 +111,6 @@ object GateTikIcons {
     val layoutPanelLeft = Res.drawable.layout_panel_left
     val squarePen = Res.drawable.square_pen
     val cornerDownLeft = Res.drawable.corner_down_left
+    val mic = Res.drawable.mic
+    val micOff = Res.drawable.mic_off
 }
