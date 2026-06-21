@@ -10,7 +10,7 @@ on:
       - main
 
 jobs:
-  # Windows & Linux Installers
+  # Windows, Linux, & Android Installers
   build:
     name: Build ${{ matrix.installer }} (${{ matrix.os }})
     runs-on: ${{ matrix.os }}
@@ -34,6 +34,14 @@ jobs:
             artifact_path: "**/build/compose/binaries/main-release/deb/*.deb"
             os_name: linux
             arch: amd64
+
+          - os: ubuntu-latest
+            installer: apk
+            task: assembleRelease
+            artifact_name: installer-apk
+            artifact_path: "**/build/outputs/apk/release/*.apk"
+            os_name: android
+            arch: ""
 
     steps:
       - name: Checkout repository
@@ -62,17 +70,33 @@ jobs:
         env:
           JAVA_HOME: ${{ env.JAVA_HOME }}
 
+      - name: Decode Android keystore
+        if: matrix.installer == 'apk'
+        shell: bash
+        run: |
+          echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 -d > GateTIK.jks
+
       - name: Package ${{ matrix.installer }}
         run: ./gradlew ${{ matrix.task }}
         env:
           JAVA_HOME: ${{ env.JAVA_HOME }}
+          KEYSTORE_FILE: ${{ github.workspace }}/GateTIK.jks
+          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+          KEYSTORE_KEY_ALIAS: ${{ secrets.KEYSTORE_KEY_ALIAS }}
+          KEYSTORE_KEY_PASSWORD: ${{ secrets.KEYSTORE_KEY_PASSWORD }}
 
       - name: Rename installer
         shell: bash
         run: |
           FILE=$(find . -path "${{ matrix.artifact_path }}" | head -n 1)
           DIR=$(dirname "$FILE")
-          mv "$FILE" "$DIR/${{ env.APP_NAME }}-${{ env.VERSION }}_${{ matrix.os_name }}_${{ matrix.arch }}.${{ matrix.installer }}"
+          ARCH="${{ matrix.arch }}"
+          if [ -n "$ARCH" ]; then
+            NAME="${{ env.APP_NAME }}-${{ env.VERSION }}_${{ matrix.os_name }}_${ARCH}.${{ matrix.installer }}"
+          else
+            NAME="${{ env.APP_NAME }}-${{ env.VERSION }}_${{ matrix.os_name }}.${{ matrix.installer }}"
+          fi
+          mv "$FILE" "$DIR/$NAME"
 
       - name: Upload ${{ matrix.installer }} artifact
         uses: actions/upload-artifact@v4
