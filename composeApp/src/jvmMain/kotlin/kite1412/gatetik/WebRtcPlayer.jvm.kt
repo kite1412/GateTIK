@@ -5,7 +5,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
@@ -43,11 +42,12 @@ import kotlin.time.Duration.Companion.milliseconds
 actual fun WebRtcPlayer(url: String, modifier: Modifier) {
     var browser by remember { mutableStateOf<CefBrowser?>(null) }
 
-    LaunchedEffect(Unit) {
-        browser = CefBrowserProvider.createBrowser(url)
-    }
-    DisposableEffect(Unit) {
+    DisposableEffect(url) {
         val scope = CoroutineScope(Dispatchers.Swing)
+
+        scope.launch {
+            browser = CefBrowserProvider.createBrowser(url)
+        }
 
         onDispose {
             val currentBrowser = browser ?: run {
@@ -89,7 +89,7 @@ actual fun WebRtcPlayer(url: String, modifier: Modifier) {
         contentAlignment = Alignment.Center
     ) {
         CircularProgressIndicator()
-    } else key(url) {
+    } else key(browser) {
         SwingPanel(
             modifier = modifier.fillMaxSize(),
             factory = {
