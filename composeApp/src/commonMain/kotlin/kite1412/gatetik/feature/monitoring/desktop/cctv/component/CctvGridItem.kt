@@ -30,6 +30,7 @@ import kite1412.gatetik.designsystem.component.Badge
 import kite1412.gatetik.designsystem.component.GlassBox
 import kite1412.gatetik.designsystem.component.Icon
 import kite1412.gatetik.designsystem.theme.Blue500
+import kite1412.gatetik.designsystem.theme.Emerald500
 import kite1412.gatetik.designsystem.theme.GateTikTheme
 import kite1412.gatetik.designsystem.theme.Red500
 import kite1412.gatetik.designsystem.theme.Slate500
@@ -45,6 +46,7 @@ import org.jetbrains.compose.resources.painterResource
 fun CctvGridItem(
     cctv: Cctv,
     onFullscreenClick: () -> Unit,
+    onMicClick: () -> Unit,
     onSettingsClick: () -> Unit,
     onDeleteClick: () -> Unit,
     modifier: Modifier = Modifier
@@ -117,17 +119,24 @@ fun CctvGridItem(
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    HoverIconButton(
+                    IconButton(
                         icon = GateTikIcons.trash,
                         onClick = onDeleteClick,
                         containerColor = Red500
                     )
-                    HoverIconButton(
+                    IconButton(
                         icon = GateTikIcons.settings,
                         onClick = onSettingsClick,
                         containerColor = Slate500
                     )
-                    HoverIconButton(
+                    if (cctv.type == CctvType.INTERCOM) {
+                        IconButton(
+                            icon = GateTikIcons.mic,
+                            onClick = onMicClick,
+                            containerColor = Emerald500
+                        )
+                    }
+                    IconButton(
                         icon = GateTikIcons.zoomIn,
                         onClick = onFullscreenClick,
                         containerColor = Blue500
@@ -152,6 +161,7 @@ private fun CctvGridItemPreview() {
                 type = CctvType.MONITOR
             ),
             onFullscreenClick = {},
+            onMicClick = {},
             onSettingsClick = {},
             onDeleteClick = {}
         )
@@ -159,7 +169,7 @@ private fun CctvGridItemPreview() {
 }
 
 @Composable
-private fun HoverIconButton(
+private fun IconButton(
     icon: DrawableResource,
     onClick: () -> Unit,
     containerColor: Color

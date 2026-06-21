@@ -1,7 +1,7 @@
 package kite1412.gatetik.feature.monitoring.desktop.cctv
 
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.viewModelScope
@@ -44,7 +44,7 @@ class DesktopCctvViewModel(
     private val _gridColumns = MutableStateFlow(2)
     val gridColumns = _gridColumns.asStateFlow()
 
-    private val fullScreenCctvPaths = mutableStateListOf<String>()
+    private val openCctvWindows = mutableStateMapOf<String, Boolean>()
     var cctvs by mutableStateOf<LoadState<List<Cctv>>>(LoadState.Loading("Memuat Cctv"))
         private set
 
@@ -125,17 +125,16 @@ class DesktopCctvViewModel(
         }
     }
 
-    fun isCctvFullScreen(cctv: Cctv) = fullScreenCctvPaths.contains(cctv.path)
+    fun isCctvWindowOpen(cctv: Cctv) = openCctvWindows.containsKey(cctv.path)
 
-    fun addFullScreenCctv(cctv: Cctv) {
-        if (!fullScreenCctvPaths.contains(cctv.path)) fullScreenCctvPaths.add(cctv.path)
+    fun shouldAutoMicOn(cctv: Cctv) = openCctvWindows[cctv.path] ?: false
+
+    fun openCctvWindow(cctv: Cctv, autoMicOn: Boolean = false) {
+        openCctvWindows[cctv.path] = autoMicOn
     }
 
-    fun removeFullScreenCctv(cctv: Cctv) {
-        fullScreenCctvPaths
-            .indexOfFirst { it == cctv.path }
-            .takeIf { it != -1 }
-            ?.let(fullScreenCctvPaths::removeAt)
+    fun closeCctvWindow(cctv: Cctv) {
+        openCctvWindows.remove(cctv.path)
     }
 
     private suspend fun updateCctvs() {

@@ -202,9 +202,10 @@ fun DesktopCctvScreen(
                                 cameras = filteredCameras,
                                 gridColumns = gridColumns,
                                 contentPadding = bottomContentPadding,
-                                isFullScreen = viewModel::isCctvFullScreen,
-                                onFullScreenClick = viewModel::addFullScreenCctv,
-                                onExitFullScreen = viewModel::removeFullScreenCctv,
+                                isWindowOpen = viewModel::isCctvWindowOpen,
+                                shouldAutoMicOn = viewModel::shouldAutoMicOn,
+                                onOpenWindow = viewModel::openCctvWindow,
+                                onCloseWindow = viewModel::closeCctvWindow,
                                 onEditClick = openEditDialog,
                                 onDeleteClick = openDeleteDialog,
                                 modifier = Modifier.weight(1f)
@@ -322,9 +323,10 @@ private fun CctvGridView(
     cameras: List<Cctv>,
     gridColumns: Int,
     contentPadding: PaddingValues,
-    isFullScreen: (Cctv) -> Boolean,
-    onFullScreenClick: (Cctv) -> Unit,
-    onExitFullScreen: (Cctv) -> Unit,
+    isWindowOpen: (Cctv) -> Boolean,
+    shouldAutoMicOn: (Cctv) -> Boolean,
+    onOpenWindow: (Cctv, autoMicOn: Boolean) -> Unit,
+    onCloseWindow: (Cctv) -> Unit,
     onEditClick: (Cctv) -> Unit,
     onDeleteClick: (Cctv) -> Unit,
     modifier: Modifier = Modifier
@@ -339,13 +341,15 @@ private fun CctvGridView(
         items(cameras) { cctv ->
             CctvGridItem(
                 cctv = cctv,
-                onFullscreenClick = { onFullScreenClick(cctv) },
+                onFullscreenClick = { onOpenWindow(cctv, false) },
+                onMicClick = { onOpenWindow(cctv, true) },
                 onSettingsClick = { onEditClick(cctv) },
                 onDeleteClick = { onDeleteClick(cctv) }
             )
-            if (isFullScreen(cctv)) CctvWindow(
+            if (isWindowOpen(cctv)) CctvWindow(
                 cctv = cctv,
-                onClose = { onExitFullScreen(cctv) }
+                onClose = { onCloseWindow(cctv) },
+                autoMicOn = shouldAutoMicOn(cctv)
             )
         }
     }
