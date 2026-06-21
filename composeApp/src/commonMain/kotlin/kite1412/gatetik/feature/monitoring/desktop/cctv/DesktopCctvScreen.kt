@@ -101,11 +101,13 @@ fun DesktopCctvScreen(
     }
     val openEditDialog = { camera: Cctv ->
         selectedCameraForEdit = camera
+        if (selectedTab != CctvTab.MANAGE) viewModel.updateSelectedTab(CctvTab.MANAGE)
         showAddDialog = true
         windowBlurRequester.applyWindowBlur()
     }
     val openDeleteDialog = { camera: Cctv ->
         showDeleteDialog = camera
+        if (selectedTab != CctvTab.MANAGE) viewModel.updateSelectedTab(CctvTab.MANAGE)
         windowBlurRequester.applyWindowBlur()
     }
     val dismissDialogs = {

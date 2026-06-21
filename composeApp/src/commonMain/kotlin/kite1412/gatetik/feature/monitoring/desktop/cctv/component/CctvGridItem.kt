@@ -1,16 +1,11 @@
 package kite1412.gatetik.feature.monitoring.desktop.cctv.component
 
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.hoverable
-import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.interaction.collectIsHoveredAsState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
@@ -23,19 +18,19 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import kite1412.gatetik.WebRtcPlayer
 import kite1412.gatetik.designsystem.component.Badge
 import kite1412.gatetik.designsystem.component.GlassBox
 import kite1412.gatetik.designsystem.component.Icon
 import kite1412.gatetik.designsystem.theme.Blue500
+import kite1412.gatetik.designsystem.theme.GateTikTheme
 import kite1412.gatetik.designsystem.theme.Red500
 import kite1412.gatetik.designsystem.theme.Slate500
 import kite1412.gatetik.designsystem.theme.White
@@ -43,6 +38,7 @@ import kite1412.gatetik.designsystem.util.GateTikIcons
 import kite1412.gatetik.getWebRtcStreamUrl
 import kite1412.gatetik.model.Cctv
 import kite1412.gatetik.model.CctvType
+import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.painterResource
 
 @Composable
@@ -53,11 +49,8 @@ fun CctvGridItem(
     onDeleteClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val interactionSource = remember { MutableInteractionSource() }
-    val isHovered by interactionSource.collectIsHoveredAsState()
-
     GlassBox(
-        modifier = modifier.hoverable(interactionSource),
+        modifier = modifier,
         contentPadding = PaddingValues(0.dp),
         shape = RoundedCornerShape(16.dp)
     ) {
@@ -72,52 +65,20 @@ fun CctvGridItem(
                     url = getWebRtcStreamUrl(cctv.path),
                     modifier = Modifier.fillMaxSize()
                 )
-
-                this@Column.AnimatedVisibility(
-                    visible = isHovered,
-                    enter = fadeIn(),
-                    exit = fadeOut(),
-                    modifier = Modifier.fillMaxSize()
-                ) {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .background(Color.Black.copy(alpha = 0.4f)),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Row(
-                            horizontalArrangement = Arrangement.spacedBy(16.dp)
-                        ) {
-                            HoverIconButton(
-                                icon = GateTikIcons.zoomIn,
-                                onClick = onFullscreenClick,
-                                containerColor = Blue500
-                            )
-                            HoverIconButton(
-                                icon = GateTikIcons.settings,
-                                onClick = onSettingsClick,
-                                containerColor = Slate500
-                            )
-                            HoverIconButton(
-                                icon = GateTikIcons.trash,
-                                onClick = onDeleteClick,
-                                containerColor = Red500
-                            )
-                        }
-                    }
-                }
             }
 
-            Row(
+            FlowRow(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(12.dp),
                 horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
+                verticalArrangement = Arrangement.Center,
+                maxItemsInEachRow = Int.MAX_VALUE
             ) {
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    modifier = Modifier.padding(bottom = 8.dp)
                 ) {
                     Icon(
                         painter = painterResource(GateTikIcons.camera),
@@ -151,29 +112,70 @@ fun CctvGridItem(
                         )
                     }
                 }
+
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    HoverIconButton(
+                        icon = GateTikIcons.trash,
+                        onClick = onDeleteClick,
+                        containerColor = Red500
+                    )
+                    HoverIconButton(
+                        icon = GateTikIcons.settings,
+                        onClick = onSettingsClick,
+                        containerColor = Slate500
+                    )
+                    HoverIconButton(
+                        icon = GateTikIcons.zoomIn,
+                        onClick = onFullscreenClick,
+                        containerColor = Blue500
+                    )
+                }
             }
         }
     }
 }
 
+@Preview
+@Composable
+private fun CctvGridItemPreview() {
+    GateTikTheme {
+        CctvGridItem(
+            cctv = Cctv(
+                id = 1,
+                cameraName = "Camera 1",
+                streamUrl = "url",
+                path = "camera1",
+                isActive = true,
+                type = CctvType.MONITOR
+            ),
+            onFullscreenClick = {},
+            onSettingsClick = {},
+            onDeleteClick = {}
+        )
+    }
+}
+
 @Composable
 private fun HoverIconButton(
-    icon: org.jetbrains.compose.resources.DrawableResource,
+    icon: DrawableResource,
     onClick: () -> Unit,
     containerColor: Color
 ) {
     Box(
         modifier = Modifier
-            .size(40.dp)
             .clip(CircleShape)
             .background(containerColor.copy(alpha = 0.8f))
-            .clickable(onClick = onClick),
+            .clickable(onClick = onClick)
+            .padding(8.dp),
         contentAlignment = Alignment.Center
     ) {
         Icon(
             painter = painterResource(icon),
             contentDescription = null,
-            modifier = Modifier.size(20.dp),
+            modifier = Modifier.size(16.dp),
             tint = White
         )
     }
