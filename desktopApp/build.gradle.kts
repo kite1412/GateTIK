@@ -57,6 +57,13 @@ compose.desktop {
 
             macOS {
                 iconFile.set(project.file("resource/desktop_icon.icns"))
+
+                infoPlist {
+                    extraKeysRawXml = """
+                        <key>NSMicrophoneUsageDescription</key>
+                        <string>Required for two-way audio communication.</string>
+                    """.trimIndent()
+                }
             }
             windows {
                 iconFile.set(project.file("resource/desktop_icon.ico"))

@@ -49,7 +49,7 @@ fun CctvWindow(
                     .radialBackground()
             ) {
                 WebRtcPlayer(
-                    url = getWebRtcStreamUrl(cctv.path),
+                    url = getWebRtcStreamUrl(cctv.path) + if (isMicOn) "&media=video+audio+microphone" else "",
                     modifier = Modifier
                         .fillMaxWidth()
                         .weight(1f)

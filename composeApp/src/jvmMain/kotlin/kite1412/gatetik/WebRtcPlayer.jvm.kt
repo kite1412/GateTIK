@@ -5,7 +5,9 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -16,6 +18,9 @@ import kite1412.gatetik.util.SupportedOS
 import kite1412.gatetik.util.getSupportedOS
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
@@ -32,18 +37,50 @@ import java.awt.BorderLayout
 import java.io.File
 import javax.swing.JPanel
 import kotlin.math.max
+import kotlin.time.Duration.Companion.milliseconds
 
 @Composable
 actual fun WebRtcPlayer(url: String, modifier: Modifier) {
     var browser by remember { mutableStateOf<CefBrowser?>(null) }
 
-    DisposableEffect(url) {
-        CoroutineScope(Dispatchers.Swing).launch {
-            browser = CefBrowserProvider.createBrowser(url)
-        }
+    LaunchedEffect(Unit) {
+        browser = CefBrowserProvider.createBrowser(url)
+    }
+    DisposableEffect(Unit) {
+        val scope = CoroutineScope(Dispatchers.Swing)
 
         onDispose {
-            browser?.close(false)
+            val currentBrowser = browser ?: run {
+                scope.cancel()
+                return@onDispose
+            }
+
+            browser = null
+            scope.cancel()
+
+            CoroutineScope(Dispatchers.Swing + SupervisorJob()).launch {
+                // Nuke all media streams — broader sweep than srcObject only
+                currentBrowser.executeJavaScript("""
+                    (async () => {
+                        try {
+                            const devices = await navigator.mediaDevices.enumerateDevices();
+                            const stream = await navigator.mediaDevices.getUserMedia({ audio: true, video: true });
+                            stream.getTracks().forEach(t => t.stop());
+                        } catch(e) {}
+                        document.querySelectorAll('*').forEach(el => {
+                            if (el.srcObject) {
+                                el.srcObject.getTracks().forEach(t => t.stop());
+                                el.srcObject = null;
+                            }
+                        });
+                    })();
+                """.trimIndent(), currentBrowser.url, 0)
+
+                delay(200.milliseconds)
+                currentBrowser.loadURL("about:blank")
+                delay(500.milliseconds)
+                currentBrowser.close(true)
+            }
         }
     }
 
@@ -52,18 +89,20 @@ actual fun WebRtcPlayer(url: String, modifier: Modifier) {
         contentAlignment = Alignment.Center
     ) {
         CircularProgressIndicator()
-    } else SwingPanel(
-        modifier = modifier.fillMaxSize(),
-        factory = {
-            JPanel(BorderLayout()).apply {
-                browser
-                    ?.uiComponent
-                    ?.let { cefComponent ->
-                        add(cefComponent, BorderLayout.CENTER)
-                    }
+    } else key(url) {
+        SwingPanel(
+            modifier = modifier.fillMaxSize(),
+            factory = {
+                JPanel(BorderLayout()).apply {
+                    browser
+                        ?.uiComponent
+                        ?.let { cefComponent ->
+                            add(cefComponent, BorderLayout.CENTER)
+                        }
+                }
             }
-        }
-    )
+        )
+    }
 }
 
 object CefBrowserProvider {
@@ -98,6 +137,7 @@ object CefBrowserProvider {
                         )
                     }
                     addJcefArgs("--disable-web-security")
+                    addJcefArgs("--enable-media-stream")
 
                     if (getSupportedOS() == SupportedOS.WINDOWS) {
                         cefSettings.windowless_rendering_enabled = false
@@ -114,8 +154,8 @@ object CefBrowserProvider {
     suspend fun getClient(): CefClient {
         val app = initApp()
 
-        return client ?: app.createClient().also {
-            client = it
+        return client ?: app.createClient().also { cefClient ->
+            client = cefClient
         }
     }
 
