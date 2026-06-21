@@ -7,6 +7,7 @@ import gatetik.composeapp.generated.resources.car
 import gatetik.composeapp.generated.resources.chevron_first
 import gatetik.composeapp.generated.resources.chevron_last
 import gatetik.composeapp.generated.resources.chevron_right
+import gatetik.composeapp.generated.resources.corner_down_left
 import gatetik.composeapp.generated.resources.cpu
 import gatetik.composeapp.generated.resources.dashboard
 import gatetik.composeapp.generated.resources.door_close
@@ -40,6 +41,7 @@ import gatetik.composeapp.generated.resources.search
 import gatetik.composeapp.generated.resources.settings
 import gatetik.composeapp.generated.resources.shield
 import gatetik.composeapp.generated.resources.sound_up
+import gatetik.composeapp.generated.resources.square_pen
 import gatetik.composeapp.generated.resources.sun
 import gatetik.composeapp.generated.resources.trash
 import gatetik.composeapp.generated.resources.triangle_alert
@@ -105,4 +107,6 @@ object GateTikIcons {
     val plus = Res.drawable.plus
     val grid2x2 = Res.drawable.grid2x2
     val layoutPanelLeft = Res.drawable.layout_panel_left
+    val squarePen = Res.drawable.square_pen
+    val cornerDownLeft = Res.drawable.corner_down_left
 }

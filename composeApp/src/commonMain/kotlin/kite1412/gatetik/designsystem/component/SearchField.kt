@@ -24,7 +24,8 @@ fun SearchField(
     placeholder: String,
     modifier: Modifier = Modifier,
     isDarkMode: Boolean = LocalDarkMode.current,
-    keyboardActions: KeyboardActions = KeyboardActions.Default
+    keyboardActions: KeyboardActions = KeyboardActions.Default,
+    trailing: (@Composable () -> Unit)? = null
 ) {
     GlassBox(
         modifier = modifier,
@@ -36,23 +37,44 @@ fun SearchField(
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(12.dp)
+            horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            Icon(
-                painter = painterResource(GateTikIcons.search),
-                contentDescription = null,
-                modifier = Modifier.size(20.dp),
-                tint = if (isDarkMode) Gray200.copy(alpha = 0.5f) else Gray900.copy(alpha = 0.5f)
-            )
-
-            BasicTextField(
-                value = value,
-                onValueChange = onValueChange,
+            Row(
                 modifier = Modifier.weight(1f),
-                placeholder = placeholder,
-                singleLine = true,
-                keyboardActions = keyboardActions
-            )
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                Icon(
+                    painter = painterResource(GateTikIcons.search),
+                    contentDescription = null,
+                    modifier = Modifier.size(20.dp),
+                    tint = if (isDarkMode) Gray200.copy(alpha = 0.5f) else Gray900.copy(alpha = 0.5f)
+                )
+
+                BasicTextField(
+                    value = value,
+                    onValueChange = onValueChange,
+                    placeholder = placeholder,
+                    singleLine = true,
+                    keyboardActions = keyboardActions
+                )
+            }
+            trailing?.invoke()
         }
+    }
+}
+
+@Composable
+fun EnterIconTrailing(modifier: Modifier = Modifier) {
+    GlassBox(
+        modifier = modifier,
+        contentPadding = PaddingValues(4.dp),
+        shape = RoundedCornerShape(4.dp)
+    ) {
+        Icon(
+            painter = painterResource(GateTikIcons.cornerDownLeft),
+            contentDescription = "enter",
+            modifier = Modifier.size(16.dp)
+        )
     }
 }

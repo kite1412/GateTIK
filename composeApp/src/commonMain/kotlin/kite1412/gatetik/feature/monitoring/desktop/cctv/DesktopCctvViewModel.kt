@@ -23,7 +23,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
 enum class CctvTab {
-    MONITOR, KELOLA
+    MONITOR, MANAGE
 }
 
 class DesktopCctvViewModel(

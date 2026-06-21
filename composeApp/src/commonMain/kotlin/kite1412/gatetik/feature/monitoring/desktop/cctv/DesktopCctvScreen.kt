@@ -4,7 +4,6 @@ import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -12,12 +11,11 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -27,13 +25,19 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.retain.retain
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.key.Key
+import androidx.compose.ui.input.key.KeyEventType
+import androidx.compose.ui.input.key.key
+import androidx.compose.ui.input.key.onPreviewKeyEvent
+import androidx.compose.ui.input.key.type
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kite1412.gatetik.designsystem.component.GradientTextButton
@@ -63,6 +67,7 @@ import kite1412.gatetik.ui.compositionlocal.LocalDarkMode
 import kite1412.gatetik.ui.compositionlocal.LocalSnackbarHostStateWrapper
 import kite1412.gatetik.ui.compositionlocal.LocalWindowBlurRequester
 import kite1412.gatetik.ui.preview.DevicePreviews
+import kite1412.gatetik.ui.util.LoadState
 import kite1412.gatetik.ui.util.UiEvent
 import kite1412.gatetik.ui.util.data
 import kite1412.gatetik.util.toLocalDateString
@@ -82,29 +87,27 @@ fun DesktopCctvScreen(
     val searchQuery by viewModel.searchQuery.collectAsStateWithLifecycle()
     val selectedTab by viewModel.selectedTab.collectAsStateWithLifecycle()
     val gridColumns by viewModel.gridColumns.collectAsStateWithLifecycle()
-
     val windowBlurRequester = LocalWindowBlurRequester.current
 
-    var showAddDialog by remember { mutableStateOf(false) }
-    var showDeleteDialog by remember { mutableStateOf<Cctv?>(null) }
-    var selectedCameraForEdit by remember { mutableStateOf<Cctv?>(null) }
+    var showAddDialog by retain { mutableStateOf(false) }
+    var tempSearchQuery by retain(searchQuery) { mutableStateOf(searchQuery) }
+    var showDeleteDialog by retain { mutableStateOf<Cctv?>(null) }
+    var selectedCameraForEdit by retain { mutableStateOf<Cctv?>(null) }
 
     val openAddDialog = {
+        if (selectedTab != CctvTab.MANAGE) viewModel.updateSelectedTab(CctvTab.MANAGE)
         showAddDialog = true
         windowBlurRequester.applyWindowBlur()
     }
-
     val openEditDialog = { camera: Cctv ->
         selectedCameraForEdit = camera
         showAddDialog = true
         windowBlurRequester.applyWindowBlur()
     }
-
     val openDeleteDialog = { camera: Cctv ->
         showDeleteDialog = camera
         windowBlurRequester.applyWindowBlur()
     }
-
     val dismissDialogs = {
         showAddDialog = false
         selectedCameraForEdit = null
@@ -129,7 +132,11 @@ fun DesktopCctvScreen(
             Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(16.dp),
+                    .padding(
+                        start = contentPadding.calculateLeftPadding(LayoutDirection.Ltr),
+                        end = contentPadding.calculateRightPadding(LayoutDirection.Ltr),
+                        top = contentPadding.calculateTopPadding()
+                    ),
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
                 CctvHeader(
@@ -144,35 +151,61 @@ fun DesktopCctvScreen(
                 CctvActionBar(
                     selectedTab = selectedTab,
                     onTabSelected = viewModel::updateSelectedTab,
-                    searchQuery = searchQuery,
-                    onSearchQueryChange = viewModel::updateSearchQuery,
+                    searchQuery = tempSearchQuery,
+                    onSearchQueryChange = { tempSearchQuery = it },
                     gridColumns = gridColumns,
                     onGridColumnsChange = viewModel::updateGridColumns,
-                    onAddClick = openAddDialog
+                    modifier = Modifier.onPreviewKeyEvent { event ->
+                        if (event.type == KeyEventType.KeyUp && event.key == Key.Enter) {
+                            viewModel.updateSearchQuery(tempSearchQuery)
+                            true
+                        } else false
+                    }
                 )
 
                 val filteredCameras = cctvs.data?.filter {
                     it.cameraName.contains(searchQuery, ignoreCase = true) ||
                             it.path.contains(searchQuery, ignoreCase = true) ||
                             it.streamUrl.contains(searchQuery, ignoreCase = true) ||
-                            (if (it.type == CctvType.MONITOR) "Monitor" else "Interkom").contains(searchQuery, ignoreCase = true)
+                            (if (it.type == CctvType.MONITOR) "erMonitor" else "Interkom").contains(searchQuery, ignoreCase = true)
                 }
 
-                if (selectedTab == CctvTab.MONITOR) {
-                    if (filteredCameras != null) CctvGridView(
-                        cameras = filteredCameras,
-                        gridColumns = gridColumns,
-                        onEditClick = openEditDialog,
-                        onDeleteClick = openDeleteDialog,
-                        modifier = Modifier.weight(1f)
-                    )
-                } else {
-                    CctvTableView(
-                        cameras = filteredCameras,
-                        onEditClick = openEditDialog,
-                        onDeleteClick = openDeleteDialog
-                    )
-                }
+                LoadState(
+                    state = cctvs,
+                    loading = {
+                        SmallCircularProgressIndicator(
+                            modifier = Modifier.align(Alignment.CenterHorizontally)
+                        )
+                    },
+                    error = {
+                        Text(
+                            text = "Gagal memuat cctv, coba lagi",
+                            modifier = Modifier.align(Alignment.CenterHorizontally),
+                            style = MaterialTheme.typography.bodySmall
+                        )
+                    },
+                    success = {
+                        val bottomContentPadding = PaddingValues(
+                            bottom = contentPadding.calculateBottomPadding()
+                        )
+
+                        if (filteredCameras != null) {
+                            if (selectedTab == CctvTab.MANAGE) CctvTable(
+                                cctvs = filteredCameras,
+                                contentPadding = bottomContentPadding,
+                                onEditClick = openEditDialog,
+                                onDeleteClick = openDeleteDialog
+                            ) else CctvGridView(
+                                cameras = filteredCameras,
+                                gridColumns = gridColumns,
+                                contentPadding = bottomContentPadding,
+                                onEditClick = openEditDialog,
+                                onDeleteClick = openDeleteDialog,
+                                modifier = Modifier.weight(1f)
+                            )
+                        }
+                    }
+                )
             }
         }
     }
@@ -282,13 +315,14 @@ private fun CctvStats(
 private fun CctvGridView(
     cameras: List<Cctv>,
     gridColumns: Int,
+    contentPadding: PaddingValues,
     onEditClick: (Cctv) -> Unit,
     onDeleteClick: (Cctv) -> Unit,
     modifier: Modifier = Modifier
 ) {
     LazyVerticalGrid(
         columns = GridCells.Fixed(gridColumns),
-        contentPadding = PaddingValues(bottom = 16.dp),
+        contentPadding = contentPadding,
         horizontalArrangement = Arrangement.spacedBy(16.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp),
         modifier = modifier
@@ -305,106 +339,103 @@ private fun CctvGridView(
 }
 
 @Composable
-private fun CctvTableView(
-    cameras: List<Cctv>?,
+private fun CctvTable(
+    cctvs: List<Cctv>,
+    contentPadding: PaddingValues,
     onEditClick: (Cctv) -> Unit,
     onDeleteClick: (Cctv) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    if (cameras == null) {
-        Box(
-            modifier = modifier.fillMaxWidth(),
-            contentAlignment = Alignment.Center
-        ) {
-            SmallCircularProgressIndicator()
-        }
-    } else {
-        CompositionLocalProvider(
-            LocalTextStyle provides MaterialTheme.typography.bodySmall
-        ) {
-            val columns = listOf<TableColumn<Cctv>>(
-                TableColumn(title = "Kamera", weight = 2f) { camera ->
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(12.dp)
-                    ) {
-                        Icon(
-                            painter = painterResource(GateTikIcons.camera),
-                            contentDescription = null,
-                            modifier = Modifier.size(16.dp),
-                            tint = Blue500
-                        )
-                        Text(
-                            text = camera.cameraName,
-                            color = MaterialTheme.colorScheme.onSurface
-                        )
-                    }
-                },
-                TableColumn(title = "Path", weight = 1f) { camera ->
-                    Text(
-                        text = "/${camera.path}",
-                        color = Blue700,
-                        modifier = Modifier
-                            .clip(RoundedCornerShape(16.dp))
-                            .background(Blue700.copy(alpha = 0.2f))
-                            .padding(
-                                horizontal = 8.dp,
-                                vertical = 2.dp
-                            )
+    CompositionLocalProvider(
+        LocalTextStyle provides MaterialTheme.typography.bodySmall
+    ) {
+        val columns = listOf<TableColumn<Cctv>>(
+            TableColumn(title = "Kamera", weight = 2f) { camera ->
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    Icon(
+                        painter = painterResource(GateTikIcons.camera),
+                        contentDescription = null,
+                        modifier = Modifier.size(16.dp),
+                        tint = Blue500
                     )
-                },
-                TableColumn(title = "Stream URL", weight = 3f) { camera ->
                     Text(
-                        text = camera.streamUrl,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                        text = camera.cameraName,
+                        color = MaterialTheme.colorScheme.onSurface
                     )
-                },
-                TableColumn(title = "Tipe", weight = 1f) { camera ->
-                    Text(
-                        text = when (camera.type) {
-                            CctvType.MONITOR -> "Monitor"
-                            CctvType.INTERCOM -> "Interkom"
-                        },
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                },
-                TableColumn(title = "Dibuat", weight = 1.5f) { camera ->
-                    Text(
-                        text = camera.createdAt.toLocalDateString(),
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                },
-                TableColumn(title = "Aksi", weight = 1f) { camera ->
-                    Row(
-                        horizontalArrangement = Arrangement.spacedBy(12.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Icon(
-                            painter = painterResource(GateTikIcons.userPen),
-                            contentDescription = "Edit",
-                            modifier = Modifier
-                                .size(16.dp)
-                                .clickable { onEditClick(camera) },
-                            tint = Blue500
-                        )
-                        Icon(
-                            painter = painterResource(GateTikIcons.trash),
-                            contentDescription = "Hapus",
-                            modifier = Modifier
-                                .size(16.dp)
-                                .clickable { onDeleteClick(camera) },
-                            tint = Red500
-                        )
-                    }
                 }
-            )
+            },
+            TableColumn(title = "Path", weight = 1.5f) { camera ->
+                Text(
+                    text = "/${camera.path}",
+                    color = Blue700,
+                    modifier = Modifier
+                        .clip(RoundedCornerShape(16.dp))
+                        .background(Blue700.copy(alpha = 0.2f))
+                        .padding(
+                            horizontal = 8.dp,
+                            vertical = 2.dp
+                        )
+                )
+            },
+            TableColumn(title = "Stream URL", weight = 3f) { camera ->
+                Text(
+                    text = camera.streamUrl,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            },
+            TableColumn(title = "Tipe", weight = 1f) { camera ->
+                Text(
+                    text = when (camera.type) {
+                        CctvType.MONITOR -> "Monitor"
+                        CctvType.INTERCOM -> "Interkom"
+                    },
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            },
+            TableColumn(title = "Dibuat", weight = 1f) { camera ->
+                Text(
+                    text = camera.createdAt.toLocalDateString(),
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            },
+            TableColumn(title = "Aksi", weight = 1f) { camera ->
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(12.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(
+                        painter = painterResource(GateTikIcons.squarePen),
+                        contentDescription = "Edit",
+                        modifier = Modifier
+                            .size(16.dp)
+                            .clickable { onEditClick(camera) },
+                        tint = Blue500
+                    )
+                    Icon(
+                        painter = painterResource(GateTikIcons.trash),
+                        contentDescription = "Hapus",
+                        modifier = Modifier
+                            .size(16.dp)
+                            .clickable { onDeleteClick(camera) },
+                        tint = Red500
+                    )
+                }
+            }
+        )
 
-            Table(
-                columns = columns,
-                items = cameras,
-                modifier = modifier
-                    .verticalScroll(rememberScrollState())
-            )
+        LazyColumn(
+            modifier = modifier,
+            contentPadding = contentPadding
+        ) {
+            item {
+                Table(
+                    columns = columns,
+                    items = cctvs
+                )
+            }
         }
     }
 }
@@ -433,8 +464,8 @@ fun CctvTabSelector(
         CctvTabItem(
             text = "Kelola",
             icon = GateTikIcons.layoutPanelLeft,
-            isSelected = selectedTab == CctvTab.KELOLA,
-            onClick = { onTabSelected(CctvTab.KELOLA) }
+            isSelected = selectedTab == CctvTab.MANAGE,
+            onClick = { onTabSelected(CctvTab.MANAGE) }
         )
     }
 }

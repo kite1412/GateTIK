@@ -59,6 +59,7 @@ import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kite1412.gatetik.designsystem.component.Badge
+import kite1412.gatetik.designsystem.component.EnterIconTrailing
 import kite1412.gatetik.designsystem.component.FilterChip
 import kite1412.gatetik.designsystem.component.GlassBox
 import kite1412.gatetik.designsystem.component.GlassBoxDialog
@@ -231,7 +232,8 @@ private fun DesktopUserManagementScreen(
                                 onSearchTextChange(searchText)
                                 true
                             } else false
-                        }
+                        },
+                    trailing = { EnterIconTrailing() }
                 )
 
                 Icon(

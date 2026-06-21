@@ -9,6 +9,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import kite1412.gatetik.designsystem.component.EnterIconTrailing
 import kite1412.gatetik.designsystem.component.FilterChip
 import kite1412.gatetik.designsystem.component.GlassBox
 import kite1412.gatetik.designsystem.component.SearchField
@@ -23,7 +24,6 @@ fun CctvActionBar(
     onSearchQueryChange: (String) -> Unit,
     gridColumns: Int,
     onGridColumnsChange: (Int) -> Unit,
-    onAddClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     GlassBox(
@@ -44,7 +44,8 @@ fun CctvActionBar(
                 value = searchQuery,
                 onValueChange = onSearchQueryChange,
                 placeholder = "Cari nama, path, atau URL...",
-                modifier = Modifier.weight(1f)
+                modifier = Modifier.weight(1f),
+                trailing = { EnterIconTrailing() }
             )
 
             Row(

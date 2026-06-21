@@ -145,7 +145,7 @@ fun CctvGridItem(
                             )
                         }
                         Text(
-                            text = cctv.path,
+                            text = "/${cctv.path}",
                             style = MaterialTheme.typography.labelSmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
