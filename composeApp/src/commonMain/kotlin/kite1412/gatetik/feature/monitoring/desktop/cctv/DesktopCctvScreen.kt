@@ -40,6 +40,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import kite1412.gatetik.AppWindow
+import kite1412.gatetik.WebRtcPlayer
 import kite1412.gatetik.designsystem.component.GradientTextButton
 import kite1412.gatetik.designsystem.component.Icon
 import kite1412.gatetik.designsystem.component.Table
@@ -60,6 +62,7 @@ import kite1412.gatetik.feature.monitoring.desktop.cctv.component.CctvStatsCard
 import kite1412.gatetik.feature.monitoring.desktop.cctv.component.DeleteCctvDialog
 import kite1412.gatetik.feature.monitoring.desktop.ui.component.DesktopLayout
 import kite1412.gatetik.feature.monitoring.desktop.ui.util.desktopBaseModifier
+import kite1412.gatetik.getWebRtcStreamUrl
 import kite1412.gatetik.model.Cctv
 import kite1412.gatetik.model.CctvType
 import kite1412.gatetik.ui.component.SmallCircularProgressIndicator
@@ -201,6 +204,9 @@ fun DesktopCctvScreen(
                                 cameras = filteredCameras,
                                 gridColumns = gridColumns,
                                 contentPadding = bottomContentPadding,
+                                isFullScreen = viewModel::isCctvFullScreen,
+                                onFullScreenClick = viewModel::addFullScreenCctv,
+                                onExitFullScreen = viewModel::removeFullScreenCctv,
                                 onEditClick = openEditDialog,
                                 onDeleteClick = openDeleteDialog,
                                 modifier = Modifier.weight(1f)
@@ -318,6 +324,9 @@ private fun CctvGridView(
     cameras: List<Cctv>,
     gridColumns: Int,
     contentPadding: PaddingValues,
+    isFullScreen: (Cctv) -> Boolean,
+    onFullScreenClick: (Cctv) -> Unit,
+    onExitFullScreen: (Cctv) -> Unit,
     onEditClick: (Cctv) -> Unit,
     onDeleteClick: (Cctv) -> Unit,
     modifier: Modifier = Modifier
@@ -332,10 +341,20 @@ private fun CctvGridView(
         items(cameras) { cctv ->
             CctvGridItem(
                 cctv = cctv,
-                onFullscreenClick = { /* TODO */ },
+                onFullscreenClick = { onFullScreenClick(cctv) },
                 onSettingsClick = { onEditClick(cctv) },
                 onDeleteClick = { onDeleteClick(cctv) }
             )
+
+            if (isFullScreen(cctv)) AppWindow(
+                title = cctv.cameraName,
+                onClose = { onExitFullScreen(cctv) }
+            ) {
+                WebRtcPlayer(
+                    url = getWebRtcStreamUrl(cctv.path),
+                    modifier = Modifier.fillMaxSize()
+                )
+            }
         }
     }
 }

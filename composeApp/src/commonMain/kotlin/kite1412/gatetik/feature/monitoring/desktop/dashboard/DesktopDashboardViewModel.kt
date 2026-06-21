@@ -45,6 +45,8 @@ class DesktopDashboardViewModel(
         private set
     var accessLogs by mutableStateOf<LoadState<List<AccessLog>>>(LoadState.Loading())
         private set
+    var isMainCctvFullScreen by mutableStateOf(false)
+        private set
 
     init {
         viewModelScope.launch {
@@ -96,6 +98,10 @@ class DesktopDashboardViewModel(
             pollData()
             _uiEvent.emit(UiEvent.ShowSnackbar("Data dimuat ulang"))
         }
+    }
+
+    fun updateMainCctvFullScreen(isFullScreen: Boolean) {
+        isMainCctvFullScreen = isFullScreen
     }
 
     private suspend fun pollData() = listOf(

@@ -37,6 +37,8 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import kite1412.gatetik.AppWindow
+import kite1412.gatetik.WebRtcPlayer
 import kite1412.gatetik.designsystem.component.Badge
 import kite1412.gatetik.designsystem.component.GlassBox
 import kite1412.gatetik.designsystem.component.Icon
@@ -57,6 +59,7 @@ import kite1412.gatetik.feature.monitoring.desktop.ui.component.DesktopLayout
 import kite1412.gatetik.feature.monitoring.desktop.ui.component.LiveCameraSection
 import kite1412.gatetik.feature.monitoring.desktop.ui.util.SideNotificationManager
 import kite1412.gatetik.feature.monitoring.desktop.ui.util.desktopBaseModifier
+import kite1412.gatetik.getWebRtcStreamUrl
 import kite1412.gatetik.model.AccessLog
 import kite1412.gatetik.model.AccessStatus
 import kite1412.gatetik.model.Cctv
@@ -80,7 +83,6 @@ import kotlin.math.roundToInt
 @Composable
 fun DesktopDashboardScreen(
     contentPadding: PaddingValues,
-    navigateToCctv: () -> Unit,
     navigateToAccessLogs: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: DesktopDashboardViewModel = koinViewModel()
@@ -102,6 +104,7 @@ fun DesktopDashboardScreen(
     user?.let { user ->
         DesktopDashboardScreen(
             userRole = user.role,
+            isMainCctvFullScreen = viewModel.isMainCctvFullScreen,
             sideNotificationManager = viewModel.sideNotificationManager,
             gate = gate,
             parkingQuota = parkingQuota,
@@ -112,7 +115,8 @@ fun DesktopDashboardScreen(
             onThemeToggle = viewModel::updateDarkMode,
             onOpenGate = viewModel::openGate,
             onCloseGate = viewModel::closeGate,
-            onCctvFullScreenClick = navigateToCctv,
+            onCctvFullScreenClick = { viewModel.updateMainCctvFullScreen(true) },
+            onExitCctvFullScreen = { viewModel.updateMainCctvFullScreen(false) },
             onSeeAllAccessLogClick = navigateToAccessLogs,
             onRefreshClick = viewModel::refreshData,
             modifier = modifier
@@ -123,6 +127,7 @@ fun DesktopDashboardScreen(
 @Composable
 private fun DesktopDashboardScreen(
     userRole: UserRole,
+    isMainCctvFullScreen: Boolean,
     sideNotificationManager: SideNotificationManager,
     gate: LoadState<Gate?>,
     parkingQuota: LoadState<ParkingQuota?>,
@@ -134,6 +139,7 @@ private fun DesktopDashboardScreen(
     onOpenGate: () -> Unit,
     onCloseGate: () -> Unit,
     onCctvFullScreenClick: () -> Unit,
+    onExitCctvFullScreen: () -> Unit,
     onSeeAllAccessLogClick: () -> Unit,
     onRefreshClick: () -> Unit,
     modifier: Modifier = Modifier
@@ -230,6 +236,18 @@ private fun DesktopDashboardScreen(
                     onSeeAllAccessLogClick = onSeeAllAccessLogClick
                 )
             }
+        }
+    }
+
+    if (isMainCctvFullScreen) cctv.data?.let { cctv ->
+        AppWindow(
+            title = cctv.cameraName,
+            onClose = { onExitCctvFullScreen() }
+        ) {
+            WebRtcPlayer(
+                url = getWebRtcStreamUrl(cctv.path),
+                modifier = Modifier.fillMaxSize()
+            )
         }
     }
 }
@@ -597,7 +615,6 @@ private fun DesktopDashboardScreenPreview() {
         Scaffold { p ->
             DesktopDashboardScreen(
                 contentPadding = PaddingValues(24.dp),
-                navigateToCctv = {},
                 navigateToAccessLogs = {},
                 modifier = Modifier.padding(p)
             )

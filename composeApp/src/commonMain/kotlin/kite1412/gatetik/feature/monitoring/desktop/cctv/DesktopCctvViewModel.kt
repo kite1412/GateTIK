@@ -1,6 +1,7 @@
 package kite1412.gatetik.feature.monitoring.desktop.cctv
 
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.viewModelScope
@@ -43,6 +44,7 @@ class DesktopCctvViewModel(
     private val _gridColumns = MutableStateFlow(2)
     val gridColumns = _gridColumns.asStateFlow()
 
+    private val fullScreenCctvPaths = mutableStateListOf<String>()
     var cctvs by mutableStateOf<LoadState<List<Cctv>>>(LoadState.Loading("Memuat Cctv"))
         private set
 
@@ -70,6 +72,7 @@ class DesktopCctvViewModel(
                 .addCctv(data)
                 .onSuccess {
                     cctvs = LoadState.Success((cctvs.data ?: emptyList()) + listOf(it))
+                    _uiEvent.emit(UiEvent.ShowSnackbar("Berhasil menambah CCTV"))
                 }
         }
     }
@@ -87,6 +90,7 @@ class DesktopCctvViewModel(
                             }
                                 ?.let {
                                     cctvs = LoadState.Success(it)
+                                    _uiEvent.emit(UiEvent.ShowSnackbar("CCTV diperbarui"))
                                 }
                         }
                 }
@@ -107,6 +111,7 @@ class DesktopCctvViewModel(
                                         removeAt(index)
                                     }
                                 )
+                                _uiEvent.emit(UiEvent.ShowSnackbar("CCTV dihapus"))
                             }
                     }
                 }
@@ -118,6 +123,19 @@ class DesktopCctvViewModel(
             updateCctvs()
             _uiEvent.emit(UiEvent.ShowSnackbar("Data dimuat ulang"))
         }
+    }
+
+    fun isCctvFullScreen(cctv: Cctv) = fullScreenCctvPaths.contains(cctv.path)
+
+    fun addFullScreenCctv(cctv: Cctv) {
+        if (!fullScreenCctvPaths.contains(cctv.path)) fullScreenCctvPaths.add(cctv.path)
+    }
+
+    fun removeFullScreenCctv(cctv: Cctv) {
+        fullScreenCctvPaths
+            .indexOfFirst { it == cctv.path }
+            .takeIf { it != -1 }
+            ?.let(fullScreenCctvPaths::removeAt)
     }
 
     private suspend fun updateCctvs() {
