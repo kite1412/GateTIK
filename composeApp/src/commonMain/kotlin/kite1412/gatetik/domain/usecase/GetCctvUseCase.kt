@@ -8,9 +8,9 @@ import kite1412.gatetik.util.onSuccess
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 
-class GetMainCctvUseCase(private val cctvRepository: CctvRepository) {
-    fun observeAsLoadStateFlow(): Flow<LoadState<Cctv?>> = flow {
-        emit(LoadState.Loading())
+class GetCctvUseCase(private val cctvRepository: CctvRepository) {
+    fun observeMainAsLoadStateFlow(): Flow<LoadState<Cctv?>> = flow {
+        emit(LoadState.Loading("Memuat CCTV"))
 
         cctvRepository
             .getMainCctv()
@@ -19,6 +19,19 @@ class GetMainCctvUseCase(private val cctvRepository: CctvRepository) {
             }
             .onSuccess { cctv ->
                 emit(LoadState.Success(cctv))
+            }
+    }
+
+    fun observeAllAsLoadStateFlow(): Flow<LoadState<List<Cctv>>> = flow {
+        emit(LoadState.Loading("Memuat CCTV"))
+
+        cctvRepository
+            .getAll()
+            .onSuccess {
+                emit(LoadState.Success(it))
+            }
+            .onError {
+                emit(LoadState.Error("Gagal memuat informasi cctv."))
             }
     }
 }

@@ -6,7 +6,7 @@ import kite1412.gatetik.domain.Authentication
 import kite1412.gatetik.domain.SessionStatus
 import kite1412.gatetik.domain.repository.AccessLogRepository
 import kite1412.gatetik.domain.usecase.AccessGateUseCase
-import kite1412.gatetik.domain.usecase.GetMainCctvUseCase
+import kite1412.gatetik.domain.usecase.GetCctvUseCase
 import kite1412.gatetik.domain.usecase.GetMainGateUseCase
 import kite1412.gatetik.domain.usecase.GetMainParkingQuotaUseCase
 import kite1412.gatetik.model.AccessLog
@@ -30,7 +30,7 @@ import kotlinx.coroutines.launch
 class MobileHomeViewModel(
     authentication: Authentication,
     getMainGateUseCase: GetMainGateUseCase,
-    getMainCctvUseCase: GetMainCctvUseCase,
+    getCctvUseCase: GetCctvUseCase,
     getMainParkingQuotaUseCase: GetMainParkingQuotaUseCase,
     accessLogRepository: AccessLogRepository,
     private val accessGateUseCase: AccessGateUseCase
@@ -55,7 +55,7 @@ class MobileHomeViewModel(
             }
         }
         .stateIn(viewModelScope)
-    val mainCctv = getMainCctvUseCase.observeAsLoadStateFlow().stateIn(viewModelScope)
+    val mainCctv = getCctvUseCase.observeMainAsLoadStateFlow().stateIn(viewModelScope)
     val mainParkingQuota = getMainParkingQuotaUseCase.observeAsLoadStateFlow().stateIn(viewModelScope)
     val latestAccessLog = flow {
         emit(accessLogRepository.getLatestOpenLog())

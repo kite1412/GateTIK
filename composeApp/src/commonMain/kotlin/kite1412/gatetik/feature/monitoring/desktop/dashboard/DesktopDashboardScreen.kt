@@ -96,7 +96,7 @@ fun DesktopDashboardScreen(
     val user by viewModel.signedInUser.collectAsStateWithLifecycle()
     val gate by viewModel.gate.collectAsStateWithLifecycle()
     val parkingQuota by viewModel.parkingQuota.collectAsStateWithLifecycle()
-    val cctv by viewModel.cctv.collectAsStateWithLifecycle()
+    val cctvs by viewModel.cctvs.collectAsStateWithLifecycle()
     val totalUsers = viewModel.totalUsers
     val accessLogs = viewModel.accessLogs
 
@@ -109,19 +109,20 @@ fun DesktopDashboardScreen(
     user?.let { user ->
         DesktopDashboardScreen(
             userRole = user.role,
-            isMainCctvFullScreen = viewModel.isMainCctvFullScreen,
+            fullScreenCctv = viewModel.fullScreenCctv,
             sideNotificationManager = viewModel.sideNotificationManager,
+            isFullScreenCctvAutoMicOn = viewModel.isFullScreenCctvAutoMicOn,
             gate = gate,
             parkingQuota = parkingQuota,
-            cctv = cctv,
+            cctvs = cctvs,
             totalUsers = totalUsers,
             accessLogs = accessLogs,
             contentPadding = contentPadding,
             onThemeToggle = viewModel::updateDarkMode,
             onOpenGate = viewModel::openGate,
             onCloseGate = viewModel::closeGate,
-            onCctvFullScreenClick = { viewModel.updateMainCctvFullScreen(true) },
-            onExitCctvFullScreen = { viewModel.updateMainCctvFullScreen(false) },
+            onCctvFullScreenClick = viewModel::updateFullScreenCctv,
+            onExitCctvFullScreen = { viewModel.updateFullScreenCctv(null, false) },
             onSeeAllAccessLogClick = navigateToAccessLogs,
             onRefreshClick = viewModel::refreshData,
             modifier = modifier
@@ -132,18 +133,19 @@ fun DesktopDashboardScreen(
 @Composable
 private fun DesktopDashboardScreen(
     userRole: UserRole,
-    isMainCctvFullScreen: Boolean,
+    fullScreenCctv: Cctv?,
     sideNotificationManager: SideNotificationManager,
+    isFullScreenCctvAutoMicOn: Boolean,
     gate: LoadState<Gate?>,
     parkingQuota: LoadState<ParkingQuota?>,
-    cctv: LoadState<Cctv?>,
+    cctvs: LoadState<List<Cctv>>,
     totalUsers: LoadState<Int>,
     accessLogs: LoadState<List<AccessLog>>,
     contentPadding: PaddingValues,
     onThemeToggle: (darkMode: Boolean) -> Unit,
     onOpenGate: () -> Unit,
     onCloseGate: () -> Unit,
-    onCctvFullScreenClick: () -> Unit,
+    onCctvFullScreenClick: (Cctv,Boolean) -> Unit,
     onExitCctvFullScreen: () -> Unit,
     onSeeAllAccessLogClick: () -> Unit,
     onRefreshClick: () -> Unit,
@@ -175,10 +177,9 @@ private fun DesktopDashboardScreen(
             }
             if (!isLargeWindow) item {
                 LiveCameraSection(
-                    cameraName = cctv.data?.cameraName ?: "~",
+                    cctvs = cctvs,
                     showFullScreenButton = true,
-                    onFullScreenClick = onCctvFullScreenClick,
-                    path = cctv.data?.path
+                    onFullScreenClick = onCctvFullScreenClick
                 )
             }
             item {
@@ -189,13 +190,12 @@ private fun DesktopDashboardScreen(
                     horizontalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
                     if (isLargeWindow) LiveCameraSection(
-                        cameraName = cctv.data?.cameraName ?: "~",
+                        cctvs = cctvs,
                         modifier = Modifier
                             .weight(2f)
                             .fillMaxHeight(),
                         showFullScreenButton = true,
-                        onFullScreenClick = onCctvFullScreenClick,
-                        path = cctv.data?.path
+                        onFullScreenClick = onCctvFullScreenClick
                     )
                     if (isLargeWindow) Column(
                         modifier = Modifier.weight(1f),
@@ -244,10 +244,11 @@ private fun DesktopDashboardScreen(
         }
     }
 
-    if (isMainCctvFullScreen) cctv.data?.let { cctv ->
+    fullScreenCctv?.let { cctv ->
         CctvWindow(
             cctv = cctv,
-            onClose = { onExitCctvFullScreen() }
+            onClose = { onExitCctvFullScreen() },
+            autoMicOn = isFullScreenCctvAutoMicOn
         )
     }
 }
@@ -621,17 +622,18 @@ private fun DesktopDashboardScreenPreview() {
                 DesktopDashboardScreen(
                     userRole = UserRole.ADMIN,
                     contentPadding = PaddingValues(24.dp),
-                    isMainCctvFullScreen = false,
+                    fullScreenCctv = null,
                     sideNotificationManager = SideNotificationManager(scope),
+                    isFullScreenCctvAutoMicOn = false,
                     gate = LoadState.Success(mockGate),
                     parkingQuota = LoadState.Success(mockParkingQuota),
-                    cctv = LoadState.Success(mockCctv),
+                    cctvs = LoadState.Success(listOf(mockCctv)),
                     totalUsers = LoadState.Success(3),
                     accessLogs = LoadState.Success(mockAccessLogs),
                     onThemeToggle = {},
                     onOpenGate = {},
                     onCloseGate = {},
-                    onCctvFullScreenClick = {},
+                    onCctvFullScreenClick = {_, _ ->},
                     onExitCctvFullScreen = {},
                     onSeeAllAccessLogClick = {},
                     onRefreshClick = {},
