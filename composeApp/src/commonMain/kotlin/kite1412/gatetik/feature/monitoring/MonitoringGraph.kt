@@ -136,7 +136,6 @@ private fun NavGraphBuilder.desktopMonitoringGraph(
 ) {
     desktopDashboardScreen(
         contentPadding = normalContentPadding(scaffoldPadding),
-        navigateToCctv = { navigateToRootDestination(MonitoringGraph.Desktop.Cctv) },
         navigateToAccessLogs = { navigateToRootDestination(MonitoringGraph.Desktop.AccessLogs) }
     )
     desktopCctvScreen(contentPadding = normalContentPadding(scaffoldPadding))

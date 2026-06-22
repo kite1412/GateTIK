@@ -52,6 +52,7 @@ import kite1412.gatetik.designsystem.util.GateTikIcons
 import kite1412.gatetik.designsystem.util.WindowWidthSize
 import kite1412.gatetik.designsystem.util.rememberWindowWidthSize
 import kite1412.gatetik.feature.monitoring.desktop.ui.component.AccessLogTrend
+import kite1412.gatetik.feature.monitoring.desktop.ui.component.CctvWindow
 import kite1412.gatetik.feature.monitoring.desktop.ui.component.DashboardSummaryCard
 import kite1412.gatetik.feature.monitoring.desktop.ui.component.DesktopLayout
 import kite1412.gatetik.feature.monitoring.desktop.ui.component.LiveCameraSection
@@ -80,7 +81,6 @@ import kotlin.math.roundToInt
 @Composable
 fun DesktopDashboardScreen(
     contentPadding: PaddingValues,
-    navigateToCctv: () -> Unit,
     navigateToAccessLogs: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: DesktopDashboardViewModel = koinViewModel()
@@ -102,6 +102,7 @@ fun DesktopDashboardScreen(
     user?.let { user ->
         DesktopDashboardScreen(
             userRole = user.role,
+            isMainCctvFullScreen = viewModel.isMainCctvFullScreen,
             sideNotificationManager = viewModel.sideNotificationManager,
             gate = gate,
             parkingQuota = parkingQuota,
@@ -112,7 +113,8 @@ fun DesktopDashboardScreen(
             onThemeToggle = viewModel::updateDarkMode,
             onOpenGate = viewModel::openGate,
             onCloseGate = viewModel::closeGate,
-            onCctvFullScreenClick = navigateToCctv,
+            onCctvFullScreenClick = { viewModel.updateMainCctvFullScreen(true) },
+            onExitCctvFullScreen = { viewModel.updateMainCctvFullScreen(false) },
             onSeeAllAccessLogClick = navigateToAccessLogs,
             onRefreshClick = viewModel::refreshData,
             modifier = modifier
@@ -123,6 +125,7 @@ fun DesktopDashboardScreen(
 @Composable
 private fun DesktopDashboardScreen(
     userRole: UserRole,
+    isMainCctvFullScreen: Boolean,
     sideNotificationManager: SideNotificationManager,
     gate: LoadState<Gate?>,
     parkingQuota: LoadState<ParkingQuota?>,
@@ -134,6 +137,7 @@ private fun DesktopDashboardScreen(
     onOpenGate: () -> Unit,
     onCloseGate: () -> Unit,
     onCctvFullScreenClick: () -> Unit,
+    onExitCctvFullScreen: () -> Unit,
     onSeeAllAccessLogClick: () -> Unit,
     onRefreshClick: () -> Unit,
     modifier: Modifier = Modifier
@@ -166,7 +170,8 @@ private fun DesktopDashboardScreen(
                 LiveCameraSection(
                     cameraName = cctv.data?.cameraName ?: "~",
                     showFullScreenButton = true,
-                    onFullScreenClick = onCctvFullScreenClick
+                    onFullScreenClick = onCctvFullScreenClick,
+                    path = cctv.data?.path
                 )
             }
             item {
@@ -182,7 +187,8 @@ private fun DesktopDashboardScreen(
                             .weight(2f)
                             .fillMaxHeight(),
                         showFullScreenButton = true,
-                        onFullScreenClick = onCctvFullScreenClick
+                        onFullScreenClick = onCctvFullScreenClick,
+                        path = cctv.data?.path
                     )
                     if (isLargeWindow) Column(
                         modifier = Modifier.weight(1f),
@@ -229,6 +235,13 @@ private fun DesktopDashboardScreen(
                 )
             }
         }
+    }
+
+    if (isMainCctvFullScreen) cctv.data?.let { cctv ->
+        CctvWindow(
+            cctv = cctv,
+            onClose = { onExitCctvFullScreen() }
+        )
     }
 }
 
@@ -595,7 +608,6 @@ private fun DesktopDashboardScreenPreview() {
         Scaffold { p ->
             DesktopDashboardScreen(
                 contentPadding = PaddingValues(24.dp),
-                navigateToCctv = {},
                 navigateToAccessLogs = {},
                 modifier = Modifier.padding(p)
             )

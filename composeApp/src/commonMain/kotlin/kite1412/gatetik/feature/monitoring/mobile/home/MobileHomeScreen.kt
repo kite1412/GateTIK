@@ -43,7 +43,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import kite1412.gatetik.BuildConfig
 import kite1412.gatetik.WebRtcPlayer
 import kite1412.gatetik.designsystem.component.Badge
 import kite1412.gatetik.designsystem.component.Icon
@@ -58,6 +57,7 @@ import kite1412.gatetik.designsystem.theme.White20
 import kite1412.gatetik.designsystem.theme.White60
 import kite1412.gatetik.designsystem.theme.White80
 import kite1412.gatetik.designsystem.util.GateTikIcons
+import kite1412.gatetik.getWebRtcStreamUrl
 import kite1412.gatetik.model.AccessLog
 import kite1412.gatetik.model.Cctv
 import kite1412.gatetik.model.Gate
@@ -440,7 +440,7 @@ private fun CctvCard(
                             }
                         }
                         WebRtcPlayer(
-                            url = BuildConfig.WEB_RTC_PLAYER_CCTV_URL,
+                            url = getWebRtcStreamUrl(cctv.path),
                             modifier = Modifier.fillMaxSize()
                         )
                         this@Column.AnimatedVisibility(

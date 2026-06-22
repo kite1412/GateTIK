@@ -40,6 +40,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kite1412.gatetik.LocalCsvExporter
 import kite1412.gatetik.designsystem.component.Badge
+import kite1412.gatetik.designsystem.component.EnterIconTrailing
 import kite1412.gatetik.designsystem.component.GlassBox
 import kite1412.gatetik.designsystem.component.Icon
 import kite1412.gatetik.designsystem.component.Pagination
@@ -305,7 +306,8 @@ private fun FilterSection(
                         onSearchChange(searchText)
                         true
                     } else false
-                }
+                },
+            trailing = { EnterIconTrailing() }
         )
 
         Select(

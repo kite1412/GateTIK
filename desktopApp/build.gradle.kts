@@ -53,10 +53,17 @@ compose.desktop {
             javaHome = System.getenv("JAVA_HOME")
 
             packageName = "Gate TIK"
-            packageVersion = "1.1.0"
+            packageVersion = "2.0.0"
 
             macOS {
                 iconFile.set(project.file("resource/desktop_icon.icns"))
+
+                infoPlist {
+                    extraKeysRawXml = """
+                        <key>NSMicrophoneUsageDescription</key>
+                        <string>Required for two-way audio communication.</string>
+                    """.trimIndent()
+                }
             }
             windows {
                 iconFile.set(project.file("resource/desktop_icon.ico"))

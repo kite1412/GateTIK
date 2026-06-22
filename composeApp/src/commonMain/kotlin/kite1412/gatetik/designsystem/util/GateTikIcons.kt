@@ -7,6 +7,7 @@ import gatetik.composeapp.generated.resources.car
 import gatetik.composeapp.generated.resources.chevron_first
 import gatetik.composeapp.generated.resources.chevron_last
 import gatetik.composeapp.generated.resources.chevron_right
+import gatetik.composeapp.generated.resources.corner_down_left
 import gatetik.composeapp.generated.resources.cpu
 import gatetik.composeapp.generated.resources.dashboard
 import gatetik.composeapp.generated.resources.door_close
@@ -16,13 +17,17 @@ import gatetik.composeapp.generated.resources.email
 import gatetik.composeapp.generated.resources.eye_close
 import gatetik.composeapp.generated.resources.eye_open
 import gatetik.composeapp.generated.resources.funnel
+import gatetik.composeapp.generated.resources.grid2x2
 import gatetik.composeapp.generated.resources.house
 import gatetik.composeapp.generated.resources.id_card
+import gatetik.composeapp.generated.resources.layout_panel_left
 import gatetik.composeapp.generated.resources.locate_fixed
 import gatetik.composeapp.generated.resources.location_mark
 import gatetik.composeapp.generated.resources.lock
 import gatetik.composeapp.generated.resources.lock_open
 import gatetik.composeapp.generated.resources.logout
+import gatetik.composeapp.generated.resources.mic
+import gatetik.composeapp.generated.resources.mic_off
 import gatetik.composeapp.generated.resources.moon
 import gatetik.composeapp.generated.resources.numbers
 import gatetik.composeapp.generated.resources.parking_off
@@ -30,6 +35,7 @@ import gatetik.composeapp.generated.resources.people
 import gatetik.composeapp.generated.resources.person
 import gatetik.composeapp.generated.resources.phone
 import gatetik.composeapp.generated.resources.phone_call
+import gatetik.composeapp.generated.resources.plus
 import gatetik.composeapp.generated.resources.radio
 import gatetik.composeapp.generated.resources.rotate
 import gatetik.composeapp.generated.resources.scroll_text
@@ -37,6 +43,7 @@ import gatetik.composeapp.generated.resources.search
 import gatetik.composeapp.generated.resources.settings
 import gatetik.composeapp.generated.resources.shield
 import gatetik.composeapp.generated.resources.sound_up
+import gatetik.composeapp.generated.resources.square_pen
 import gatetik.composeapp.generated.resources.sun
 import gatetik.composeapp.generated.resources.trash
 import gatetik.composeapp.generated.resources.triangle_alert
@@ -99,4 +106,11 @@ object GateTikIcons {
     val userX = Res.drawable.user_x
     val rotate = Res.drawable.rotate
     val triangleAlert = Res.drawable.triangle_alert
+    val plus = Res.drawable.plus
+    val grid2x2 = Res.drawable.grid2x2
+    val layoutPanelLeft = Res.drawable.layout_panel_left
+    val squarePen = Res.drawable.square_pen
+    val cornerDownLeft = Res.drawable.corner_down_left
+    val mic = Res.drawable.mic
+    val micOff = Res.drawable.mic_off
 }

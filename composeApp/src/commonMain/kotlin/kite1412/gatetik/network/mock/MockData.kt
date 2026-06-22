@@ -5,6 +5,7 @@ import kite1412.gatetik.model.AccessLog
 import kite1412.gatetik.model.AccessMethod
 import kite1412.gatetik.model.AccessStatus
 import kite1412.gatetik.model.Cctv
+import kite1412.gatetik.model.CctvType
 import kite1412.gatetik.model.Gate
 import kite1412.gatetik.model.IotDevice
 import kite1412.gatetik.model.IotDeviceStatus
@@ -46,9 +47,25 @@ val mockGate = Gate(
 
 val mockCctv = Cctv(
     id = 1,
-    cameraName = "Lobby Camera",
+    cameraName = "Main Gate Camera",
     streamUrl = "rtsp://192.168.1.10:554/stream1",
-    isActive = true
+    path = "/gate1",
+    isActive = true,
+    type = CctvType.MONITOR,
+    createdAt = Instant.parse("2026-06-18T00:00:00Z")
+)
+
+val mockCctvs = listOf(
+    mockCctv,
+    Cctv(
+        id = 2,
+        cameraName = "Second Camera",
+        streamUrl = "rtsp://192.168.1.11:554/stream2",
+        path = "/gate2",
+        isActive = true,
+        type = CctvType.MONITOR,
+        createdAt = Instant.parse("2026-06-18T00:00:00Z")
+    )
 )
 
 val mockParkingQuota = ParkingQuota(

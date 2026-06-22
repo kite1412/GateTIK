@@ -7,13 +7,11 @@ import kite1412.gatetik.feature.monitoring.MonitoringGraph
 
 fun NavGraphBuilder.desktopDashboardScreen(
     contentPadding: PaddingValues,
-    navigateToCctv: () -> Unit,
     navigateToAccessLogs: () -> Unit
 ) {
     composable(MonitoringGraph.Desktop.Dashboard.name) {
         DesktopDashboardScreen(
             contentPadding = contentPadding,
-            navigateToCctv = navigateToCctv,
             navigateToAccessLogs = navigateToAccessLogs
         )
     }
