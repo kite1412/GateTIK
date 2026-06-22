@@ -12,6 +12,7 @@ import kite1412.gatetik.domain.AuthResult
 import kite1412.gatetik.domain.Authentication
 import kite1412.gatetik.model.User
 import kite1412.gatetik.ui.util.UiEvent
+import kite1412.gatetik.ui.util.showSnackbar
 import kite1412.gatetik.util.Result
 import kite1412.gatetik.util.onError
 import kite1412.gatetik.util.onSuccess
@@ -73,7 +74,7 @@ class AuthenticationViewModel(
             when (result) {
                 is PickResult.Success -> this@AuthenticationViewModel.idCard = result.file
                 is PickResult.Failed -> result.reason.message?.let { message ->
-                    _uiEvent.emit(UiEvent.ShowSnackbar(message))
+                    _uiEvent.showSnackbar(message)
                 }
             }
         }
@@ -85,10 +86,10 @@ class AuthenticationViewModel(
             authResult = Result.Loading
             authResult = authentication.signIn(email, password)
                 .onSuccess {
-                    _uiEvent.emit(UiEvent.ShowSnackbar("Login berhasil"))
+                    _uiEvent.showSnackbar("Login berhasil")
                 }
                 .onError {
-                    _uiEvent.emit(UiEvent.ShowSnackbar(it.message))
+                    _uiEvent.showSnackbar(it.message)
                 }
             isInProgress = false
         }
@@ -114,7 +115,7 @@ class AuthenticationViewModel(
                 ktm = idCard
             )
                 .onSuccess {
-                    _uiEvent.emit(UiEvent.ShowSnackbar("Registrasi berhasil, harap tunggu validasi admin"))
+                    _uiEvent.showSnackbar("Registrasi berhasil, harap tunggu validasi admin")
                     with(this@AuthenticationViewModel) {
                         this.isSignIn = true
                         this.fullName = ""
@@ -126,7 +127,7 @@ class AuthenticationViewModel(
                     }
                 }
                 .onError {
-                    _uiEvent.emit(UiEvent.ShowSnackbar(it.message))
+                    _uiEvent.showSnackbar(it.message)
                 }
             isInProgress = false
         }

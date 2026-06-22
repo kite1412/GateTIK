@@ -10,6 +10,7 @@ import kite1412.gatetik.domain.usecase.UpdateMainParkingQuotaUseCase
 import kite1412.gatetik.feature.monitoring.desktop.DesktopBaseViewModel
 import kite1412.gatetik.ui.util.UiEvent
 import kite1412.gatetik.ui.util.data
+import kite1412.gatetik.ui.util.showSnackbar
 import kite1412.gatetik.ui.util.stateIn
 import kite1412.gatetik.util.Error
 import kite1412.gatetik.util.Result
@@ -40,9 +41,7 @@ class DesktopParkingViewModel(
     fun refreshParkingQuota() {
         viewModelScope.launch {
             pollData()
-            _uiEvent.emit(
-                UiEvent.ShowSnackbar("Data dimuat ulang")
-            )
+            _uiEvent.showSnackbar("Data dimuat ulang")
         }
     }
 
@@ -99,10 +98,10 @@ class DesktopParkingViewModel(
     ) {
         updater(newValue)
             .onSuccess {
-                _uiEvent.emit(UiEvent.ShowSnackbar(successMessage))
+                _uiEvent.showSnackbar(successMessage)
             }
             .onError {
-                _uiEvent.emit(UiEvent.ShowSnackbar(errorMessage))
+                _uiEvent.showSnackbar(errorMessage)
             }
     }
 }

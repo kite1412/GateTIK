@@ -18,6 +18,7 @@ import kite1412.gatetik.model.AccessLog
 import kite1412.gatetik.ui.util.LoadState
 import kite1412.gatetik.ui.util.UiEvent
 import kite1412.gatetik.ui.util.data
+import kite1412.gatetik.ui.util.showSnackbar
 import kite1412.gatetik.ui.util.stateIn
 import kite1412.gatetik.util.onError
 import kite1412.gatetik.util.onSuccess
@@ -60,15 +61,13 @@ class DesktopDashboardViewModel(
             gate.first().data?.let { gate ->
                 accessGateUseCase.open(gate.id)
                     .onSuccess { success ->
-                        _uiEvent.emit(
-                            UiEvent.ShowSnackbar(
-                                if (success) "Gate dibuka"
-                                else "Gagal membuka gate"
-                            )
+                        _uiEvent.showSnackbar(
+                            if (success) "Gate dibuka"
+                            else "Gagal membuka gate"
                         )
                     }
                     .onError {
-                        _uiEvent.emit(UiEvent.ShowSnackbar("Gagal membuka gate"))
+                        _uiEvent.showSnackbar("Gagal membuka gate")
                     }
             }
         }
@@ -79,15 +78,13 @@ class DesktopDashboardViewModel(
             gate.first().data?.let { gate ->
                 accessGateUseCase.close(gate.id)
                     .onSuccess { success ->
-                        _uiEvent.emit(
-                            UiEvent.ShowSnackbar(
-                                if (success) "Gate ditutup"
-                                else "Gagal menutup gate"
-                            )
+                        _uiEvent.showSnackbar(
+                            if (success) "Gate ditutup"
+                            else "Gagal menutup gate"
                         )
                     }
                     .onError {
-                        _uiEvent.emit(UiEvent.ShowSnackbar("Gagal menutup gate"))
+                        _uiEvent.showSnackbar("Gagal menutup gate")
                     }
             }
         }
@@ -96,7 +93,7 @@ class DesktopDashboardViewModel(
     fun refreshData() {
         viewModelScope.launch {
             pollData()
-            _uiEvent.emit(UiEvent.ShowSnackbar("Data dimuat ulang"))
+            _uiEvent.showSnackbar("Data dimuat ulang")
         }
     }
 

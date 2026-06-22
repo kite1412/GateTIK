@@ -12,6 +12,7 @@ import kite1412.gatetik.domain.usecase.GetMainParkingQuotaUseCase
 import kite1412.gatetik.model.AccessLog
 import kite1412.gatetik.ui.util.LoadState
 import kite1412.gatetik.ui.util.UiEvent
+import kite1412.gatetik.ui.util.showSnackbar
 import kite1412.gatetik.ui.util.stateIn
 import kite1412.gatetik.util.onError
 import kite1412.gatetik.util.onSuccess
@@ -80,15 +81,13 @@ class MobileHomeViewModel(
         viewModelScope.launch {
             accessGateUseCase.open(gateId)
                 .onSuccess { success ->
-                    _uiEvent.emit(
-                        UiEvent.ShowSnackbar(
-                            if (success) "Gate dibuka"
-                            else "Gagal membuka gate"
-                        )
+                    _uiEvent.showSnackbar(
+                        if (success) "Gate dibuka"
+                        else "Gagal membuka gate"
                     )
                 }
                 .onError {
-                    _uiEvent.emit(UiEvent.ShowSnackbar("Gagal membuka gate"))
+                    _uiEvent.showSnackbar("Gagal membuka gate")
                 }
         }
     }
@@ -97,15 +96,13 @@ class MobileHomeViewModel(
         viewModelScope.launch {
             accessGateUseCase.close(gateId)
                 .onSuccess { success ->
-                    _uiEvent.emit(
-                        UiEvent.ShowSnackbar(
-                            if (success) "Gate ditutup"
-                            else "Gagal menutup gate"
-                        )
+                    _uiEvent.showSnackbar(
+                        if (success) "Gate ditutup"
+                        else "Gagal menutup gate"
                     )
                 }
                 .onError {
-                    _uiEvent.emit(UiEvent.ShowSnackbar("Gagal menutup gate"))
+                    _uiEvent.showSnackbar("Gagal menutup gate")
                 }
         }
     }

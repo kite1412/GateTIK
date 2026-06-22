@@ -23,6 +23,7 @@ import kite1412.gatetik.model.AccessMethod
 import kite1412.gatetik.model.AccessStatus
 import kite1412.gatetik.ui.util.LoadState
 import kite1412.gatetik.ui.util.UiEvent
+import kite1412.gatetik.ui.util.showSnackbar
 import kite1412.gatetik.util.now
 import kite1412.gatetik.util.onError
 import kite1412.gatetik.util.onSuccess
@@ -164,9 +165,7 @@ class DesktopAccessLogsViewModel(
     fun refreshAccessLogs() {
         viewModelScope.launch {
             pollData()
-            _uiEvent.emit(
-                UiEvent.ShowSnackbar("Data dimuat ulang")
-            )
+            _uiEvent.showSnackbar("Data dimuat ulang")
         }
     }
 
@@ -190,14 +189,12 @@ class DesktopAccessLogsViewModel(
                         write = { logs.writeToCsv(writer = this) }
                     )
 
-                    _uiEvent.emit(
-                        UiEvent.ShowSnackbar(
-                            when (res) {
-                                is CsvExportResult.Cancelled -> res.reason
-                                is CsvExportResult.Failed -> res.reason
-                                is CsvExportResult.Success -> "Berhasil mengekspor data log akses"
-                            }
-                        )
+                    _uiEvent.showSnackbar(
+                        when (res) {
+                            is CsvExportResult.Cancelled -> res.reason
+                            is CsvExportResult.Failed -> res.reason
+                            is CsvExportResult.Success -> "Berhasil mengekspor data log akses"
+                        }
                     )
                 }
         }

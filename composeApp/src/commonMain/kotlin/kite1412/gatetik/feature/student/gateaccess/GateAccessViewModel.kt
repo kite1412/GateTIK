@@ -16,6 +16,7 @@ import kite1412.gatetik.domain.usecase.GetMainGateUseCase
 import kite1412.gatetik.domain.usecase.GetMainParkingQuotaUseCase
 import kite1412.gatetik.model.User
 import kite1412.gatetik.ui.util.UiEvent
+import kite1412.gatetik.ui.util.showSnackbar
 import kite1412.gatetik.ui.util.stateIn
 import kite1412.gatetik.util.onError
 import kite1412.gatetik.util.onSuccess
@@ -31,6 +32,7 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import kotlin.time.Duration.Companion.milliseconds
 
 class GateAccessViewModel(
     authentication: Authentication,
@@ -86,19 +88,13 @@ class GateAccessViewModel(
                         location = state.currentLocation
                     )
                         .onSuccess {
-                            _uiEvent.emit(
-                                UiEvent.ShowSnackbar("Berhasil membuka gate")
-                            )
+                            _uiEvent.showSnackbar("Berhasil membuka gate")
                         }
                         .onError {
-                            _uiEvent.emit(
-                                UiEvent.ShowSnackbar("Gagal membuka gate, pastikan berada di sekitar gate")
-                            )
+                            _uiEvent.showSnackbar("Gagal membuka gate, pastikan berada di sekitar gate")
                         }
-                } else _uiEvent.emit(
-                    UiEvent.ShowSnackbar("Tidak dapat mengakses lokasi, tunggu beberapa saat")
-                )
-                delay(5000)
+                } else _uiEvent.showSnackbar("Tidak dapat mengakses lokasi, tunggu beberapa saat")
+                delay(5000.milliseconds)
                 delayAction = false
             }
         }
