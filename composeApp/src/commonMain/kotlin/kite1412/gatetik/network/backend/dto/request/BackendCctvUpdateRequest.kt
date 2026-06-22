@@ -9,7 +9,8 @@ data class BackendCctvUpdateRequest(
     @SerialName("camera_name")
     val cameraName: String? = null,
     val path: String? = null,
-    val streamUrl: String? = null,
     @SerialName("stream_url")
+    val streamUrl: String? = null,
+    @SerialName("type")
     val type: BackendCctvType? = null
 )
