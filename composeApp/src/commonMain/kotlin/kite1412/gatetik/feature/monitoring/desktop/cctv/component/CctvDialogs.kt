@@ -45,7 +45,8 @@ import org.jetbrains.compose.resources.painterResource
 fun AddCctvDialog(
     camera: Cctv?,
     onDismiss: () -> Unit,
-    onConfirm: (name: String, path: String, url: String, type: CctvType) -> Unit
+    onConfirm: (name: String, path: String, url: String, type: CctvType) -> Unit,
+    onDelete: () -> Unit = {}
 ) {
     val isDarkMode = LocalDarkMode.current
     var name by remember { mutableStateOf(camera?.cameraName ?: "") }
@@ -118,18 +119,42 @@ fun AddCctvDialog(
                 }
             }
 
-            PrimaryButton(
-                text = if (camera == null) "Tambah Kamera" else "Simpan Perubahan",
-                onClick = { onConfirm(name, path, url, type) },
-                leading = {
-                    Icon(
-                        painter = painterResource(GateTikIcons.userCheck), // Reusing check icon
-                        contentDescription = null,
-                        modifier = Modifier.size(18.dp),
-                        tint = White
-                    )
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(12.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                if (camera != null) {
+                    Box(
+                        modifier = Modifier
+                            .clip(RoundedCornerShape(12.dp))
+                            .background(Red500)
+                            .clickable(onClick = onDelete)
+                            .padding(8.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Icon(
+                            painter = painterResource(GateTikIcons.trash),
+                            contentDescription = "Hapus",
+                            modifier = Modifier.size(20.dp),
+                            tint = White
+                        )
+                    }
                 }
-            )
+                PrimaryButton(
+                    text = if (camera == null) "Tambah Kamera" else "Simpan Perubahan",
+                    onClick = { onConfirm(name, path, url, type) },
+                    modifier = Modifier.weight(1f),
+                    leading = {
+                        Icon(
+                            painter = painterResource(GateTikIcons.userCheck), // Reusing check icon
+                            contentDescription = null,
+                            modifier = Modifier.size(18.dp),
+                            tint = White
+                        )
+                    }
+                )
+            }
         }
     }
 }

@@ -42,8 +42,8 @@ class DesktopCctvViewModel(
     private val _selectedTab = MutableStateFlow(CctvTab.MONITOR)
     val selectedTab = _selectedTab.asStateFlow()
 
-    private val _gridColumns = MutableStateFlow(2)
-    val gridColumns = _gridColumns.asStateFlow()
+    private val _currentPage = MutableStateFlow(0)
+    val currentPage = _currentPage.asStateFlow()
 
     private val openCctvWindows = mutableStateMapOf<String, Boolean>()
     var cctvs by mutableStateOf<LoadState<List<Cctv>>>(LoadState.Loading("Memuat Cctv"))
@@ -57,14 +57,15 @@ class DesktopCctvViewModel(
 
     fun updateSearchQuery(query: String) {
         _searchQuery.value = query
+        _currentPage.value = 0
     }
 
     fun updateSelectedTab(tab: CctvTab) {
         _selectedTab.value = tab
     }
 
-    fun updateGridColumns(columns: Int) {
-        _gridColumns.value = columns
+    fun updateCurrentPage(page: Int) {
+        _currentPage.value = page
     }
 
     fun addCctv(data: CctvCreate) {

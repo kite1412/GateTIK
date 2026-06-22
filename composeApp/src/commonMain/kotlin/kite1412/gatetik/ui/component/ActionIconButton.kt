@@ -23,6 +23,7 @@ fun ActionIconButton(
     icon: DrawableResource,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
+    enabled: Boolean = true,
     containerColor: Color = Color.Transparent,
     tint: Color = MaterialTheme.colorScheme.primary
 ) {
@@ -31,7 +32,7 @@ fun ActionIconButton(
             .size(32.dp)
             .clip(CircleShape)
             .background(containerColor)
-            .clickable(onClick = onClick)
+            .clickable(enabled = enabled, onClick = onClick)
             .padding(6.dp),
         contentAlignment = Alignment.Center
     ) {

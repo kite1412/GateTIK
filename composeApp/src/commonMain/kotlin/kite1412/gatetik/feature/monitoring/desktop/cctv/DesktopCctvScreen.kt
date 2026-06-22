@@ -4,11 +4,13 @@ import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
@@ -56,6 +58,7 @@ import kite1412.gatetik.domain.model.CctvUpdate
 import kite1412.gatetik.feature.monitoring.desktop.cctv.component.AddCctvDialog
 import kite1412.gatetik.feature.monitoring.desktop.cctv.component.CctvActionBar
 import kite1412.gatetik.feature.monitoring.desktop.cctv.component.CctvGridItem
+import kite1412.gatetik.feature.monitoring.desktop.cctv.component.CctvPaginationHeader
 import kite1412.gatetik.feature.monitoring.desktop.cctv.component.CctvStatsCard
 import kite1412.gatetik.feature.monitoring.desktop.cctv.component.DeleteCctvDialog
 import kite1412.gatetik.feature.monitoring.desktop.ui.component.CctvWindow
@@ -87,7 +90,7 @@ fun DesktopCctvScreen(
     val cctvs = viewModel.cctvs
     val searchQuery by viewModel.searchQuery.collectAsStateWithLifecycle()
     val selectedTab by viewModel.selectedTab.collectAsStateWithLifecycle()
-    val gridColumns by viewModel.gridColumns.collectAsStateWithLifecycle()
+    val currentPage by viewModel.currentPage.collectAsStateWithLifecycle()
     val windowBlurRequester = LocalWindowBlurRequester.current
 
     var showAddDialog by retain { mutableStateOf(false) }
@@ -147,17 +150,11 @@ fun DesktopCctvScreen(
                     onAddClick = openAddDialog
                 )
 
-                CctvStats(
-                    cameraCount = cctvs.data?.size
-                )
-
                 CctvActionBar(
                     selectedTab = selectedTab,
                     onTabSelected = viewModel::updateSelectedTab,
                     searchQuery = tempSearchQuery,
                     onSearchQueryChange = { tempSearchQuery = it },
-                    gridColumns = gridColumns,
-                    onGridColumnsChange = viewModel::updateGridColumns,
                     modifier = Modifier.onPreviewKeyEvent { event ->
                         if (event.type == KeyEventType.KeyUp && event.key == Key.Enter) {
                             viewModel.updateSearchQuery(tempSearchQuery)
@@ -193,23 +190,57 @@ fun DesktopCctvScreen(
                         )
 
                         if (filteredCameras != null) {
-                            if (selectedTab == CctvTab.MANAGE) CctvTable(
-                                cctvs = filteredCameras,
-                                contentPadding = bottomContentPadding,
-                                onEditClick = openEditDialog,
-                                onDeleteClick = openDeleteDialog
-                            ) else CctvGridView(
-                                cameras = filteredCameras,
-                                gridColumns = gridColumns,
-                                contentPadding = bottomContentPadding,
-                                isWindowOpen = viewModel::isCctvWindowOpen,
-                                shouldAutoMicOn = viewModel::shouldAutoMicOn,
-                                onOpenWindow = viewModel::openCctvWindow,
-                                onCloseWindow = viewModel::closeCctvWindow,
-                                onEditClick = openEditDialog,
-                                onDeleteClick = openDeleteDialog,
-                                modifier = Modifier.weight(1f)
-                            )
+                            if (selectedTab == CctvTab.MANAGE) {
+                                CctvTable(
+                                    cctvs = filteredCameras,
+                                    contentPadding = bottomContentPadding,
+                                    onEditClick = openEditDialog,
+                                    onDeleteClick = openDeleteDialog
+                                )
+                            } else {
+                                BoxWithConstraints(modifier = Modifier.weight(1f)) {
+                                    val availableWidth = maxWidth
+                                    
+                                    val columns = when {
+                                        availableWidth > 1400.dp -> 4
+                                        availableWidth > 800.dp -> 3
+                                        else -> 2
+                                    }
+                                    val pageSize = columns * 2
+                                    
+                                    val totalPages = (filteredCameras.size + pageSize - 1) / pageSize
+                                    val startIndex = currentPage * pageSize
+                                    val endIndex = (startIndex + pageSize).coerceAtMost(filteredCameras.size)
+                                    val pagedCameras = filteredCameras.subList(startIndex, endIndex)
+
+                                    Column(
+                                        modifier = Modifier.fillMaxSize(),
+                                        verticalArrangement = Arrangement.spacedBy(16.dp)
+                                    ) {
+                                        CctvPaginationHeader(
+                                            currentPage = currentPage,
+                                            totalPages = totalPages,
+                                            startIndex = startIndex,
+                                            endIndex = endIndex,
+                                            totalItems = filteredCameras.size,
+                                            onPageChange = viewModel::updateCurrentPage
+                                        )
+
+                                        CctvGridView(
+                                            cameras = pagedCameras,
+                                            gridColumns = columns,
+                                            contentPadding = bottomContentPadding,
+                                            isWindowOpen = viewModel::isCctvWindowOpen,
+                                            shouldAutoMicOn = viewModel::shouldAutoMicOn,
+                                            onOpenWindow = viewModel::openCctvWindow,
+                                            onCloseWindow = viewModel::closeCctvWindow,
+                                            onEditClick = openEditDialog,
+                                            onDeleteClick = openDeleteDialog,
+                                            modifier = Modifier.weight(1f)
+                                        )
+                                    }
+                                }
+                            }
                         }
                     }
                 )
@@ -221,6 +252,9 @@ fun DesktopCctvScreen(
         AddCctvDialog(
             camera = selectedCameraForEdit,
             onDismiss = dismissDialogs,
+            onDelete = {
+                selectedCameraForEdit?.let { openDeleteDialog(it) }
+            },
             onConfirm = { name, path, url, type ->
                 if (selectedCameraForEdit == null) {
                     viewModel.addCctv(
@@ -331,26 +365,34 @@ private fun CctvGridView(
     onDeleteClick: (Cctv) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    LazyVerticalGrid(
-        columns = GridCells.Fixed(gridColumns),
-        contentPadding = contentPadding,
-        horizontalArrangement = Arrangement.spacedBy(16.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp),
-        modifier = modifier
-    ) {
-        items(cameras) { cctv ->
-            CctvGridItem(
-                cctv = cctv,
-                onFullscreenClick = { onOpenWindow(cctv, false) },
-                onMicClick = { onOpenWindow(cctv, true) },
-                onSettingsClick = { onEditClick(cctv) },
-                onDeleteClick = { onDeleteClick(cctv) }
-            )
-            if (isWindowOpen(cctv)) CctvWindow(
-                cctv = cctv,
-                onClose = { onCloseWindow(cctv) },
-                autoMicOn = shouldAutoMicOn(cctv)
-            )
+    BoxWithConstraints(modifier = modifier) {
+        val spacing = 16.dp
+        val availableHeight = maxHeight - contentPadding.calculateTopPadding() - contentPadding.calculateBottomPadding()
+        val maxItemHeight = (availableHeight - spacing) / 2
+
+        LazyVerticalGrid(
+            columns = GridCells.Fixed(gridColumns),
+            contentPadding = contentPadding,
+            horizontalArrangement = Arrangement.spacedBy(spacing),
+            verticalArrangement = Arrangement.spacedBy(spacing),
+            userScrollEnabled = false,
+            modifier = Modifier.fillMaxSize()
+        ) {
+            items(cameras) { cctv ->
+                CctvGridItem(
+                    cctv = cctv,
+                    onFullscreenClick = { onOpenWindow(cctv, false) },
+                    onMicClick = { onOpenWindow(cctv, true) },
+                    onSettingsClick = { onEditClick(cctv) },
+                    onDeleteClick = { onDeleteClick(cctv) },
+                    modifier = Modifier.heightIn(max = maxItemHeight)
+                )
+                if (isWindowOpen(cctv)) CctvWindow(
+                    cctv = cctv,
+                    onClose = { onCloseWindow(cctv) },
+                    autoMicOn = shouldAutoMicOn(cctv)
+                )
+            }
         }
     }
 }
