@@ -18,4 +18,13 @@ interface CctvRepository {
     suspend fun updateCctv(data: CctvUpdate): CctvResult<Cctv>
 
     suspend fun deleteCctv(id: Int): CctvResult<Boolean>
+
+    sealed interface CctvError : Error {
+        data class PathIsAlreadyExist(
+            override val message: String = "Path sudah digunakan, coba dengan path lain"
+        ) : CctvError
+
+        data class BadRequest(override val message: String) : CctvError
+
+    }
 }

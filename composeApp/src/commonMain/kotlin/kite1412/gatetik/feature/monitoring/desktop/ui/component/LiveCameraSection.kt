@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -49,16 +48,18 @@ fun LiveCameraSection(
         Column {
             Box(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .aspectRatio(16f / 9f)
                     .background(Color.Black)
             ) {
+                val videoModifier = Modifier
+                    .fillMaxWidth()
+                    .aspectRatio(16f / 9f)
+
                 path?.let { path ->
                     WebRtcPlayer(
                         url = getWebRtcStreamUrl(path),
-                        modifier = Modifier.fillMaxSize()
+                        modifier = videoModifier
                     )
-                }
+                } ?: Box(videoModifier)
 
                 Badge(
                     text = "LIVE",

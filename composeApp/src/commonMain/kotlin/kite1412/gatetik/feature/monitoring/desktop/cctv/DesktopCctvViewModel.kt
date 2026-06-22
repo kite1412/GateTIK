@@ -15,6 +15,7 @@ import kite1412.gatetik.model.Cctv
 import kite1412.gatetik.ui.util.LoadState
 import kite1412.gatetik.ui.util.UiEvent
 import kite1412.gatetik.ui.util.data
+import kite1412.gatetik.ui.util.showSnackbar
 import kite1412.gatetik.util.onError
 import kite1412.gatetik.util.onSuccess
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -72,7 +73,10 @@ class DesktopCctvViewModel(
                 .addCctv(data)
                 .onSuccess {
                     cctvs = LoadState.Success((cctvs.data ?: emptyList()) + listOf(it))
-                    _uiEvent.emit(UiEvent.ShowSnackbar("Berhasil menambah CCTV"))
+                    _uiEvent.showSnackbar("Berhasil menambah CCTV")
+                }
+                .onError {
+                    _uiEvent.showSnackbar(it.message)
                 }
         }
     }
@@ -90,9 +94,12 @@ class DesktopCctvViewModel(
                             }
                                 ?.let {
                                     cctvs = LoadState.Success(it)
-                                    _uiEvent.emit(UiEvent.ShowSnackbar("CCTV diperbarui"))
+                                    _uiEvent.showSnackbar("CCTV diperbarui")
                                 }
                         }
+                }
+                .onError {
+                    _uiEvent.showSnackbar(it.message)
                 }
         }
     }
@@ -111,7 +118,7 @@ class DesktopCctvViewModel(
                                         removeAt(index)
                                     }
                                 )
-                                _uiEvent.emit(UiEvent.ShowSnackbar("CCTV dihapus"))
+                                _uiEvent.showSnackbar("CCTV dihapus")
                             }
                     }
                 }
@@ -121,7 +128,7 @@ class DesktopCctvViewModel(
     fun refreshCctvs() {
         viewModelScope.launch {
             updateCctvs()
-            _uiEvent.emit(UiEvent.ShowSnackbar("Data dimuat ulang"))
+            _uiEvent.showSnackbar("Data dimuat ulang")
         }
     }
 

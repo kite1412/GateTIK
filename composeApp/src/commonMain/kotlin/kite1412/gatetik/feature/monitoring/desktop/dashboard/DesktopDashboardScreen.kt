@@ -28,6 +28,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -64,12 +65,18 @@ import kite1412.gatetik.model.Cctv
 import kite1412.gatetik.model.Gate
 import kite1412.gatetik.model.ParkingQuota
 import kite1412.gatetik.model.UserRole
+import kite1412.gatetik.network.mock.mockAccessLogs
+import kite1412.gatetik.network.mock.mockCctv
+import kite1412.gatetik.network.mock.mockGate
+import kite1412.gatetik.network.mock.mockParkingQuota
 import kite1412.gatetik.ui.component.GateControlButton
 import kite1412.gatetik.ui.component.ParkingQuotaCard
 import kite1412.gatetik.ui.compositionlocal.LocalDarkMode
+import kite1412.gatetik.ui.compositionlocal.LocalScaffoldComponentsController
 import kite1412.gatetik.ui.compositionlocal.LocalSnackbarHostStateWrapper
 import kite1412.gatetik.ui.preview.DevicePreviews
 import kite1412.gatetik.ui.util.LoadState
+import kite1412.gatetik.ui.util.MockScaffoldComponentController
 import kite1412.gatetik.ui.util.UiEvent
 import kite1412.gatetik.ui.util.data
 import kite1412.gatetik.ui.util.map
@@ -605,12 +612,32 @@ private fun RecentAccessActivitySection(
 @Composable
 private fun DesktopDashboardScreenPreview() {
     GateTikTheme {
+        val scope = rememberCoroutineScope()
+
         Scaffold { p ->
-            DesktopDashboardScreen(
-                contentPadding = PaddingValues(24.dp),
-                navigateToAccessLogs = {},
-                modifier = Modifier.padding(p)
-            )
+            CompositionLocalProvider(
+                LocalScaffoldComponentsController provides MockScaffoldComponentController
+            ) {
+                DesktopDashboardScreen(
+                    userRole = UserRole.ADMIN,
+                    contentPadding = PaddingValues(24.dp),
+                    isMainCctvFullScreen = false,
+                    sideNotificationManager = SideNotificationManager(scope),
+                    gate = LoadState.Success(mockGate),
+                    parkingQuota = LoadState.Success(mockParkingQuota),
+                    cctv = LoadState.Success(mockCctv),
+                    totalUsers = LoadState.Success(3),
+                    accessLogs = LoadState.Success(mockAccessLogs),
+                    onThemeToggle = {},
+                    onOpenGate = {},
+                    onCloseGate = {},
+                    onCctvFullScreenClick = {},
+                    onExitCctvFullScreen = {},
+                    onSeeAllAccessLogClick = {},
+                    onRefreshClick = {},
+                    modifier = Modifier.padding(p)
+                )
+            }
         }
     }
 }

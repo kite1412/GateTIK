@@ -31,8 +31,10 @@ import kite1412.gatetik.designsystem.component.OutlinedTextField
 import kite1412.gatetik.designsystem.component.PrimaryButton
 import kite1412.gatetik.designsystem.theme.Gray200
 import kite1412.gatetik.designsystem.theme.Red500
+import kite1412.gatetik.designsystem.theme.RoyalBlue800_30
 import kite1412.gatetik.designsystem.theme.Slate900
 import kite1412.gatetik.designsystem.theme.White
+import kite1412.gatetik.designsystem.theme.White30
 import kite1412.gatetik.designsystem.util.GateTikIcons
 import kite1412.gatetik.model.Cctv
 import kite1412.gatetik.model.CctvType
@@ -45,6 +47,7 @@ fun AddCctvDialog(
     onDismiss: () -> Unit,
     onConfirm: (name: String, path: String, url: String, type: CctvType) -> Unit
 ) {
+    val isDarkMode = LocalDarkMode.current
     var name by remember { mutableStateOf(camera?.cameraName ?: "") }
     var path by remember { mutableStateOf(camera?.path ?: "") }
     var url by remember { mutableStateOf(camera?.streamUrl ?: "") }
@@ -68,7 +71,13 @@ fun AddCctvDialog(
                 value = path,
                 onValueChange = { path = it },
                 label = buildAnnotatedString { append("PATH") },
-                placeholder = "e.g. /gate1"
+                placeholder = "e.g. gate1",
+                leading = {
+                    Text(
+                        text = "/",
+                        color = if (!isDarkMode) RoyalBlue800_30 else White30
+                    )
+                }
             )
             OutlinedTextField(
                 value = url,
