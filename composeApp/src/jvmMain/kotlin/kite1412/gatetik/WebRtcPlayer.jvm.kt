@@ -138,7 +138,7 @@ object CefBrowserProvider {
                     }
                     addJcefArgs("--disable-web-security")
                     addJcefArgs("--enable-media-stream")
-                    addJcefArgs("--ignore-ssl-errors")
+                    addJcefArgs("--ignore-certificate-errors")
 
                     if (getSupportedOS() == SupportedOS.WINDOWS) {
                         cefSettings.windowless_rendering_enabled = false
