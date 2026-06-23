@@ -31,8 +31,10 @@ import kite1412.gatetik.designsystem.component.OutlinedTextField
 import kite1412.gatetik.designsystem.component.PrimaryButton
 import kite1412.gatetik.designsystem.theme.Gray200
 import kite1412.gatetik.designsystem.theme.Red500
+import kite1412.gatetik.designsystem.theme.RoyalBlue800_30
 import kite1412.gatetik.designsystem.theme.Slate900
 import kite1412.gatetik.designsystem.theme.White
+import kite1412.gatetik.designsystem.theme.White30
 import kite1412.gatetik.designsystem.util.GateTikIcons
 import kite1412.gatetik.model.Cctv
 import kite1412.gatetik.model.CctvType
@@ -43,8 +45,10 @@ import org.jetbrains.compose.resources.painterResource
 fun AddCctvDialog(
     camera: Cctv?,
     onDismiss: () -> Unit,
-    onConfirm: (name: String, path: String, url: String, type: CctvType) -> Unit
+    onConfirm: (name: String, path: String, url: String, type: CctvType) -> Unit,
+    onDelete: () -> Unit = {}
 ) {
+    val isDarkMode = LocalDarkMode.current
     var name by remember { mutableStateOf(camera?.cameraName ?: "") }
     var path by remember { mutableStateOf(camera?.path ?: "") }
     var url by remember { mutableStateOf(camera?.streamUrl ?: "") }
@@ -68,7 +72,13 @@ fun AddCctvDialog(
                 value = path,
                 onValueChange = { path = it },
                 label = buildAnnotatedString { append("PATH") },
-                placeholder = "e.g. /gate1"
+                placeholder = "e.g. gate1",
+                leading = {
+                    Text(
+                        text = "/",
+                        color = if (!isDarkMode) RoyalBlue800_30 else White30
+                    )
+                }
             )
             OutlinedTextField(
                 value = url,
@@ -109,18 +119,42 @@ fun AddCctvDialog(
                 }
             }
 
-            PrimaryButton(
-                text = if (camera == null) "Tambah Kamera" else "Simpan Perubahan",
-                onClick = { onConfirm(name, path, url, type) },
-                leading = {
-                    Icon(
-                        painter = painterResource(GateTikIcons.userCheck), // Reusing check icon
-                        contentDescription = null,
-                        modifier = Modifier.size(18.dp),
-                        tint = White
-                    )
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(12.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                if (camera != null) {
+                    Box(
+                        modifier = Modifier
+                            .clip(RoundedCornerShape(12.dp))
+                            .background(Red500)
+                            .clickable(onClick = onDelete)
+                            .padding(8.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Icon(
+                            painter = painterResource(GateTikIcons.trash),
+                            contentDescription = "Hapus",
+                            modifier = Modifier.size(20.dp),
+                            tint = White
+                        )
+                    }
                 }
-            )
+                PrimaryButton(
+                    text = if (camera == null) "Tambah Kamera" else "Simpan Perubahan",
+                    onClick = { onConfirm(name, path, url, type) },
+                    modifier = Modifier.weight(1f),
+                    leading = {
+                        Icon(
+                            painter = painterResource(GateTikIcons.userCheck), // Reusing check icon
+                            contentDescription = null,
+                            modifier = Modifier.size(18.dp),
+                            tint = White
+                        )
+                    }
+                )
+            }
         }
     }
 }

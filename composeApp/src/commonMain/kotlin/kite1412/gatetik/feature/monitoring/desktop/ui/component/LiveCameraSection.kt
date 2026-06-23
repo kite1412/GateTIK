@@ -1,5 +1,6 @@
 package kite1412.gatetik.feature.monitoring.desktop.ui.component
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -9,7 +10,6 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -18,8 +18,14 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.retain.retain
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -32,33 +38,40 @@ import kite1412.gatetik.designsystem.theme.Blue500
 import kite1412.gatetik.designsystem.theme.Red500
 import kite1412.gatetik.designsystem.util.GateTikIcons
 import kite1412.gatetik.getWebRtcStreamUrl
+import kite1412.gatetik.model.Cctv
+import kite1412.gatetik.model.CctvType
+import kite1412.gatetik.ui.util.LoadState
+import kite1412.gatetik.ui.util.data
 import org.jetbrains.compose.resources.painterResource
 
 @Composable
 fun LiveCameraSection(
-    cameraName: String,
+    cctvs: LoadState<List<Cctv>>,
     modifier: Modifier = Modifier,
     showFullScreenButton: Boolean = false,
-    onFullScreenClick: () -> Unit = {},
-    path: String? = null
+    onFullScreenClick: (Cctv, autoMicOn: Boolean) -> Unit = {_, _ ->}
 ) {
+    var currentIndex by retain { mutableIntStateOf(0) }
+    val currentCctv = cctvs.data?.getOrNull(currentIndex)
+
     GlassBox(
         modifier = modifier,
         contentPadding = PaddingValues(0.dp)
     ) {
         Column {
             Box(
-                modifier = Modifier
+                modifier = Modifier.background(Color.Black)
+            ) {
+                val videoModifier = Modifier
                     .fillMaxWidth()
                     .aspectRatio(16f / 9f)
-                    .background(Color.Black)
-            ) {
-                path?.let { path ->
+
+                currentCctv?.let { cctv ->
                     WebRtcPlayer(
-                        url = getWebRtcStreamUrl(path),
-                        modifier = Modifier.fillMaxSize()
+                        url = getWebRtcStreamUrl(cctv.path),
+                        modifier = videoModifier
                     )
-                }
+                } ?: Box(videoModifier)
 
                 Badge(
                     text = "LIVE",
@@ -88,7 +101,7 @@ fun LiveCameraSection(
                         )
                         Spacer(modifier = Modifier.width(6.dp))
                         Text(
-                            text = cameraName,
+                            text = currentCctv?.cameraName ?: "~",
                             style = MaterialTheme.typography.labelSmall,
                             color = Color.White
                         )
@@ -103,24 +116,83 @@ fun LiveCameraSection(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Text(
-                    text = "KAMERA LANGSUNG",
-                    style = MaterialTheme.typography.labelSmall.copy(
-                        fontWeight = FontWeight.Bold,
-                        letterSpacing = 1.sp
-                    ),
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-                if (showFullScreenButton) Text(
-                    text = "Layar Penuh ↗",
-                    modifier = Modifier.clickable(
-                        indication = null,
-                        interactionSource = null,
-                        onClick = onFullScreenClick
-                    ),
-                    style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Bold),
-                    color = Blue500
-                )
+                Column {
+                    Text(
+                        text = "KAMERA LANGSUNG",
+                        style = MaterialTheme.typography.labelSmall.copy(
+                            letterSpacing = 1.sp
+                        )
+                    )
+                    currentCctv?.let { cctv ->
+                        Text(
+                            text = cctv.cameraName,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            style = MaterialTheme.typography.bodySmall.copy(
+                                fontWeight = FontWeight.Light
+                            )
+                        )
+                    }
+                }
+
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(16.dp)
+                ) {
+                    val iconButtonModifier: @Composable (() -> Unit) -> Modifier = { onClick ->
+                        Modifier
+                            .clip(CircleShape)
+                            .clickable(onClick = onClick)
+                            .background(MaterialTheme.colorScheme.surface.copy(alpha = 0.5f))
+                            .padding(16.dp)
+                            .size(20.dp)
+                    }
+
+                    val cctvListSize = cctvs.data?.size ?: 0
+
+                    AnimatedVisibility(
+                        visible = currentCctv?.type == CctvType.INTERCOM
+                    ) {
+                        Icon(
+                            painter = painterResource(GateTikIcons.mic),
+                            contentDescription = "interkom",
+                            modifier = iconButtonModifier {
+                                currentCctv?.let { onFullScreenClick(it, true) }
+                            }
+                        )
+                    }
+
+                    if (cctvListSize > 1) Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        Icon(
+                            painter = painterResource(GateTikIcons.chevronRight),
+                            contentDescription = "Previous",
+                            modifier = iconButtonModifier {
+                                currentIndex = (currentIndex - 1 + cctvListSize) % cctvListSize
+                            }
+                                .rotate(180f),
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                        Icon(
+                            painter = painterResource(GateTikIcons.chevronRight),
+                            contentDescription = "Next",
+                            modifier = iconButtonModifier {
+                                currentIndex = (currentIndex + 1) % cctvListSize
+                            },
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+
+                    if (showFullScreenButton) Icon(
+                        painter = painterResource(GateTikIcons.zoomIn),
+                        contentDescription = "Full Screen",
+                        modifier = iconButtonModifier {
+                            currentCctv?.let { onFullScreenClick(it, false) }
+                        },
+                        tint = Blue500
+                    )
+                }
             }
         }
     }

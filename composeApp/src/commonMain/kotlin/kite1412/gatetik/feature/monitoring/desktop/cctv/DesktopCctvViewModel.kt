@@ -15,6 +15,7 @@ import kite1412.gatetik.model.Cctv
 import kite1412.gatetik.ui.util.LoadState
 import kite1412.gatetik.ui.util.UiEvent
 import kite1412.gatetik.ui.util.data
+import kite1412.gatetik.ui.util.showSnackbar
 import kite1412.gatetik.util.onError
 import kite1412.gatetik.util.onSuccess
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -41,8 +42,8 @@ class DesktopCctvViewModel(
     private val _selectedTab = MutableStateFlow(CctvTab.MONITOR)
     val selectedTab = _selectedTab.asStateFlow()
 
-    private val _gridColumns = MutableStateFlow(2)
-    val gridColumns = _gridColumns.asStateFlow()
+    private val _currentPage = MutableStateFlow(0)
+    val currentPage = _currentPage.asStateFlow()
 
     private val openCctvWindows = mutableStateMapOf<String, Boolean>()
     var cctvs by mutableStateOf<LoadState<List<Cctv>>>(LoadState.Loading("Memuat Cctv"))
@@ -56,14 +57,15 @@ class DesktopCctvViewModel(
 
     fun updateSearchQuery(query: String) {
         _searchQuery.value = query
+        _currentPage.value = 0
     }
 
     fun updateSelectedTab(tab: CctvTab) {
         _selectedTab.value = tab
     }
 
-    fun updateGridColumns(columns: Int) {
-        _gridColumns.value = columns
+    fun updateCurrentPage(page: Int) {
+        _currentPage.value = page
     }
 
     fun addCctv(data: CctvCreate) {
@@ -72,7 +74,10 @@ class DesktopCctvViewModel(
                 .addCctv(data)
                 .onSuccess {
                     cctvs = LoadState.Success((cctvs.data ?: emptyList()) + listOf(it))
-                    _uiEvent.emit(UiEvent.ShowSnackbar("Berhasil menambah CCTV"))
+                    _uiEvent.showSnackbar("Berhasil menambah CCTV")
+                }
+                .onError {
+                    _uiEvent.showSnackbar(it.message)
                 }
         }
     }
@@ -90,9 +95,12 @@ class DesktopCctvViewModel(
                             }
                                 ?.let {
                                     cctvs = LoadState.Success(it)
-                                    _uiEvent.emit(UiEvent.ShowSnackbar("CCTV diperbarui"))
+                                    _uiEvent.showSnackbar("CCTV diperbarui")
                                 }
                         }
+                }
+                .onError {
+                    _uiEvent.showSnackbar(it.message)
                 }
         }
     }
@@ -111,7 +119,7 @@ class DesktopCctvViewModel(
                                         removeAt(index)
                                     }
                                 )
-                                _uiEvent.emit(UiEvent.ShowSnackbar("CCTV dihapus"))
+                                _uiEvent.showSnackbar("CCTV dihapus")
                             }
                     }
                 }
@@ -121,7 +129,7 @@ class DesktopCctvViewModel(
     fun refreshCctvs() {
         viewModelScope.launch {
             updateCctvs()
-            _uiEvent.emit(UiEvent.ShowSnackbar("Data dimuat ulang"))
+            _uiEvent.showSnackbar("Data dimuat ulang")
         }
     }
 

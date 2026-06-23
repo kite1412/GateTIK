@@ -4,6 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.PaddingValues
@@ -51,96 +52,107 @@ fun CctvGridItem(
     onDeleteClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    GlassBox(
-        modifier = modifier,
-        contentPadding = PaddingValues(0.dp),
-        shape = RoundedCornerShape(16.dp)
-    ) {
-        Column {
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .aspectRatio(16f / 9f)
-                    .background(Color.Black)
-            ) {
-                WebRtcPlayer(
-                    url = getWebRtcStreamUrl(cctv.path),
-                    modifier = Modifier.fillMaxSize()
-                )
-            }
+    BoxWithConstraints(modifier = modifier) {
+        val currentMaxWidth = maxWidth
 
-            FlowRow(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(12.dp),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalArrangement = Arrangement.Center,
-                maxItemsInEachRow = Int.MAX_VALUE
-            ) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
-                    modifier = Modifier.padding(bottom = 8.dp)
+        GlassBox(
+            modifier = Modifier
+                .fillMaxWidth()
+                .align(Alignment.Center),
+            contentPadding = PaddingValues(0.dp),
+            shape = RoundedCornerShape(16.dp)
+        ) {
+            Column(modifier = Modifier.fillMaxWidth()) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .aspectRatio(16f / 9f)
+                        .background(Color.Black)
                 ) {
-                    Icon(
-                        painter = painterResource(GateTikIcons.camera),
-                        contentDescription = null,
-                        modifier = Modifier.size(16.dp),
-                        tint = Blue500
+                    WebRtcPlayer(
+                        url = getWebRtcStreamUrl(cctv.path),
+                        modifier = Modifier.fillMaxSize()
                     )
-                    Column {
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.spacedBy(8.dp)
-                        ) {
-                            Text(
-                                text = cctv.cameraName,
-                                style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold),
-                                color = MaterialTheme.colorScheme.onSurface
-                            )
-                            Badge(
-                                text = when (cctv.type) {
-                                    CctvType.MONITOR -> "Monitor"
-                                    CctvType.INTERCOM -> "Interkom"
-                                },
-                                containerColor = Blue500.copy(alpha = 0.1f),
-                                contentColor = Blue500
-                            )
-                        }
-                        Text(
-                            text = "/${cctv.path}",
-                            style = MaterialTheme.typography.labelSmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                    }
                 }
 
-                Row(
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
-                    verticalAlignment = Alignment.CenterVertically
+                FlowRow(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(8.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalArrangement = Arrangement.Center,
+                    itemVerticalAlignment = Alignment.CenterVertically,
+                    maxItemsInEachRow = Int.MAX_VALUE
                 ) {
-                    IconButton(
-                        icon = GateTikIcons.trash,
-                        onClick = onDeleteClick,
-                        containerColor = Red500
-                    )
-                    IconButton(
-                        icon = GateTikIcons.settings,
-                        onClick = onSettingsClick,
-                        containerColor = Slate500
-                    )
-                    if (cctv.type == CctvType.INTERCOM) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        modifier = Modifier.padding(bottom = 8.dp)
+                    ) {
+                        Icon(
+                            painter = painterResource(GateTikIcons.camera),
+                            contentDescription = null,
+                            modifier = Modifier.size(16.dp),
+                            tint = Blue500
+                        )
+                        Column {
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                            ) {
+                                Text(
+                                    text = cctv.cameraName,
+                                    style = MaterialTheme.typography.labelSmall,
+                                    color = MaterialTheme.colorScheme.onSurface
+                                )
+                                Badge(
+                                    text = when (cctv.type) {
+                                        CctvType.MONITOR -> "Monitor"
+                                        CctvType.INTERCOM -> "Interkom"
+                                    },
+                                    containerColor = Blue500.copy(alpha = 0.1f),
+                                    contentColor = Blue500
+                                )
+                            }
+                            Text(
+                                text = "/${cctv.path}",
+                                style = MaterialTheme.typography.bodySmall.copy(
+                                    fontWeight = FontWeight.Light
+                                ),
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
+                    }
+
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        if (currentMaxWidth > 300.dp) {
+                            IconButton(
+                                icon = GateTikIcons.trash,
+                                onClick = onDeleteClick,
+                                containerColor = Red500
+                            )
+                        }
                         IconButton(
-                            icon = GateTikIcons.mic,
-                            onClick = onMicClick,
-                            containerColor = Emerald500
+                            icon = GateTikIcons.settings,
+                            onClick = onSettingsClick,
+                            containerColor = Slate500
+                        )
+                        if (cctv.type == CctvType.INTERCOM && currentMaxWidth > 300.dp) {
+                            IconButton(
+                                icon = GateTikIcons.mic,
+                                onClick = onMicClick,
+                                containerColor = Emerald500
+                            )
+                        }
+                        IconButton(
+                            icon = GateTikIcons.zoomIn,
+                            onClick = onFullscreenClick,
+                            containerColor = Blue500
                         )
                     }
-                    IconButton(
-                        icon = GateTikIcons.zoomIn,
-                        onClick = onFullscreenClick,
-                        containerColor = Blue500
-                    )
                 }
             }
         }
@@ -179,7 +191,7 @@ private fun IconButton(
             .clip(CircleShape)
             .background(containerColor.copy(alpha = 0.8f))
             .clickable(onClick = onClick)
-            .padding(8.dp),
+            .padding(4.dp),
         contentAlignment = Alignment.Center
     ) {
         Icon(

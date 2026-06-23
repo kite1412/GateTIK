@@ -28,6 +28,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -64,12 +65,18 @@ import kite1412.gatetik.model.Cctv
 import kite1412.gatetik.model.Gate
 import kite1412.gatetik.model.ParkingQuota
 import kite1412.gatetik.model.UserRole
+import kite1412.gatetik.network.mock.mockAccessLogs
+import kite1412.gatetik.network.mock.mockCctv
+import kite1412.gatetik.network.mock.mockGate
+import kite1412.gatetik.network.mock.mockParkingQuota
 import kite1412.gatetik.ui.component.GateControlButton
 import kite1412.gatetik.ui.component.ParkingQuotaCard
 import kite1412.gatetik.ui.compositionlocal.LocalDarkMode
+import kite1412.gatetik.ui.compositionlocal.LocalScaffoldComponentsController
 import kite1412.gatetik.ui.compositionlocal.LocalSnackbarHostStateWrapper
 import kite1412.gatetik.ui.preview.DevicePreviews
 import kite1412.gatetik.ui.util.LoadState
+import kite1412.gatetik.ui.util.MockScaffoldComponentController
 import kite1412.gatetik.ui.util.UiEvent
 import kite1412.gatetik.ui.util.data
 import kite1412.gatetik.ui.util.map
@@ -89,7 +96,7 @@ fun DesktopDashboardScreen(
     val user by viewModel.signedInUser.collectAsStateWithLifecycle()
     val gate by viewModel.gate.collectAsStateWithLifecycle()
     val parkingQuota by viewModel.parkingQuota.collectAsStateWithLifecycle()
-    val cctv by viewModel.cctv.collectAsStateWithLifecycle()
+    val cctvs by viewModel.cctvs.collectAsStateWithLifecycle()
     val totalUsers = viewModel.totalUsers
     val accessLogs = viewModel.accessLogs
 
@@ -102,19 +109,20 @@ fun DesktopDashboardScreen(
     user?.let { user ->
         DesktopDashboardScreen(
             userRole = user.role,
-            isMainCctvFullScreen = viewModel.isMainCctvFullScreen,
+            fullScreenCctv = viewModel.fullScreenCctv,
             sideNotificationManager = viewModel.sideNotificationManager,
+            isFullScreenCctvAutoMicOn = viewModel.isFullScreenCctvAutoMicOn,
             gate = gate,
             parkingQuota = parkingQuota,
-            cctv = cctv,
+            cctvs = cctvs,
             totalUsers = totalUsers,
             accessLogs = accessLogs,
             contentPadding = contentPadding,
             onThemeToggle = viewModel::updateDarkMode,
             onOpenGate = viewModel::openGate,
             onCloseGate = viewModel::closeGate,
-            onCctvFullScreenClick = { viewModel.updateMainCctvFullScreen(true) },
-            onExitCctvFullScreen = { viewModel.updateMainCctvFullScreen(false) },
+            onCctvFullScreenClick = viewModel::updateFullScreenCctv,
+            onExitCctvFullScreen = { viewModel.updateFullScreenCctv(null, false) },
             onSeeAllAccessLogClick = navigateToAccessLogs,
             onRefreshClick = viewModel::refreshData,
             modifier = modifier
@@ -125,18 +133,19 @@ fun DesktopDashboardScreen(
 @Composable
 private fun DesktopDashboardScreen(
     userRole: UserRole,
-    isMainCctvFullScreen: Boolean,
+    fullScreenCctv: Cctv?,
     sideNotificationManager: SideNotificationManager,
+    isFullScreenCctvAutoMicOn: Boolean,
     gate: LoadState<Gate?>,
     parkingQuota: LoadState<ParkingQuota?>,
-    cctv: LoadState<Cctv?>,
+    cctvs: LoadState<List<Cctv>>,
     totalUsers: LoadState<Int>,
     accessLogs: LoadState<List<AccessLog>>,
     contentPadding: PaddingValues,
     onThemeToggle: (darkMode: Boolean) -> Unit,
     onOpenGate: () -> Unit,
     onCloseGate: () -> Unit,
-    onCctvFullScreenClick: () -> Unit,
+    onCctvFullScreenClick: (Cctv,Boolean) -> Unit,
     onExitCctvFullScreen: () -> Unit,
     onSeeAllAccessLogClick: () -> Unit,
     onRefreshClick: () -> Unit,
@@ -168,10 +177,9 @@ private fun DesktopDashboardScreen(
             }
             if (!isLargeWindow) item {
                 LiveCameraSection(
-                    cameraName = cctv.data?.cameraName ?: "~",
+                    cctvs = cctvs,
                     showFullScreenButton = true,
-                    onFullScreenClick = onCctvFullScreenClick,
-                    path = cctv.data?.path
+                    onFullScreenClick = onCctvFullScreenClick
                 )
             }
             item {
@@ -182,13 +190,12 @@ private fun DesktopDashboardScreen(
                     horizontalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
                     if (isLargeWindow) LiveCameraSection(
-                        cameraName = cctv.data?.cameraName ?: "~",
+                        cctvs = cctvs,
                         modifier = Modifier
                             .weight(2f)
                             .fillMaxHeight(),
                         showFullScreenButton = true,
-                        onFullScreenClick = onCctvFullScreenClick,
-                        path = cctv.data?.path
+                        onFullScreenClick = onCctvFullScreenClick
                     )
                     if (isLargeWindow) Column(
                         modifier = Modifier.weight(1f),
@@ -237,10 +244,11 @@ private fun DesktopDashboardScreen(
         }
     }
 
-    if (isMainCctvFullScreen) cctv.data?.let { cctv ->
+    fullScreenCctv?.let { cctv ->
         CctvWindow(
             cctv = cctv,
-            onClose = { onExitCctvFullScreen() }
+            onClose = { onExitCctvFullScreen() },
+            autoMicOn = isFullScreenCctvAutoMicOn
         )
     }
 }
@@ -605,12 +613,33 @@ private fun RecentAccessActivitySection(
 @Composable
 private fun DesktopDashboardScreenPreview() {
     GateTikTheme {
+        val scope = rememberCoroutineScope()
+
         Scaffold { p ->
-            DesktopDashboardScreen(
-                contentPadding = PaddingValues(24.dp),
-                navigateToAccessLogs = {},
-                modifier = Modifier.padding(p)
-            )
+            CompositionLocalProvider(
+                LocalScaffoldComponentsController provides MockScaffoldComponentController
+            ) {
+                DesktopDashboardScreen(
+                    userRole = UserRole.ADMIN,
+                    contentPadding = PaddingValues(24.dp),
+                    fullScreenCctv = null,
+                    sideNotificationManager = SideNotificationManager(scope),
+                    isFullScreenCctvAutoMicOn = false,
+                    gate = LoadState.Success(mockGate),
+                    parkingQuota = LoadState.Success(mockParkingQuota),
+                    cctvs = LoadState.Success(listOf(mockCctv)),
+                    totalUsers = LoadState.Success(3),
+                    accessLogs = LoadState.Success(mockAccessLogs),
+                    onThemeToggle = {},
+                    onOpenGate = {},
+                    onCloseGate = {},
+                    onCctvFullScreenClick = {_, _ ->},
+                    onExitCctvFullScreen = {},
+                    onSeeAllAccessLogClick = {},
+                    onRefreshClick = {},
+                    modifier = Modifier.padding(p)
+                )
+            }
         }
     }
 }

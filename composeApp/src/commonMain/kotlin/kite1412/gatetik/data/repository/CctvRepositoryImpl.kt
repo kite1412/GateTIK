@@ -25,15 +25,11 @@ class CctvRepositoryImpl(
         action = remoteDataSource::getAll
     )
 
-    override suspend fun addCctv(data: CctvCreate): CctvResult<Cctv> = tryOrThrowUnknown(
-        logTag = logTag,
-        errorMessage = "Failed to add cctv"
-    ) { _ -> remoteDataSource.addCctv(data) }
+    override suspend fun addCctv(data: CctvCreate): CctvResult<Cctv> =
+        remoteDataSource.addCctv(data)
 
-    override suspend fun updateCctv(data: CctvUpdate): CctvResult<Cctv> = tryOrThrowUnknown(
-        logTag = logTag,
-        errorMessage = "Failed to update cctv"
-    ) { _ -> remoteDataSource.updateCctv(data) }
+    override suspend fun updateCctv(data: CctvUpdate): CctvResult<Cctv> =
+        remoteDataSource.updateCctv(data)
 
     override suspend fun deleteCctv(id: Int): CctvResult<Boolean> = tryOrThrowUnknown(
         logTag = logTag,

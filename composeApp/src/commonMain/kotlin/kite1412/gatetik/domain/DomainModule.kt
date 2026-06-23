@@ -3,7 +3,7 @@ package kite1412.gatetik.domain
 import kite1412.gatetik.domain.usecase.AccessGateUseCase
 import kite1412.gatetik.domain.usecase.EnterGateUseCase
 import kite1412.gatetik.domain.usecase.ExitGateUseCase
-import kite1412.gatetik.domain.usecase.GetMainCctvUseCase
+import kite1412.gatetik.domain.usecase.GetCctvUseCase
 import kite1412.gatetik.domain.usecase.GetMainGateUseCase
 import kite1412.gatetik.domain.usecase.GetMainParkingQuotaUseCase
 import kite1412.gatetik.domain.usecase.ResetPasswordUseCase
@@ -18,7 +18,7 @@ private val useCaseModule = module {
     }
 
     factory {
-        GetMainCctvUseCase(cctvRepository = get())
+        GetCctvUseCase(cctvRepository = get())
     }
 
     factory {

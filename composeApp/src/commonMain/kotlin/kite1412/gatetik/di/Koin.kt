@@ -57,7 +57,7 @@ private val mobileMonitoringViewModelModule = module {
         MobileHomeViewModel(
             authentication = get(),
             getMainGateUseCase = get(),
-            getMainCctvUseCase = get(),
+            getCctvUseCase = get(),
             getMainParkingQuotaUseCase = get(),
             accessLogRepository = get(),
             accessGateUseCase = get()
@@ -65,7 +65,7 @@ private val mobileMonitoringViewModelModule = module {
     }
     viewModel {
         MobileCctvViewModel(
-            getMainCctvUseCase = get()
+            getCctvUseCase = get()
         )
     }
     viewModel {
@@ -82,7 +82,7 @@ private val desktopMonitoringViewModel = module {
             dataStore = get(),
             getMainGateUseCase = get(),
             getMainParkingQuotaUseCase = get(),
-            getMainCctvUseCase = get(),
+            getCctvUseCase = get(),
             userRepository = get(),
             accessLogRepository = get(),
             accessGateUseCase = get()

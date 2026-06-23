@@ -22,8 +22,6 @@ fun CctvActionBar(
     onTabSelected: (CctvTab) -> Unit,
     searchQuery: String,
     onSearchQueryChange: (String) -> Unit,
-    gridColumns: Int,
-    onGridColumnsChange: (Int) -> Unit,
     modifier: Modifier = Modifier
 ) {
     GlassBox(
@@ -47,24 +45,6 @@ fun CctvActionBar(
                 modifier = Modifier.weight(1f),
                 trailing = { EnterIconTrailing() }
             )
-
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(4.dp)
-            ) {
-                listOf(2, 3, 4).forEach { cols ->
-                    FilterChip(
-                        text = cols.toString(),
-                        isSelected = gridColumns == cols,
-                        onClick = { onGridColumnsChange(cols) },
-                        shape = RoundedCornerShape(4.dp),
-                        contentPadding = PaddingValues(
-                            horizontal = 8.dp,
-                            vertical = 4.dp
-                        )
-                    )
-                }
-            }
         }
     }
 }

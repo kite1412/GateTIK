@@ -21,6 +21,7 @@ import kite1412.gatetik.model.UserRole
 import kite1412.gatetik.model.UserStatus
 import kite1412.gatetik.ui.util.LoadState
 import kite1412.gatetik.ui.util.UiEvent
+import kite1412.gatetik.ui.util.showSnackbar
 import kite1412.gatetik.util.onError
 import kite1412.gatetik.util.onSuccess
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -132,7 +133,7 @@ class DesktopUserManagementViewModel(
     fun refreshUsers() {
         viewModelScope.launch {
             pollData()
-            showSnackbar("Data dimuat ulang")
+            _uiEvent.showSnackbar("Data dimuat ulang")
         }
     }
 
@@ -165,10 +166,10 @@ class DesktopUserManagementViewModel(
                         }
                     }
 
-                    showSnackbar("Berhasil menambahkan pengguna")
+                    _uiEvent.showSnackbar("Berhasil menambahkan pengguna")
                 }
                 .onError {
-                    showSnackbar("Gagal menambahkan pengguna, harap coba lagi")
+                    _uiEvent.showSnackbar("Gagal menambahkan pengguna, harap coba lagi")
                 }
         }
     }
@@ -211,10 +212,10 @@ class DesktopUserManagementViewModel(
                             updateUsersOnParamsChange(params)
                     }
 
-                    showSnackbar("Berhasil menghapus pengguna")
+                    _uiEvent.showSnackbar("Berhasil menghapus pengguna")
                 }
                 .onError {
-                    showSnackbar("Gagal menghapus pengguna, harap coba lagi")
+                    _uiEvent.showSnackbar("Gagal menghapus pengguna, harap coba lagi")
                 }
         }
     }
@@ -249,10 +250,10 @@ class DesktopUserManagementViewModel(
                         updateUsersOnParamsChange(params)
                 }
 
-                showSnackbar(successMessage)
+                _uiEvent.showSnackbar(successMessage)
             }
             .onError {
-                showSnackbar(errorMessage)
+                _uiEvent.showSnackbar(errorMessage)
             }
     }
 
@@ -292,9 +293,5 @@ class DesktopUserManagementViewModel(
                     users = LoadState.Error("Gagal memuat daftar pengguna")
                 }
         }
-    }
-
-    private suspend fun showSnackbar(message: String) {
-        _uiEvent.emit(UiEvent.ShowSnackbar(message))
     }
 }

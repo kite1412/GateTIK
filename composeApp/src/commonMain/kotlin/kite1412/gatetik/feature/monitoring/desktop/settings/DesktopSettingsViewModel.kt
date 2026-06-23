@@ -5,6 +5,7 @@ import kite1412.gatetik.datastore.GateTikDataStore
 import kite1412.gatetik.domain.Authentication
 import kite1412.gatetik.feature.monitoring.desktop.DesktopBaseViewModel
 import kite1412.gatetik.ui.util.UiEvent
+import kite1412.gatetik.ui.util.showSnackbar
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asSharedFlow
@@ -44,9 +45,7 @@ class DesktopSettingsViewModel(
     fun updatePollingIntervalSecond(second: Int) {
         viewModelScope.launch {
             dataStore.setPollingIntervalMs(second * 1000)
-            _uiEvent.emit(
-                UiEvent.ShowSnackbar("Berhasil memperbarui Polling Interval")
-            )
+            _uiEvent.showSnackbar("Berhasil memperbarui Polling Interval")
         }
     }
 }
