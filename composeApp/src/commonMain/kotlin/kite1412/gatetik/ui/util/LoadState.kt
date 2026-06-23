@@ -129,7 +129,10 @@ private fun ErrorState(
         Text(message)
         onRetry?.let { onRetry ->
             Button(onClick = onRetry) {
-                Text("Retry")
+                Text(
+                    text = "Coba Ulang",
+                    style = MaterialTheme.typography.bodySmall
+                )
             }
         }
     }

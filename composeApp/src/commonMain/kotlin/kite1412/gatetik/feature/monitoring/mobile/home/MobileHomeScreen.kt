@@ -27,6 +27,7 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -110,6 +111,8 @@ fun MobileHomeScreen(
             latestAccessLog = latestAccessLog,
             parkingQuota = mainParkingQuota,
             cctv = mainCctv,
+            isRefreshing = viewModel.isRefreshing,
+            onRefresh = viewModel::onRefresh,
             contentPadding = contentPadding,
             onOpenGate = viewModel::openGate,
             onCloseGate = viewModel::closeGate,
@@ -128,6 +131,8 @@ private fun MobileHomeScreen(
     latestAccessLog: AccessLog?,
     parkingQuota: LoadState<ParkingQuota?>,
     cctv: LoadState<Cctv?>,
+    isRefreshing: Boolean,
+    onRefresh: () -> Unit,
     contentPadding: PaddingValues,
     onOpenGate: () -> Unit,
     onCloseGate: () -> Unit,
@@ -137,47 +142,52 @@ private fun MobileHomeScreen(
 ) {
     val isDarkMode = LocalDarkMode.current
 
-    LazyColumn(
+    PullToRefreshBox(
+        isRefreshing = isRefreshing,
+        onRefresh = onRefresh,
         modifier = modifier
-            .fillMaxSize()
-            .padding(contentPadding),
-        contentPadding = navBarPadding(),
-        verticalArrangement = Arrangement.spacedBy(24.dp)
     ) {
-        item {
-            HeaderSection(
-                userName = userName,
-                userRole = userRole,
-                isDarkMode = isDarkMode,
-                modifier = Modifier.padding(start = 8.dp),
-                trailing = {
-                    Box(
-                        modifier = Modifier
-                            .size(40.dp)
-                            .background(
-                                color = if (isDarkMode) White20 else MaterialTheme.colorScheme.surface,
-                                shape = CircleShape
-                            ),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Icon(
-                            painter = painterResource(GateTikIcons.bell),
-                            contentDescription = "Notifikasi",
-                            modifier = Modifier.size(20.dp),
-                            tint = MaterialTheme.colorScheme.onSurface
-                        )
+        LazyColumn(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(contentPadding),
+            contentPadding = navBarPadding(),
+            verticalArrangement = Arrangement.spacedBy(24.dp)
+        ) {
+            item {
+                HeaderSection(
+                    userName = userName,
+                    userRole = userRole,
+                    isDarkMode = isDarkMode,
+                    modifier = Modifier.padding(start = 8.dp),
+                    trailing = {
+                        Box(
+                            modifier = Modifier
+                                .size(40.dp)
+                                .background(
+                                    color = if (isDarkMode) White20 else MaterialTheme.colorScheme.surface,
+                                    shape = CircleShape
+                                ),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Icon(
+                                painter = painterResource(GateTikIcons.bell),
+                                contentDescription = "Notifikasi",
+                                modifier = Modifier.size(20.dp),
+                                tint = MaterialTheme.colorScheme.onSurface
+                            )
+                        }
                     }
-                }
-            )
-        }
-        item {
-            GateControlCard(
-                gate = gate,
-                latestAccessLog = latestAccessLog,
-                onOpenGate = onOpenGate,
-                onCloseGate = onCloseGate
-            )
-        }
+                )
+            }
+            item {
+                GateControlCard(
+                    gate = gate,
+                    latestAccessLog = latestAccessLog,
+                    onOpenGate = onOpenGate,
+                    onCloseGate = onCloseGate
+                )
+            }
 //        item {
 //            GateAccessButton(
 //                isLocked = true,
@@ -185,18 +195,19 @@ private fun MobileHomeScreen(
 //                modifier = Modifier.fillMaxWidth()
 //            )
 //        }
-        item { CctvCard(cctv = cctv) }
-        item {
-            ParkingQuotaCard(
-                parkingQuota = parkingQuota,
-                isDarkMode = isDarkMode
-            )
-        }
-        item {
-            QuickActionsRow(
-                onParkingClick = onParkingClick,
-                onCctvClick = onCctvClick
-            )
+            item { CctvCard(cctv = cctv) }
+            item {
+                ParkingQuotaCard(
+                    parkingQuota = parkingQuota,
+                    isDarkMode = isDarkMode
+                )
+            }
+            item {
+                QuickActionsRow(
+                    onParkingClick = onParkingClick,
+                    onCctvClick = onCctvClick
+                )
+            }
         }
     }
 }
@@ -529,6 +540,8 @@ private fun MobileHomeScreenPreview() {
                 latestAccessLog = null,
                 parkingQuota = LoadState.Loading(),
                 cctv = LoadState.Loading(),
+                isRefreshing = false,
+                onRefresh = {},
                 contentPadding = p,
                 onOpenGate = {},
                 onCloseGate = {},

@@ -21,6 +21,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -52,10 +53,13 @@ import kite1412.gatetik.designsystem.util.GateTikIcons
 import kite1412.gatetik.getWebRtcStreamUrl
 import kite1412.gatetik.model.Cctv
 import kite1412.gatetik.model.CctvType
+import kite1412.gatetik.network.mock.mockCctvs
 import kite1412.gatetik.ui.component.InfoCard
 import kite1412.gatetik.ui.compositionlocal.LocalDarkMode
+import kite1412.gatetik.ui.compositionlocal.LocalSnackbarHostStateWrapper
 import kite1412.gatetik.ui.preview.DevicePreviews
 import kite1412.gatetik.ui.util.LoadState
+import kite1412.gatetik.ui.util.UiEvent
 import kite1412.gatetik.ui.util.UiLoadState
 import kite1412.gatetik.ui.util.data
 import kite1412.gatetik.ui.util.navBarPadding
@@ -70,10 +74,20 @@ fun MobileCctvScreen(
     modifier: Modifier = Modifier,
     viewModel: MobileCctvViewModel = koinViewModel()
 ) {
+    val snackbarHostStateWrapper = LocalSnackbarHostStateWrapper.current
     val cctvs by viewModel.cctvs.collectAsStateWithLifecycle()
+
+    LaunchedEffect(Unit) {
+        viewModel.uiEvent.collect { event ->
+            if (event is UiEvent.ShowSnackbar) snackbarHostStateWrapper
+                .showSnackbar(event.message)
+        }
+    }
 
     MobileCctvScreen(
         cctvs = cctvs,
+        isRefreshing = viewModel.isRefreshing,
+        onRefresh = viewModel::onRefresh,
         contentPadding = contentPadding,
         modifier = modifier
     )
@@ -82,6 +96,8 @@ fun MobileCctvScreen(
 @Composable
 private fun MobileCctvScreen(
     cctvs: LoadState<List<Cctv>>,
+    isRefreshing: Boolean,
+    onRefresh: () -> Unit,
     contentPadding: PaddingValues,
     modifier: Modifier = Modifier
 ) {
@@ -89,93 +105,100 @@ private fun MobileCctvScreen(
     var fullScreenCctv by retain { mutableStateOf<Cctv?>(null) }
     var micOnCctvIds by rememberSaveable { mutableStateOf(emptySet<Int>()) }
 
-    Box(
-        modifier = modifier.fillMaxSize()
+    PullToRefreshBox(
+        isRefreshing = isRefreshing,
+        onRefresh = onRefresh,
+        modifier = modifier
     ) {
-        UiLoadState(
-            state = cctvs,
+        Box(
             modifier = Modifier.fillMaxSize()
         ) {
-            LazyColumn(
-                modifier = Modifier.padding(contentPadding),
-                contentPadding = navBarPadding(),
-                verticalArrangement = Arrangement.spacedBy(24.dp)
+            UiLoadState(
+                state = cctvs,
+                modifier = Modifier.fillMaxSize(),
+                onRetry = onRefresh
             ) {
-                item {
-                    SectionHeader(
-                        title = "CCTV",
-                        subtitle = "Sistem monitoring area gate"
-                    )
-                }
-                items(cctvs.data ?: emptyList()) { cctv ->
-                    val isMicOn = micOnCctvIds.contains(cctv.id)
-                    CctvPlayer(
-                        cctv = cctv,
-                        isDarkMode = isDarkMode,
-                        isMicOn = isMicOn,
-                        onMicOnChange = { isOn ->
-                            micOnCctvIds = if (isOn) micOnCctvIds + cctv.id else micOnCctvIds - cctv.id
-                            if (isOn) fullScreenCctv = cctv
-                        },
-                        onFullScreenClick = { fullScreenCctv = cctv }
-                    )
-                }
-                item {
-                    InfoCard(
-                        icon = painterResource(GateTikIcons.phone),
-                        title = "CCTV Monitoring",
-                        description = "Sistem monitoring untuk memantau aktivitas di area gate."
-                    )
+                LazyColumn(
+                    modifier = Modifier.padding(contentPadding),
+                    contentPadding = navBarPadding(),
+                    verticalArrangement = Arrangement.spacedBy(24.dp)
+                ) {
+                    item {
+                        SectionHeader(
+                            title = "CCTV",
+                            subtitle = "Sistem monitoring area gate"
+                        )
+                    }
+                    items(cctvs.data ?: emptyList()) { cctv ->
+                        val isMicOn = micOnCctvIds.contains(cctv.id)
+                        CctvPlayer(
+                            cctv = cctv,
+                            isDarkMode = isDarkMode,
+                            isMicOn = isMicOn,
+                            onMicOnChange = { isOn ->
+                                micOnCctvIds = if (isOn) micOnCctvIds + cctv.id else micOnCctvIds - cctv.id
+                                if (isOn) fullScreenCctv = cctv
+                            },
+                            onFullScreenClick = { fullScreenCctv = cctv }
+                        )
+                    }
+                    item {
+                        InfoCard(
+                            icon = painterResource(GateTikIcons.phone),
+                            title = "CCTV Monitoring",
+                            description = "Sistem monitoring untuk memantau aktivitas di area gate."
+                        )
+                    }
                 }
             }
-        }
-        fullScreenCctv?.let { cctv ->
-            Dialog(
-                onDismissRequest = {
-                    fullScreenCctv = null
-                    micOnCctvIds = micOnCctvIds - cctv.id
-                },
-                properties = DialogProperties(
-                    dismissOnBackPress = true,
-                    dismissOnClickOutside = true,
-                    usePlatformDefaultWidth = false
-                )
-            ) {
-                val isMicOn = micOnCctvIds.contains(cctv.id)
-
-                Column(
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    IconButton(
-                        onClick = { fullScreenCctv = null },
-                        modifier = Modifier
-                            .align(Alignment.End)
-                            .padding(end = 16.dp)
-                    ) {
-                        Icon(
-                            painter = painterResource(GateTikIcons.x),
-                            contentDescription = null
-                        )
-                    }
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .aspectRatio(16f / 9f)
-                    ) {
-                        WebRtcPlayer(
-                            url = getWebRtcStreamUrl(cctv.path) + if (isMicOn) "&media=video+audio+microphone" else "",
-                            modifier = Modifier.fillMaxSize()
-                        )
-                    }
-                    if (cctv.type == CctvType.INTERCOM) IntercomMic(
-                        isMicOn = isMicOn,
-                        onMicOnChange = { isOn ->
-                            micOnCctvIds = if (isOn) micOnCctvIds + cctv.id else micOnCctvIds - cctv.id
-                        },
-                        modifier = Modifier
-                            .align(Alignment.End)
-                            .padding(end = 16.dp)
+            fullScreenCctv?.let { cctv ->
+                Dialog(
+                    onDismissRequest = {
+                        fullScreenCctv = null
+                        micOnCctvIds = micOnCctvIds - cctv.id
+                    },
+                    properties = DialogProperties(
+                        dismissOnBackPress = true,
+                        dismissOnClickOutside = true,
+                        usePlatformDefaultWidth = false
                     )
+                ) {
+                    val isMicOn = micOnCctvIds.contains(cctv.id)
+
+                    Column(
+                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        IconButton(
+                            onClick = { fullScreenCctv = null },
+                            modifier = Modifier
+                                .align(Alignment.End)
+                                .padding(end = 16.dp)
+                        ) {
+                            Icon(
+                                painter = painterResource(GateTikIcons.x),
+                                contentDescription = null
+                            )
+                        }
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .aspectRatio(16f / 9f)
+                        ) {
+                            WebRtcPlayer(
+                                url = getWebRtcStreamUrl(cctv.path) + if (isMicOn) "&media=video+audio+microphone" else "",
+                                modifier = Modifier.fillMaxSize()
+                            )
+                        }
+                        if (cctv.type == CctvType.INTERCOM) IntercomMic(
+                            isMicOn = isMicOn,
+                            onMicOnChange = { isOn ->
+                                micOnCctvIds = if (isOn) micOnCctvIds + cctv.id else micOnCctvIds - cctv.id
+                            },
+                            modifier = Modifier
+                                .align(Alignment.End)
+                                .padding(end = 16.dp)
+                        )
+                    }
                 }
             }
         }
@@ -311,6 +334,9 @@ private fun MobileCctvScreenPreview() {
     GateTikTheme {
         Scaffold { p ->
               MobileCctvScreen(
+                  cctvs = LoadState.Success(mockCctvs),
+                  isRefreshing = false,
+                  onRefresh = {},
                   contentPadding = p
               )
         }
