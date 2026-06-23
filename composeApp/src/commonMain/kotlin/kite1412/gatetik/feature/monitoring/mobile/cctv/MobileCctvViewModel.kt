@@ -9,4 +9,5 @@ class MobileCctvViewModel(
     getCctvUseCase: GetCctvUseCase
 ) : ViewModel() {
     val mainCctv = getCctvUseCase.observeMainAsLoadStateFlow().stateIn(viewModelScope)
+    val cctvs = getCctvUseCase.observeAllAsLoadStateFlow().stateIn(viewModelScope)
 }
