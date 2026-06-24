@@ -27,7 +27,7 @@ Inside `<project root>/local.properties` file, add the following properties:
 ```properties
 BACKEND_URL=<Backend base URL>
 WEB_RTC_PLAYER_BASE_URL=<WebRTC Player Base URL>
-ANDROID_INSTALLATION_URL=<Android APK Distribution URL>
+ANDROID_INSTALLATION_URL=<APK Distribution URL>
 VERSION=<Application Version>
 LATEST_RELEASE_INFO_URL=<GitHub latest release info URL>
 ```
