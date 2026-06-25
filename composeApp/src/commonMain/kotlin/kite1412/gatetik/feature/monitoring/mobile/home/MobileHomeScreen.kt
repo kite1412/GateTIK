@@ -33,6 +33,7 @@ import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.retain.retain
@@ -278,10 +279,13 @@ private fun MobileHomeScreen(
                                 .fillMaxWidth()
                                 .aspectRatio(16f / 9f)
                         ) {
-                            WebRtcPlayer(
-                                url = getWebRtcStreamUrl(cctv.path) + if (isMicOn) "&media=video+audio+microphone" else "",
-                                modifier = Modifier.fillMaxSize()
-                            )
+                            val url = getWebRtcStreamUrl(cctv.path) + if (isMicOn) "&media=video+audio+microphone" else ""
+                            key(url) {
+                                WebRtcPlayer(
+                                    url = url,
+                                    modifier = Modifier.fillMaxSize()
+                                )
+                            }
                         }
                         if (cctv.type == CctvType.INTERCOM) IntercomMic(
                             isMicOn = isMicOn,
@@ -545,10 +549,13 @@ private fun CctvCard(
                             delay(3.seconds)
                             showMessage = false
                         }
-                        WebRtcPlayer(
-                            url = getWebRtcStreamUrl(cctv.path),
-                            modifier = Modifier.fillMaxSize()
-                        )
+                        val url = getWebRtcStreamUrl(cctv.path)
+                        key(url) {
+                            WebRtcPlayer(
+                                url = url,
+                                modifier = Modifier.fillMaxSize()
+                            )
+                        }
                         this@Column.AnimatedVisibility(
                             visible = showMessage,
                             modifier = Modifier.align(Alignment.Center),
