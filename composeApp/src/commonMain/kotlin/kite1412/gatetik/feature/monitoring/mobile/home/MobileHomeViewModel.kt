@@ -62,8 +62,8 @@ class MobileHomeViewModel(
     private val _mainGate = MutableStateFlow<LoadState<Gate?>>(LoadState.Loading())
     val mainGate = _mainGate.asStateFlow()
 
-    private val _mainCctv = MutableStateFlow<LoadState<Cctv?>>(LoadState.Loading())
-    val mainCctv = _mainCctv.asStateFlow()
+    private val _cctvs = MutableStateFlow<LoadState<List<Cctv>>>(LoadState.Loading())
+    val cctvs = _cctvs.asStateFlow()
 
     private val _mainParkingQuota = MutableStateFlow<LoadState<ParkingQuota?>>(LoadState.Loading())
     val mainParkingQuota = _mainParkingQuota.asStateFlow()
@@ -78,8 +78,8 @@ class MobileHomeViewModel(
             }
             .launchIn(viewModelScope)
 
-        getCctvUseCase.observeMainAsLoadStateFlow()
-            .onEach { _mainCctv.value = it }
+        getCctvUseCase.observeAllAsLoadStateFlow()
+            .onEach { _cctvs.value = it }
             .launchIn(viewModelScope)
 
         getMainParkingQuotaUseCase.observeAsLoadStateFlow()
@@ -149,9 +149,9 @@ class MobileHomeViewModel(
                 if (res is LoadState.Success) _mainGate.value = res
                 else if (res is LoadState.Error) isError = true
             }
-            val cctvJob = launch {
-                val res = getCctvUseCase.observeMainAsLoadStateFlow().first { it !is LoadState.Loading }
-                if (res is LoadState.Success) _mainCctv.value = res
+            val cctvsJob = launch {
+                val res = getCctvUseCase.observeAllAsLoadStateFlow().first { it !is LoadState.Loading }
+                if (res is LoadState.Success) _cctvs.value = res
                 else if (res is LoadState.Error) isError = true
             }
             val parkingJob = launch {
@@ -160,7 +160,7 @@ class MobileHomeViewModel(
                 else if (res is LoadState.Error) isError = true
             }
 
-            joinAll(gateJob, cctvJob, parkingJob)
+            joinAll(gateJob, cctvsJob, parkingJob)
             if (isError) _uiEvent.showSnackbar("Gagal memuat ulang")
             isRefreshing = false
         }

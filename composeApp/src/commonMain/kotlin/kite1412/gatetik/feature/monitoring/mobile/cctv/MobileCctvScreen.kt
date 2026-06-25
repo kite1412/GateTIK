@@ -25,6 +25,7 @@ import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.retain.retain
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -54,6 +55,7 @@ import kite1412.gatetik.getWebRtcStreamUrl
 import kite1412.gatetik.model.Cctv
 import kite1412.gatetik.model.CctvType
 import kite1412.gatetik.network.mock.mockCctvs
+import kite1412.gatetik.rememberRecordAudioPermissionRequester
 import kite1412.gatetik.ui.component.InfoCard
 import kite1412.gatetik.ui.compositionlocal.LocalDarkMode
 import kite1412.gatetik.ui.compositionlocal.LocalSnackbarHostStateWrapper
@@ -105,6 +107,17 @@ private fun MobileCctvScreen(
     var fullScreenCctv by retain { mutableStateOf<Cctv?>(null) }
     var micOnCctvIds by rememberSaveable { mutableStateOf(emptySet<Int>()) }
 
+    var pendingMicOnCctv by retain { mutableStateOf<Cctv?>(null) }
+    val recordAudioPermissionRequester = rememberRecordAudioPermissionRequester { granted ->
+        if (granted) {
+            pendingMicOnCctv?.let { cctv ->
+                micOnCctvIds = micOnCctvIds + cctv.id
+                fullScreenCctv = cctv
+            }
+        }
+        pendingMicOnCctv = null
+    }
+
     PullToRefreshBox(
         isRefreshing = isRefreshing,
         onRefresh = onRefresh,
@@ -136,8 +149,12 @@ private fun MobileCctvScreen(
                             isDarkMode = isDarkMode,
                             isMicOn = isMicOn,
                             onMicOnChange = { isOn ->
-                                micOnCctvIds = if (isOn) micOnCctvIds + cctv.id else micOnCctvIds - cctv.id
-                                if (isOn) fullScreenCctv = cctv
+                                if (isOn) {
+                                    pendingMicOnCctv = cctv
+                                    recordAudioPermissionRequester()
+                                } else {
+                                    micOnCctvIds = micOnCctvIds - cctv.id
+                                }
                             },
                             onFullScreenClick = { fullScreenCctv = cctv }
                         )
@@ -152,11 +169,13 @@ private fun MobileCctvScreen(
                 }
             }
             fullScreenCctv?.let { cctv ->
+                val onDismissRequest = {
+                    fullScreenCctv = null
+                    micOnCctvIds = micOnCctvIds - cctv.id
+                }
+
                 Dialog(
-                    onDismissRequest = {
-                        fullScreenCctv = null
-                        micOnCctvIds = micOnCctvIds - cctv.id
-                    },
+                    onDismissRequest = onDismissRequest,
                     properties = DialogProperties(
                         dismissOnBackPress = true,
                         dismissOnClickOutside = true,
@@ -169,7 +188,7 @@ private fun MobileCctvScreen(
                         verticalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
                         IconButton(
-                            onClick = { fullScreenCctv = null },
+                            onClick = onDismissRequest,
                             modifier = Modifier
                                 .align(Alignment.End)
                                 .padding(end = 16.dp)
@@ -184,15 +203,23 @@ private fun MobileCctvScreen(
                                 .fillMaxWidth()
                                 .aspectRatio(16f / 9f)
                         ) {
-                            WebRtcPlayer(
-                                url = getWebRtcStreamUrl(cctv.path) + if (isMicOn) "&media=video+audio+microphone" else "",
-                                modifier = Modifier.fillMaxSize()
-                            )
+                            val url = getWebRtcStreamUrl(cctv.path) + if (isMicOn) "&media=video+audio+microphone" else ""
+                            key(url) {
+                                WebRtcPlayer(
+                                    url = url,
+                                    modifier = Modifier.fillMaxSize()
+                                )
+                            }
                         }
                         if (cctv.type == CctvType.INTERCOM) IntercomMic(
                             isMicOn = isMicOn,
                             onMicOnChange = { isOn ->
-                                micOnCctvIds = if (isOn) micOnCctvIds + cctv.id else micOnCctvIds - cctv.id
+                                if (isOn) {
+                                    pendingMicOnCctv = cctv
+                                    recordAudioPermissionRequester()
+                                } else {
+                                    micOnCctvIds = micOnCctvIds - cctv.id
+                                }
                             },
                             modifier = Modifier
                                 .align(Alignment.End)
@@ -232,10 +259,13 @@ private fun CctvPlayer(
                         showMessage = false
                     }
                 }
-                WebRtcPlayer(
-                    url = getWebRtcStreamUrl(cctv.path),
-                    modifier = Modifier.fillMaxSize()
-                )
+                val url = getWebRtcStreamUrl(cctv.path)
+                key(url) {
+                    WebRtcPlayer(
+                        url = url,
+                        modifier = Modifier.fillMaxSize()
+                    )
+                }
                 Badge(
                     text = "LIVE",
                     containerColor = Red600,
