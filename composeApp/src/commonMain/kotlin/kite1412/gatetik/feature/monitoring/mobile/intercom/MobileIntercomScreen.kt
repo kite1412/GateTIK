@@ -38,7 +38,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import kite1412.gatetik.MicLevelMonitor
 import kite1412.gatetik.WebRtcPlayer
+import kite1412.gatetik.designsystem.component.AudioLevelMeter
 import kite1412.gatetik.designsystem.component.Badge
 import kite1412.gatetik.designsystem.component.GlassBox
 import kite1412.gatetik.designsystem.component.Icon
@@ -177,7 +179,10 @@ private fun MobileIntercomScreen(
                 }
 
                 Dialog(
-                    onDismissRequest = onDismissRequest,
+                    onDismissRequest = {
+                        onDismissRequest()
+                        MicLevelMonitor.stop()
+                    },
                     properties = DialogProperties(
                         dismissOnBackPress = true,
                         dismissOnClickOutside = true,
@@ -213,20 +218,36 @@ private fun MobileIntercomScreen(
                                 )
                             }
                         }
-                        if (cctv.type == CctvType.INTERCOM) IntercomMic(
-                            isMicOn = isMicOn,
-                            onMicOnChange = { isOn ->
-                                if (isOn) {
-                                    pendingMicOnCctv = cctv
-                                    recordAudioPermissionRequester()
-                                } else {
-                                    micOnCctvIds = micOnCctvIds - cctv.id
-                                }
-                            },
-                            modifier = Modifier
-                                .align(Alignment.End)
-                                .padding(end = 16.dp)
-                        )
+                        if (cctv.type == CctvType.INTERCOM) {
+                            val micLevel by MicLevelMonitor.level.collectAsStateWithLifecycle()
+
+                            LaunchedEffect(isMicOn) {
+                                if (isMicOn) MicLevelMonitor.start() else MicLevelMonitor.stop()
+                            }
+
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(horizontal = 16.dp),
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                if (isMicOn) AudioLevelMeter(level = micLevel) else Box(Modifier.size(1.dp))
+
+                                IntercomMic(
+                                    isMicOn = isMicOn,
+                                    onMicOnChange = { isOn ->
+                                        if (isOn) {
+                                            pendingMicOnCctv = cctv
+                                            recordAudioPermissionRequester()
+                                        } else {
+                                            micOnCctvIds = micOnCctvIds - cctv.id
+                                            MicLevelMonitor.stop()
+                                        }
+                                    }
+                                )
+                            }
+                        }
                     }
                 }
             }
