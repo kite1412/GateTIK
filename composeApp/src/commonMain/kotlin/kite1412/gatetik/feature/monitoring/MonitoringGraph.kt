@@ -18,6 +18,7 @@ import kite1412.gatetik.feature.monitoring.desktop.settings.desktopSettingsScree
 import kite1412.gatetik.feature.monitoring.desktop.usermanagement.desktopUserManagementScreen
 import kite1412.gatetik.feature.monitoring.mobile.cctv.mobileCctvScreen
 import kite1412.gatetik.feature.monitoring.mobile.home.mobileHomeScreen
+import kite1412.gatetik.feature.monitoring.mobile.intercom.mobileIntercomScreen
 import kite1412.gatetik.feature.monitoring.mobile.parking.mobileParkingScreen
 import kite1412.gatetik.feature.shared.SharedGraph
 import kite1412.gatetik.feature.shared.profile.profileScreen
@@ -101,7 +102,7 @@ object MonitoringGraph : Graph {
 
     object Mobile : RootDestinationsProvider {
         override val rootDestinations: List<RootDestination> = listOf(
-            Home, Parking, Cctv, Profile
+            Home, Parking, Cctv, Intercom, Profile
         )
 
         object Home : RootDestination, Route("mobile_monitoring_home") {
@@ -120,6 +121,12 @@ object MonitoringGraph : Graph {
             override val route: String = name
             override val icon: DrawableResource = GateTikIcons.videoRecorder
             override val label: String = "CCTV"
+        }
+
+        object Intercom : RootDestination, Route("mobile_monitoring_intercom") {
+            override val route: String = name
+            override val icon: DrawableResource = GateTikIcons.phoneCall
+            override val label: String = "Interkom"
         }
 
         object Profile : RootDestination {
@@ -150,15 +157,18 @@ private fun NavGraphBuilder.mobileMonitoringGraph(
     scaffoldPadding: PaddingValues,
     navigateToRootDestination: (RootDestination) -> Unit
 ) {
+    val contentPadding = smallContentPadding(scaffoldPadding)
+
     mobileHomeScreen(
-        contentPadding = smallContentPadding(scaffoldPadding),
+        contentPadding = contentPadding,
         navigateToParking = { navigateToRootDestination(MonitoringGraph.Mobile.Parking) },
         navigateToCctv = { navigateToRootDestination(MonitoringGraph.Mobile.Cctv) }
     )
-    mobileParkingScreen(contentPadding = smallContentPadding(scaffoldPadding))
-    mobileCctvScreen(contentPadding = smallContentPadding(scaffoldPadding))
+    mobileParkingScreen(contentPadding = contentPadding)
+    mobileCctvScreen(contentPadding = contentPadding)
+    mobileIntercomScreen(contentPadding = contentPadding)
     profileScreen(
         useDefaultHeader = true,
-        contentPadding = smallContentPadding(scaffoldPadding)
+        contentPadding = contentPadding
     )
 }

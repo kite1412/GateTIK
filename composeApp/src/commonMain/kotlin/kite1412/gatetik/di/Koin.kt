@@ -14,6 +14,7 @@ import kite1412.gatetik.feature.monitoring.desktop.settings.DesktopSettingsViewM
 import kite1412.gatetik.feature.monitoring.desktop.usermanagement.DesktopUserManagementViewModel
 import kite1412.gatetik.feature.monitoring.mobile.cctv.MobileCctvViewModel
 import kite1412.gatetik.feature.monitoring.mobile.home.MobileHomeViewModel
+import kite1412.gatetik.feature.monitoring.mobile.intercom.MobileIntercomViewModel
 import kite1412.gatetik.feature.monitoring.mobile.parking.MobileParkingViewModel
 import kite1412.gatetik.feature.shared.authentication.AuthenticationViewModel
 import kite1412.gatetik.feature.shared.profile.ProfileViewModel
@@ -71,6 +72,11 @@ private val mobileMonitoringViewModelModule = module {
     viewModel {
         MobileParkingViewModel(
             getMainParkingQuotaUseCase = get()
+        )
+    }
+    viewModel {
+        MobileIntercomViewModel(
+            getCctvUseCase = get()
         )
     }
 }

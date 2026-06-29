@@ -1,4 +1,4 @@
-package kite1412.gatetik.feature.monitoring.mobile.cctv
+package kite1412.gatetik.feature.monitoring.mobile.intercom
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
@@ -71,13 +71,13 @@ import org.koin.compose.viewmodel.koinViewModel
 import kotlin.time.Duration.Companion.seconds
 
 @Composable
-fun MobileCctvScreen(
+fun MobileIntercomScreen(
     contentPadding: PaddingValues,
     modifier: Modifier = Modifier,
-    viewModel: MobileCctvViewModel = koinViewModel()
+    viewModel: MobileIntercomViewModel = koinViewModel()
 ) {
     val snackbarHostStateWrapper = LocalSnackbarHostStateWrapper.current
-    val cctvs by viewModel.cctvs.collectAsStateWithLifecycle()
+    val intercomCameras by viewModel.intercomCameras.collectAsStateWithLifecycle()
 
     LaunchedEffect(Unit) {
         viewModel.uiEvent.collect { event ->
@@ -86,8 +86,8 @@ fun MobileCctvScreen(
         }
     }
 
-    MobileCctvScreen(
-        cctvs = cctvs,
+    MobileIntercomScreen(
+        intercomCameras = intercomCameras,
         isRefreshing = viewModel.isRefreshing,
         onRefresh = viewModel::onRefresh,
         contentPadding = contentPadding,
@@ -96,8 +96,8 @@ fun MobileCctvScreen(
 }
 
 @Composable
-private fun MobileCctvScreen(
-    cctvs: LoadState<List<Cctv>>,
+private fun MobileIntercomScreen(
+    intercomCameras: LoadState<List<Cctv>>,
     isRefreshing: Boolean,
     onRefresh: () -> Unit,
     contentPadding: PaddingValues,
@@ -127,7 +127,7 @@ private fun MobileCctvScreen(
             modifier = Modifier.fillMaxSize()
         ) {
             UiLoadState(
-                state = cctvs,
+                state = intercomCameras,
                 modifier = Modifier.fillMaxSize(),
                 onRetry = onRefresh
             ) {
@@ -140,11 +140,11 @@ private fun MobileCctvScreen(
                 ) {
                     item {
                         SectionHeader(
-                            title = "CCTV",
-                            subtitle = "Sistem monitoring area gate"
+                            title = "Interkom",
+                            subtitle = "Komunikasi dua arah area gate"
                         )
                     }
-                    items(cctvs.data ?: emptyList()) { cctv ->
+                    items(intercomCameras.data ?: emptyList()) { cctv ->
                         val isMicOn = micOnCctvIds.contains(cctv.id)
                         CctvPlayer(
                             cctv = cctv,
@@ -163,9 +163,9 @@ private fun MobileCctvScreen(
                     }
                     item {
                         InfoCard(
-                            icon = painterResource(GateTikIcons.videoRecorder),
-                            title = "CCTV Monitoring",
-                            description = "Sistem monitoring untuk memantau aktivitas di area gate."
+                            icon = painterResource(GateTikIcons.phone),
+                            title = "Interkom Gate",
+                            description = "Gunakan fitur ini untuk berkomunikasi dengan pengunjung di area gate."
                         )
                     }
                 }
@@ -362,15 +362,15 @@ private fun IntercomMic(
 
 @DevicePreviews
 @Composable
-private fun MobileCctvScreenPreview() {
+private fun MobileIntercomScreenPreview() {
     GateTikTheme {
         Scaffold { p ->
-              MobileCctvScreen(
-                  cctvs = LoadState.Success(mockCctvs),
-                  isRefreshing = false,
-                  onRefresh = {},
-                  contentPadding = p
-              )
+            MobileIntercomScreen(
+                intercomCameras = LoadState.Success(mockCctvs.filter { it.type == CctvType.INTERCOM }),
+                isRefreshing = false,
+                onRefresh = {},
+                contentPadding = p
+            )
         }
     }
 }
