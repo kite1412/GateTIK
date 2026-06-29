@@ -8,12 +8,14 @@ import kite1412.gatetik.domain.domainModule
 import kite1412.gatetik.feature.monitoring.desktop.accesslogs.DesktopAccessLogsViewModel
 import kite1412.gatetik.feature.monitoring.desktop.cctv.DesktopCctvViewModel
 import kite1412.gatetik.feature.monitoring.desktop.dashboard.DesktopDashboardViewModel
+import kite1412.gatetik.feature.monitoring.desktop.intercom.DesktopIntercomViewModel
 import kite1412.gatetik.feature.monitoring.desktop.parking.DesktopParkingViewModel
 import kite1412.gatetik.feature.monitoring.desktop.profile.DesktopProfileViewModel
 import kite1412.gatetik.feature.monitoring.desktop.settings.DesktopSettingsViewModel
 import kite1412.gatetik.feature.monitoring.desktop.usermanagement.DesktopUserManagementViewModel
 import kite1412.gatetik.feature.monitoring.mobile.cctv.MobileCctvViewModel
 import kite1412.gatetik.feature.monitoring.mobile.home.MobileHomeViewModel
+import kite1412.gatetik.feature.monitoring.mobile.intercom.MobileIntercomViewModel
 import kite1412.gatetik.feature.monitoring.mobile.parking.MobileParkingViewModel
 import kite1412.gatetik.feature.shared.authentication.AuthenticationViewModel
 import kite1412.gatetik.feature.shared.profile.ProfileViewModel
@@ -71,6 +73,11 @@ private val mobileMonitoringViewModelModule = module {
     viewModel {
         MobileParkingViewModel(
             getMainParkingQuotaUseCase = get()
+        )
+    }
+    viewModel {
+        MobileIntercomViewModel(
+            getCctvUseCase = get()
         )
     }
 }
@@ -131,6 +138,13 @@ private val desktopMonitoringViewModel = module {
             authentication = get(),
             updateProfileUseCase = get(),
             resetPasswordUseCase = get()
+        )
+    }
+    viewModel {
+        DesktopIntercomViewModel(
+            authentication = get(),
+            dataStore = get(),
+            getCctvUseCase = get()
         )
     }
 }

@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.retain.retain
@@ -17,8 +18,11 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kite1412.gatetik.AppWindow
+import kite1412.gatetik.MicLevelMonitor
 import kite1412.gatetik.WebRtcPlayer
+import kite1412.gatetik.designsystem.component.AudioLevelMeter
 import kite1412.gatetik.designsystem.component.Badge
 import kite1412.gatetik.designsystem.extension.radialBackground
 import kite1412.gatetik.designsystem.theme.Emerald500
@@ -36,10 +40,18 @@ fun CctvWindow(
     autoMicOn: Boolean = false
 ) {
     var isMicOn by retain { mutableStateOf(autoMicOn) }
+    val micLevel by MicLevelMonitor.level.collectAsStateWithLifecycle()
+
+    LaunchedEffect(isMicOn) {
+        if (isMicOn) MicLevelMonitor.start() else MicLevelMonitor.stop()
+    }
 
     AppWindow(
         title = cctv.cameraName,
-        onClose = onClose
+        onClose = {
+            MicLevelMonitor.stop()
+            onClose()
+        }
     ) {
         GateTikTheme {
             Column(
@@ -100,6 +112,9 @@ fun CctvWindow(
                             verticalAlignment = Alignment.CenterVertically,
                             horizontalArrangement = Arrangement.spacedBy(8.dp)
                         ) {
+                            if (isMicOn) {
+                                AudioLevelMeter(level = micLevel)
+                            }
                             Text(
                                 text = if (isMicOn) "MIC ON" else "MIC OFF",
                                 style = MaterialTheme.typography.labelMedium,

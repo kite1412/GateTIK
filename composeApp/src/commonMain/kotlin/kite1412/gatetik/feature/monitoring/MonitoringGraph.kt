@@ -12,12 +12,14 @@ import kite1412.gatetik.feature.Route
 import kite1412.gatetik.feature.monitoring.desktop.accesslogs.desktopAccessLogsScreen
 import kite1412.gatetik.feature.monitoring.desktop.cctv.desktopCctvScreen
 import kite1412.gatetik.feature.monitoring.desktop.dashboard.desktopDashboardScreen
+import kite1412.gatetik.feature.monitoring.desktop.intercom.desktopIntercomScreen
 import kite1412.gatetik.feature.monitoring.desktop.parking.desktopParkingScreen
 import kite1412.gatetik.feature.monitoring.desktop.profile.desktopProfileScreen
 import kite1412.gatetik.feature.monitoring.desktop.settings.desktopSettingsScreen
 import kite1412.gatetik.feature.monitoring.desktop.usermanagement.desktopUserManagementScreen
 import kite1412.gatetik.feature.monitoring.mobile.cctv.mobileCctvScreen
 import kite1412.gatetik.feature.monitoring.mobile.home.mobileHomeScreen
+import kite1412.gatetik.feature.monitoring.mobile.intercom.mobileIntercomScreen
 import kite1412.gatetik.feature.monitoring.mobile.parking.mobileParkingScreen
 import kite1412.gatetik.feature.shared.SharedGraph
 import kite1412.gatetik.feature.shared.profile.profileScreen
@@ -53,7 +55,7 @@ object MonitoringGraph : Graph {
 
     object Desktop : RootDestinationsProvider {
         override val rootDestinations: List<RootDestination> = listOf(
-            Dashboard, Cctv, Parking, UserManagement, AccessLogs, Settings, Profile
+            Dashboard, Cctv, Intercom, Parking, UserManagement, AccessLogs, Settings, Profile
         )
 
         object Dashboard : RootDestination, Route("desktop_monitoring_dashboard") {
@@ -66,6 +68,12 @@ object MonitoringGraph : Graph {
             override val route: String = name
             override val icon: DrawableResource = GateTikIcons.videoRecorder
             override val label: String = "CCTV Monitoring"
+        }
+
+        object Intercom : RootDestination, Route("desktop_monitoring_intercom") {
+            override val route: String = name
+            override val icon: DrawableResource = GateTikIcons.phoneCall
+            override val label: String = "Interkom"
         }
 
         object Parking : RootDestination, Route("desktop_monitoring_parking") {
@@ -101,7 +109,7 @@ object MonitoringGraph : Graph {
 
     object Mobile : RootDestinationsProvider {
         override val rootDestinations: List<RootDestination> = listOf(
-            Home, Parking, Cctv, Profile
+            Home, Parking, Cctv, Intercom, Profile
         )
 
         object Home : RootDestination, Route("mobile_monitoring_home") {
@@ -122,6 +130,12 @@ object MonitoringGraph : Graph {
             override val label: String = "CCTV"
         }
 
+        object Intercom : RootDestination, Route("mobile_monitoring_intercom") {
+            override val route: String = name
+            override val icon: DrawableResource = GateTikIcons.phoneCall
+            override val label: String = "Interkom"
+        }
+
         object Profile : RootDestination {
             override val route: String = SharedGraph.ProfileRoute.name
             override val icon: DrawableResource = GateTikIcons.person
@@ -132,33 +146,38 @@ object MonitoringGraph : Graph {
 
 private fun NavGraphBuilder.desktopMonitoringGraph(
     scaffoldPadding: PaddingValues,
-    navigateToRootDestination: (RootDestination) -> Unit
+    navigateToRootDestination: (RootDestination) -> Unit,
+    contentPadding: PaddingValues = normalContentPadding(scaffoldPadding)
 ) {
     desktopDashboardScreen(
-        contentPadding = normalContentPadding(scaffoldPadding),
+        contentPadding = contentPadding,
         navigateToAccessLogs = { navigateToRootDestination(MonitoringGraph.Desktop.AccessLogs) }
     )
-    desktopCctvScreen(contentPadding = normalContentPadding(scaffoldPadding))
-    desktopParkingScreen(contentPadding = normalContentPadding(scaffoldPadding))
-    desktopUserManagementScreen(contentPadding = normalContentPadding(scaffoldPadding))
-    desktopAccessLogsScreen(contentPadding = normalContentPadding(scaffoldPadding))
-    desktopSettingsScreen(contentPadding = normalContentPadding(scaffoldPadding))
-    desktopProfileScreen(contentPadding = normalContentPadding(scaffoldPadding))
+    desktopCctvScreen(contentPadding = contentPadding)
+    desktopIntercomScreen(contentPadding = contentPadding)
+    desktopParkingScreen(contentPadding = contentPadding)
+    desktopUserManagementScreen(contentPadding = contentPadding)
+    desktopAccessLogsScreen(contentPadding = contentPadding)
+    desktopSettingsScreen(contentPadding = contentPadding)
+    desktopProfileScreen(contentPadding = contentPadding)
 }
 
 private fun NavGraphBuilder.mobileMonitoringGraph(
     scaffoldPadding: PaddingValues,
     navigateToRootDestination: (RootDestination) -> Unit
 ) {
+    val contentPadding = smallContentPadding(scaffoldPadding)
+
     mobileHomeScreen(
-        contentPadding = smallContentPadding(scaffoldPadding),
+        contentPadding = contentPadding,
         navigateToParking = { navigateToRootDestination(MonitoringGraph.Mobile.Parking) },
         navigateToCctv = { navigateToRootDestination(MonitoringGraph.Mobile.Cctv) }
     )
-    mobileParkingScreen(contentPadding = smallContentPadding(scaffoldPadding))
-    mobileCctvScreen(contentPadding = smallContentPadding(scaffoldPadding))
+    mobileParkingScreen(contentPadding = contentPadding)
+    mobileCctvScreen(contentPadding = contentPadding)
+    mobileIntercomScreen(contentPadding = contentPadding)
     profileScreen(
         useDefaultHeader = true,
-        contentPadding = smallContentPadding(scaffoldPadding)
+        contentPadding = contentPadding
     )
 }
