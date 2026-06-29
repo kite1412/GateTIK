@@ -18,11 +18,11 @@ import kite1412.gatetik.feature.monitoring.desktop.cctv.CctvTabSelector
 
 @Composable
 fun CctvActionBar(
-    selectedTab: CctvTab,
-    onTabSelected: (CctvTab) -> Unit,
     searchQuery: String,
     onSearchQueryChange: (String) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    selectedTab: CctvTab? = null,
+    onTabSelected: ((CctvTab) -> Unit)? = null
 ) {
     GlassBox(
         modifier = modifier.fillMaxWidth(),
@@ -33,10 +33,12 @@ fun CctvActionBar(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            CctvTabSelector(
-                selectedTab = selectedTab,
-                onTabSelected = onTabSelected
-            )
+            if (selectedTab != null && onTabSelected != null) {
+                CctvTabSelector(
+                    selectedTab = selectedTab,
+                    onTabSelected = onTabSelected
+                )
+            }
 
             SearchField(
                 value = searchQuery,

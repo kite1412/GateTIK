@@ -12,6 +12,7 @@ import kite1412.gatetik.feature.Route
 import kite1412.gatetik.feature.monitoring.desktop.accesslogs.desktopAccessLogsScreen
 import kite1412.gatetik.feature.monitoring.desktop.cctv.desktopCctvScreen
 import kite1412.gatetik.feature.monitoring.desktop.dashboard.desktopDashboardScreen
+import kite1412.gatetik.feature.monitoring.desktop.intercom.desktopIntercomScreen
 import kite1412.gatetik.feature.monitoring.desktop.parking.desktopParkingScreen
 import kite1412.gatetik.feature.monitoring.desktop.profile.desktopProfileScreen
 import kite1412.gatetik.feature.monitoring.desktop.settings.desktopSettingsScreen
@@ -54,7 +55,7 @@ object MonitoringGraph : Graph {
 
     object Desktop : RootDestinationsProvider {
         override val rootDestinations: List<RootDestination> = listOf(
-            Dashboard, Cctv, Parking, UserManagement, AccessLogs, Settings, Profile
+            Dashboard, Cctv, Intercom, Parking, UserManagement, AccessLogs, Settings, Profile
         )
 
         object Dashboard : RootDestination, Route("desktop_monitoring_dashboard") {
@@ -67,6 +68,12 @@ object MonitoringGraph : Graph {
             override val route: String = name
             override val icon: DrawableResource = GateTikIcons.videoRecorder
             override val label: String = "CCTV Monitoring"
+        }
+
+        object Intercom : RootDestination, Route("desktop_monitoring_intercom") {
+            override val route: String = name
+            override val icon: DrawableResource = GateTikIcons.phoneCall
+            override val label: String = "Interkom"
         }
 
         object Parking : RootDestination, Route("desktop_monitoring_parking") {
@@ -139,18 +146,20 @@ object MonitoringGraph : Graph {
 
 private fun NavGraphBuilder.desktopMonitoringGraph(
     scaffoldPadding: PaddingValues,
-    navigateToRootDestination: (RootDestination) -> Unit
+    navigateToRootDestination: (RootDestination) -> Unit,
+    contentPadding: PaddingValues = normalContentPadding(scaffoldPadding)
 ) {
     desktopDashboardScreen(
-        contentPadding = normalContentPadding(scaffoldPadding),
+        contentPadding = contentPadding,
         navigateToAccessLogs = { navigateToRootDestination(MonitoringGraph.Desktop.AccessLogs) }
     )
-    desktopCctvScreen(contentPadding = normalContentPadding(scaffoldPadding))
-    desktopParkingScreen(contentPadding = normalContentPadding(scaffoldPadding))
-    desktopUserManagementScreen(contentPadding = normalContentPadding(scaffoldPadding))
-    desktopAccessLogsScreen(contentPadding = normalContentPadding(scaffoldPadding))
-    desktopSettingsScreen(contentPadding = normalContentPadding(scaffoldPadding))
-    desktopProfileScreen(contentPadding = normalContentPadding(scaffoldPadding))
+    desktopCctvScreen(contentPadding = contentPadding)
+    desktopIntercomScreen(contentPadding = contentPadding)
+    desktopParkingScreen(contentPadding = contentPadding)
+    desktopUserManagementScreen(contentPadding = contentPadding)
+    desktopAccessLogsScreen(contentPadding = contentPadding)
+    desktopSettingsScreen(contentPadding = contentPadding)
+    desktopProfileScreen(contentPadding = contentPadding)
 }
 
 private fun NavGraphBuilder.mobileMonitoringGraph(
