@@ -16,5 +16,5 @@ actual fun rememberNotificationPermissionRequester(onResult: (Boolean) -> Unit):
         return {
             launcher.launch(NotificationPermissionController.getPermissionString())
         }
-    } else return {}
+    } else return { onResult(true) }
 }
