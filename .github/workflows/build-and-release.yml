@@ -2,7 +2,7 @@ name: Build & Release Installers
 
 env:
   APP_NAME: GateTIK
-  VERSION: 2.3.0
+  VERSION: 2.3.1
 
 on:
   push:
